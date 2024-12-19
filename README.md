@@ -8,3 +8,6 @@ https://github.com/github/gitignore/tree/main
 virtualenv -p python3 env1  # env1 envname
 
 Activate the env command => . env1/bin/activate
+
+## pip commands
+pip freeze > requirements.txt

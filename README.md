@@ -10,8 +10,15 @@ virtualenv -p python3 env1  # env1 envname
 Activate the env command => . env1/bin/activate
 
 ## pip commands
-pip freeze > requirements.txt
+pip freeze >> requirements.txt
 
+pip install -r requirements.txt
+
+
+
+##
+##
+##
 ## autopep8 ref
 Open your command palette with Shift + Ctrl + P. Type in Preferences: Open Workspace Settings. 
 

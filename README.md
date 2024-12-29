@@ -17,8 +17,6 @@ pip install -r requirements.txt
 
 
 ##
-##
-##
 ## autopep8 ref
 Open your command palette with Shift + Ctrl + P. Type in Preferences: Open Workspace Settings. 
 

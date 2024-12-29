@@ -15,6 +15,8 @@ pip freeze >> requirements.txt
 pip install -r requirements.txt
 
 
+## Python formatter for vscode
+Black Formatter
 
 ##
 ## autopep8 ref

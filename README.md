@@ -9,6 +9,12 @@ python -m venv /env  # env1 envname
 
 Activate the env command => . env/Scripts/activate
 
+#### virtualenv note
+Note : Don't create the source code is inside the virtual environment, that is, in the same directory that holds bin/, lib/, and pyvenv.cfg
+
+use this project like folder structure
+
+
 ## pip commands
 pip freeze >> requirements.txt
 

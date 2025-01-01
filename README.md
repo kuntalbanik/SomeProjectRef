@@ -5,9 +5,9 @@ Backend development practice
 https://github.com/github/gitignore/tree/main
 
 ## Create Virtual env
-virtualenv -p python3 env1  # env1 envname
+python -m venv /env  # env1 envname
 
-Activate the env command => . env1/bin/activate
+Activate the env command => . env/Scripts/activate
 
 ## pip commands
 pip freeze >> requirements.txt
@@ -17,21 +17,21 @@ pip install -r requirements.txt
 
 ## Python formatter for vscode
 Black Formatter
-
-##
-## autopep8 ref
-
-### testing only
-Open your command palette with Shift + Ctrl + P. Type in Preferences: Open Workspace Settings. 
-
+## black formatter settings
+<!-- "pip install black"  on your activated virtualenv -->
+<!-- settings for windows. change it for linux as required  -->
+<!-- Press <ctrl> + <shift> + p  -> Preferences: Open workspace settings (JSON) -> paste the below settings in to it -> change the virtualenv path and .exe accordingly -->
 
 {
-    "python.pythonPath": "${workspaceFolder}/backend/env/bin/python3",
-    "python.venvPath": "${workspaceFolder}/backend/env",
-    "python.linting.flake8Enabled": true,
-    "python.linting.flake8Path": "flake8",
-    "python.linting.flake8Args": ["--ignore", "E501"],
-    "python.linting.pylintEnabled": true,
-    "python.linting.pylintPath": "pylint",
-    "python.linting.pylintArgs": ["--load-plugins", "pylint_django"]
+    "black-formatter.importStrategy": "fromEnvironment",
+    "black-formatter.interpreter": ["${workspaceFolder}\\env\\Scripts\\python.exe"],
+    "black-formatter.path": ["${workspaceFolder}\\env\\Scripts\\black.exe"],
+    "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.rulers": [
+        88,
+        120
+      ]
+  }
 }

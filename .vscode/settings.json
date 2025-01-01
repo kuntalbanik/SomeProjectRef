@@ -1,3 +1,42 @@
 {
-    
+    "black-formatter.importStrategy": "fromEnvironment",
+    "black-formatter.interpreter": ["${workspaceFolder}\\env\\Scripts\\python.exe"],
+    "black-formatter.path": ["${workspaceFolder}\\env\\Scripts\\black.exe"],
+    "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.rulers": [
+        88,
+        120
+      ],
+  }
 }
+
+// Black console log error
+// 2025-01-01 11:47:05.607 [info] [Warn  - 11:47:05 AM] Skipping standard library file: c:\Users\gan\Desktop\BackendDev\monthly_challenges\manage.py
+// The problem happens when the source code is inside the virtual environment, that is, in the same directory that holds bin/, lib/, and pyvenv.cfg:
+// 
+// 
+// 
+// Trying some settings
+// 
+//   {
+//     "[python]": {
+//       "editor.codeActionsOnSave": {
+//         "source.fixAll": true,
+//         "source.organizeImports": true
+//       },
+//       "editor.defaultFormatter": "ms-python.black-formatter",
+//       "editor.formatOnSave": true,
+//       "editor.rulers": [
+//         88,
+//         120
+//       ]
+//     },
+//     "black-formatter.importStrategy": "fromEnvironment",
+//     "black-formatter.interpreter": [
+//       "${workspaceFolder}/.venv/bin/python"
+//     ],
+//     "black-formatter.path": ["${workspaceFolder}/.venv/bin/black"],
+//     "isort.args": ["--profile", "black"],
+//   }

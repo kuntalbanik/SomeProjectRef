@@ -13,6 +13,7 @@ if len(list_one) > len(list_two):
 else:
     list_length = len(list_one)
 
+
 print(list_length)
 
 for item in range(list_length):

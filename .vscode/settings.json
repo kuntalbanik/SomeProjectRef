@@ -6,8 +6,7 @@
     "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.formatOnSave": true,
     "editor.rulers": [
-        88,
-        120
+        80
       ],
   }
 }

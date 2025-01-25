@@ -16,3 +16,6 @@ class Student:
 student_obj = Student()
 student_obj.setname("John")
 print(student_obj.getname())
+
+
+def nothing(): ...

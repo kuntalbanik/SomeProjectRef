@@ -7,41 +7,40 @@
 
 # Bike shop class
 class BikeShop:
-    __avail_bikes = 100
     __cost_per_bike = 25
 
-    def __init__(self):
-        pass
+    def __init__(self, bikes):
+        self.__bikes = bikes
 
     def show_available_bikes(self):
-        print(self.__avail_bikes)
+        print("Total Bikes", self.__bikes)
 
     def order_qty(self, qty):
-        if self.__avail_bikes < 1:
-            print("No bikes available to book...")
-        elif qty <= self.__avail_bikes:
-            print("elif block")
-            self.__avail_bikes = self.__avail_bikes - qty
+        if self.__bikes < 1:
+            print("No __bikes available to book...")
+        elif qty <= self.__bikes:
+            self.__bikes = self.__bikes - qty
+            print(self.__bikes)
             print("Bikes has been booked. Costing $" + str(qty * self.__cost_per_bike))
         else:
             print("Our available qty 100")
 
 
+bike_obj = BikeShop(100)
 while True:
-    bike_obj = BikeShop()
-    option_string = """
+    input_data = int(
+        input(
+            """
     1. Show available bikes
     2. Reserve bikes
     3. Quit
     """
-    print(option_string)
-    input_data = int(input("Enter option within range"))
+        )
+    )
     if input_data == 1:
         bike_obj.show_available_bikes()
-    if input_data == 2:
-        bike_qty = input("Enter bike qty : ")
+    elif input_data == 2:
+        bike_qty = int(input("Enter bike qty : "))
         bike_obj.order_qty(bike_qty)
-    if input_data == 3:
-        break
     else:
-        print("Option not available")
+        break

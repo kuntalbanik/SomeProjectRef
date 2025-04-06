@@ -17,13 +17,13 @@ class BikeShop:
 
     def order_qty(self, qty):
         if self.__bikes < 1:
-            print("No __bikes available to book...")
+            print("No bikes available to book...")
         elif qty <= self.__bikes:
             self.__bikes = self.__bikes - qty
             print(self.__bikes)
             print("Bikes has been booked. Costing $" + str(qty * self.__cost_per_bike))
         else:
-            print("Our available qty 100")
+            print("Bikes available " + str(self.__bikes))
 
 
 bike_obj = BikeShop(100)

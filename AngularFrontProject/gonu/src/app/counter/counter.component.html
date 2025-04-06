@@ -1,0 +1,42 @@
+<div class="main">
+  <h1>Count Your Click</h1>
+  <h2 class="counter">{{ counter }}</h2>
+  <div>
+    <button class="btn danger" (click)="btnEventHandle('dec')">
+      Decrement
+    </button>
+    <button class="btn reset" (click)="btnEventHandle('')">Reset</button>
+    <button class="btn submit" (click)="btnEventHandle('inc')">
+      Increment
+    </button>
+  </div>
+  <button class="button" (click)="handleEvent($event)">Click Event</button>
+  <!-- $event is special variable that contains al values for that event call  -->
+
+  <div class="eventdiv" (mouseenter)="handleEvent2($event)"></div>
+  <div class="eventdiv2" (mouseleave)="handleEvent2($event)"></div>
+  <br />
+  <input
+    type="text"
+    (input)="handleEvent3($event)"
+    (focus)="handleEvent3($event)"
+    (blur)="handleEvent3($event)"
+    name="user"
+  />
+
+  <br /><br />
+
+  <h1>Welcome : {{ displayName }}</h1>
+  <input
+    type="text"
+    (input)="inputStorage($event)"
+    placeholder="Enter User Name"
+  />
+  <br /><br />
+  <button (click)="showName()">Get Name</button>
+
+  <br /><br />
+  <!-- Template reference variable -->
+  <input type="text" placeholder="enter email" #emailField>
+  <button (click)="getMail(emailField.value)">Get Mail</button>
+</div>

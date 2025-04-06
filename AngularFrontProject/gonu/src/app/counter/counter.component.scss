@@ -1,0 +1,53 @@
+.main {
+  text-align: center;
+}
+
+.counter {
+  width: 100px;
+  margin: auto;
+  padding: 10px;
+  background-color: blueviolet;
+  margin-bottom: 20px;
+}
+
+.btn {
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  border: 1px solid rgb(0, 0, 0);
+  margin: 10px;
+  color: white;
+  cursor: pointer;
+}
+
+.danger {
+  background-color: red;
+}
+
+.reset {
+  background-color: chocolate;
+}
+
+.submit {
+  background-color: rgb(0, 129, 0);
+}
+
+.btn:hover {
+  border: 1px solid white;
+}
+
+.eventdiv {
+  height: 80px;
+  width: 80px;
+  background-color: blueviolet;
+  margin: auto;
+  margin-top: 20px;
+}
+
+.eventdiv2 {
+  height: 80px;
+  width: 80px;
+  background-color: rgb(32, 233, 196);
+  margin: auto;
+  margin-top: 20px;
+}

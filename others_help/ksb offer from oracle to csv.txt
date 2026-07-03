@@ -1,0 +1,14 @@
+KSB Offer From Oracle site
+--------------------------
+1) Convert only product pages from PDF to image ".jpg"
+2) Open chatGPT in "incognito window" (Google Chrome) 
+   upload only 3 files at a time.
+3) Give the following prompt
+
+Make it single comma separated data with the following columns. 
+Sl., Material Code, Part No, Item Descriptions, Qty, Rate, Amount
+
+Generate comma separated data
+
+**There are only 3 files can upload at a time. So, more files need to 
+  be open "incognito window" twice / thrice.

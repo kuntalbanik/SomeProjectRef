@@ -1,0 +1,127 @@
+
+<style>
+.bridge-table { width:100%; border-collapse:collapse; font-size:13px; }
+.bridge-table th { font-size:11px; font-weight:500; color:var(--color-text-tertiary); text-transform:uppercase; letter-spacing:.05em; padding:8px 12px; border-bottom:0.5px solid var(--color-border-tertiary); text-align:left; }
+.bridge-table td { padding:10px 12px; border-bottom:0.5px solid var(--color-border-tertiary); vertical-align:top; line-height:1.5; }
+.bridge-table tr:last-child td { border-bottom:none; }
+.bridge-table tr:hover td { background:var(--color-background-secondary); }
+.code { font-family:var(--font-mono); font-size:12px; background:var(--color-background-secondary); padding:2px 6px; border-radius:4px; color:var(--color-text-primary); }
+.pill { display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px; font-weight:500; }
+.same { background:#E1F5EE; color:#085041; }
+.diff { background:#FAEEDA; color:#633806; }
+.new  { background:#EEEDFE; color:#3C3489; }
+.section-head td { background:var(--color-background-secondary); font-size:11px; font-weight:500; color:var(--color-text-tertiary); text-transform:uppercase; letter-spacing:.05em; padding:6px 12px; }
+</style>
+
+<h2 class="sr-only">Comparison of Python and Go concepts for someone transitioning from Python to Go</h2>
+
+<div style="padding:1rem 0 0;">
+<div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+  <span class="pill same">Same idea</span>
+  <span class="pill diff">Different in Go</span>
+  <span class="pill new">New concept in Go</span>
+</div>
+
+<table class="bridge-table">
+  <tr>
+    <th style="width:28%">Concept</th>
+    <th style="width:36%">Python you know</th>
+    <th style="width:36%">Go equivalent</th>
+  </tr>
+
+  <tr class="section-head"><td colspan="3">Basics</td></tr>
+  <tr>
+    <td>Variables <span class="pill same">Same</span></td>
+    <td><span class="code">name = "Raju"</span></td>
+    <td><span class="code">name := "Raju"</span> — Go infers type</td>
+  </tr>
+  <tr>
+    <td>Functions <span class="pill same">Same</span></td>
+    <td><span class="code">def greet(name):</span></td>
+    <td><span class="code">func greet(name string) {}</span></td>
+  </tr>
+  <tr>
+    <td>If / else <span class="pill same">Same</span></td>
+    <td><span class="code">if x > 0:</span></td>
+    <td><span class="code">if x > 0 {}</span> — no colon, needs braces</td>
+  </tr>
+  <tr>
+    <td>For loop <span class="pill diff">Different</span></td>
+    <td><span class="code">for i in range(10):</span></td>
+    <td><span class="code">for i := 0; i &lt; 10; i++ {}</span></td>
+  </tr>
+  <tr>
+    <td>Lists / arrays <span class="pill diff">Different</span></td>
+    <td><span class="code">nums = [1, 2, 3]</span></td>
+    <td><span class="code">nums := []int{1, 2, 3}</span> — typed slices</td>
+  </tr>
+  <tr>
+    <td>Dictionaries <span class="pill diff">Different</span></td>
+    <td><span class="code">d = {"key": "val"}</span></td>
+    <td><span class="code">m := map[string]string{}</span></td>
+  </tr>
+
+  <tr class="section-head"><td colspan="3">Structure and types</td></tr>
+  <tr>
+    <td>Class <span class="pill diff">Different</span></td>
+    <td><span class="code">class Server:</span></td>
+    <td><span class="code">type Server struct {}</span> — structs, not classes</td>
+  </tr>
+  <tr>
+    <td>Methods <span class="pill same">Same idea</span></td>
+    <td><span class="code">def start(self):</span></td>
+    <td><span class="code">func (s Server) Start() {}</span></td>
+  </tr>
+  <tr>
+    <td>Inheritance <span class="pill diff">Different</span></td>
+    <td><span class="code">class B(A):</span></td>
+    <td>No inheritance — Go uses composition instead</td>
+  </tr>
+  <tr>
+    <td>Abstract class <span class="pill diff">Different</span></td>
+    <td><span class="code">from abc import ABC</span></td>
+    <td><span class="code">type Runner interface {}</span> — interfaces</td>
+  </tr>
+  <tr>
+    <td>Type hints <span class="pill same">Same idea</span></td>
+    <td><span class="code">def add(x: int) -> int:</span></td>
+    <td><span class="code">func add(x int) int {}</span> — mandatory in Go</td>
+  </tr>
+
+  <tr class="section-head"><td colspan="3">Error handling</td></tr>
+  <tr>
+    <td>Errors <span class="pill diff">Very different</span></td>
+    <td><span class="code">try: ... except:</span></td>
+    <td><span class="code">val, err := doThing()</span> — no exceptions</td>
+  </tr>
+  <tr>
+    <td>Error check <span class="pill new">New habit</span></td>
+    <td>Python raises exceptions automatically</td>
+    <td>You must check <span class="code">if err != nil {}</span> every time</td>
+  </tr>
+
+  <tr class="section-head"><td colspan="3">Concurrency — Go's superpower</td></tr>
+  <tr>
+    <td>Goroutines <span class="pill new">New in Go</span></td>
+    <td>Threading in Python is painful</td>
+    <td><span class="code">go doThing()</span> — runs in background instantly</td>
+  </tr>
+  <tr>
+    <td>Channels <span class="pill new">New in Go</span></td>
+    <td>Python queues are complex</td>
+    <td><span class="code">ch := make(chan int)</span> — goroutines talk safely</td>
+  </tr>
+
+  <tr class="section-head"><td colspan="3">Packaging</td></tr>
+  <tr>
+    <td>Imports <span class="pill same">Same</span></td>
+    <td><span class="code">import os, sys</span></td>
+    <td><span class="code">import "fmt"</span> — unused imports = error</td>
+  </tr>
+  <tr>
+    <td>pip / packages <span class="pill same">Same idea</span></td>
+    <td><span class="code">pip install requests</span></td>
+    <td><span class="code">go get github.com/...</span></td>
+  </tr>
+</table>
+</div>

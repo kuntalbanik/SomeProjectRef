@@ -1,0 +1,315 @@
+
+<style>
+.phase-badge{display:inline-block;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;margin-bottom:10px}
+.ph1{background:#E1F5EE;color:#085041}
+.ph2{background:#E6F1FB;color:#0C447C}
+.ph3{background:#EEEDFE;color:#3C3489}
+.ph4{background:#FAEEDA;color:#633806}
+.day-row{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.day-row:last-child{border-bottom:none}
+.day-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);min-width:32px;padding-top:2px}
+.day-task{font-size:13px;color:var(--color-text-primary);line-height:1.5}
+.tip-box{background:var(--color-background-secondary);border-left:3px solid #1D9E75;border-radius:0 6px 6px 0;padding:10px 14px;margin-top:12px;font-size:13px;color:var(--color-text-secondary);line-height:1.5}
+.py-box{background:var(--color-background-secondary);border-left:3px solid #378ADD;border-radius:0 6px 6px 0;padding:10px 14px;margin-top:10px;font-size:13px;color:var(--color-text-secondary);line-height:1.5}
+.resource-box{background:var(--color-background-secondary);border-radius:8px;padding:10px 14px;margin-top:10px;font-size:13px}
+.resource-label{font-size:11px;color:var(--color-text-tertiary);margin-bottom:4px}
+.resource-link{color:var(--color-text-info);text-decoration:none;font-weight:500}
+.nav-btn{background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer;color:var(--color-text-primary)}
+.nav-btn:hover{background:var(--color-background-tertiary)}
+.nav-btn:disabled{opacity:.35;cursor:not-allowed}
+.week-dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--color-border-secondary);cursor:pointer;transition:background .2s}
+.dot.active{background:#378ADD}
+.progress-bar-wrap{height:5px;background:var(--color-border-tertiary);border-radius:3px;margin-bottom:16px}
+.progress-bar{height:5px;border-radius:3px;background:#378ADD;transition:width .4s}
+.week-title{font-size:17px;font-weight:500;color:var(--color-text-primary);margin:0 0 4px}
+.week-sub{font-size:13px;color:var(--color-text-secondary);margin:0 0 12px}
+.section-title{font-size:12px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 6px}
+.code{font-family:var(--font-mono);font-size:12px;background:var(--color-background-tertiary);padding:2px 6px;border-radius:4px}
+</style>
+
+<h2 class="sr-only">90-day Go programming roadmap for someone with Python knowledge targeting cloud infrastructure</h2>
+
+<div style="padding:1rem 0;">
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+  <div>
+    <span id="phase-badge" class="phase-badge ph1">Phase 1 — Go fundamentals</span>
+    <p class="week-title" id="week-title"></p>
+    <p class="week-sub" id="week-sub"></p>
+  </div>
+  <div style="text-align:right;font-size:12px;color:var(--color-text-tertiary)" id="week-counter"></div>
+</div>
+
+<div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar" style="width:7%"></div></div>
+<div class="week-dots" id="dot-row"></div>
+
+<div id="card" style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:16px 18px;margin-bottom:14px;">
+  <div class="section-title">Daily 1-hour plan (Mon – Fri)</div>
+  <div id="days-list"></div>
+  <div id="py-box" class="py-box"></div>
+  <div class="resource-box" style="margin-top:12px;">
+    <div class="resource-label">Free resource</div>
+    <a id="resource-link" class="resource-link" href="#" target="_blank"></a>
+  </div>
+  <div class="tip-box" id="tip-box"></div>
+</div>
+
+<div style="display:flex;justify-content:space-between;align-items:center;">
+  <button class="nav-btn" id="prev-btn" onclick="changeWeek(-1)" disabled>← Previous</button>
+  <button class="nav-btn" onclick="sendPrompt('I completed week '+(currentWeek+1)+' of the Go roadmap. Give me a small coding challenge to test what I learned.')">Test me on this week ↗</button>
+  <button class="nav-btn" id="next-btn" onclick="changeWeek(1)">Next →</button>
+</div>
+
+</div>
+
+<script>
+const weeks = [
+  {
+    title:"Week 1: Go syntax — faster than you think",
+    sub:"Variables, functions, loops · You know this already in Python",
+    phase:1,
+    days:[
+      {d:"Mon",t:"Install Go from go.dev/dl. Run your first program: fmt.Println('Hello from Go'). Compare it to Python's print()."},
+      {d:"Tue",t:"Learn variables: name := 'Raju' and var age int = 40. Practice declaring 10 different variables."},
+      {d:"Wed",t:"Write 3 functions in Go. One that adds two numbers, one that greets a name, one that returns two values."},
+      {d:"Thu",t:"For loops: write a loop that prints 1 to 20. Then loop over a slice (like a Python list). Notice the difference."},
+      {d:"Fri",t:"Mini project: write a Go program that takes your name and age and prints 'Hello Raju, you are 40 years old'."}
+    ],
+    pybridge:"Python: name = 'Raju' → Go: name := 'Raju'  |  Python: def add(a, b): → Go: func add(a int, b int) int {}  |  The logic is identical, only the punctuation changes.",
+    resource:{text:"Go official tour — free, interactive, runs in browser",url:"https://go.dev/tour/welcome/1"},
+    tip:"You will finish Week 1 faster than most beginners because you already understand what a function, variable, and loop does. You are just learning Go's spelling."
+  },
+  {
+    title:"Week 2: Types, slices, maps",
+    sub:"Python lists and dicts have Go equivalents · Stricter but familiar",
+    phase:1,
+    days:[
+      {d:"Mon",t:"Learn Go types: int, string, bool, float64. Go is strictly typed — you cannot mix types like Python sometimes allows."},
+      {d:"Tue",t:"Slices: nums := []int{1,2,3,4,5}. Practice append(), len(), looping over slices. Compare to Python lists."},
+      {d:"Wed",t:"Maps: m := map[string]int{'age': 40}. Add, read, delete keys. Check if a key exists using the comma-ok pattern."},
+      {d:"Thu",t:"Write a program: store 5 cities and their populations in a map. Print the city with highest population."},
+      {d:"Fri",t:"Mini project: a word counter. Read a sentence, split into words, count each word using a map. Classic Go exercise."}
+    ],
+    pybridge:"Python list → Go slice  |  Python dict → Go map  |  Key difference: Go maps need types declared upfront: map[string]int not just {}",
+    resource:{text:"Go by Example — slices and maps (free)",url:"https://gobyexample.com/slices"},
+    tip:"The map comma-ok pattern — val, ok := m[key] — is Go's way of safely checking if something exists. You will use this hundreds of times in cloud code."
+  },
+  {
+    title:"Week 3: Structs — Go's version of classes",
+    sub:"No classes in Go · Structs + methods replace them cleanly",
+    phase:1,
+    days:[
+      {d:"Mon",t:"Define your first struct: type Server struct { Name string; IP string; Port int }. Create instances of it."},
+      {d:"Tue",t:"Add methods to your struct: func (s Server) Start() {}. This is like def start(self) in Python class."},
+      {d:"Wed",t:"Nested structs: a Datacenter struct that contains a slice of Server structs. Practice accessing nested fields."},
+      {d:"Thu",t:"Constructors in Go: write a NewServer() function that creates and returns a Server. Go convention for initialization."},
+      {d:"Fri",t:"Mini project: model a network device — Router struct with IP, ports, and methods like AddRoute() and ShowStatus()."}
+    ],
+    pybridge:"Python: class Server:  →  Go: type Server struct {}  |  Python: def start(self):  →  Go: func (s Server) Start() {}  |  The behaviour is identical, inheritance is replaced by embedding.",
+    resource:{text:"Go structs and methods — Go by Example (free)",url:"https://gobyexample.com/structs"},
+    tip:"Your networking background makes this week very natural. You already think about routers, servers, and devices as objects with properties. Just write them as structs now."
+  },
+  {
+    title:"Week 4: Interfaces — Go's abstract classes",
+    sub:"More powerful than Python abstract classes · The heart of Go design",
+    phase:1,
+    days:[
+      {d:"Mon",t:"Define an interface: type Startable interface { Start() }. Any struct with a Start() method automatically satisfies it."},
+      {d:"Tue",t:"Make two structs — WebServer and DatabaseServer — both implement Startable. Call Start() on both via the interface."},
+      {d:"Wed",t:"Understand why interfaces matter: write a function that accepts any Startable and starts it. This is polymorphism in Go."},
+      {d:"Thu",t:"The empty interface: interface{} accepts any type (like Python's duck typing). Practice using it safely."},
+      {d:"Fri",t:"Mini project: define a NetworkDevice interface with Connect() and Disconnect(). Implement it for Router and Switch structs."}
+    ],
+    pybridge:"Python abstract class with @abstractmethod  →  Go interface  |  Key difference: in Python you explicitly inherit. In Go, if your struct has the methods, it automatically satisfies the interface. No declaration needed.",
+    resource:{text:"Go interfaces — go.dev tour (free)",url:"https://go.dev/tour/methods/9"},
+    tip:"Go interfaces are actually cleaner than Python abstract classes. You do not have to declare that you implement an interface — Go figures it out automatically. This is called implicit satisfaction."
+  },
+  {
+    title:"Week 5: Error handling — the Go way",
+    sub:"No try/except · Every error is a value you check manually",
+    phase:2,
+    days:[
+      {d:"Mon",t:"Understand Go errors: functions return (result, error). Practice: val, err := strconv.Atoi('123'). Check if err != nil."},
+      {d:"Tue",t:"Write a function that reads a file and returns (content, error). Handle the case where the file does not exist."},
+      {d:"Wed",t:"Create custom errors: errors.New('server not found') and fmt.Errorf('port %d is closed', port)."},
+      {d:"Thu",t:"Error wrapping: use fmt.Errorf('connecting: %w', err) to add context to errors. Unwrap with errors.Is()."},
+      {d:"Fri",t:"Mini project: a file reader that gives clear error messages — file not found, permission denied, file empty — all handled separately."}
+    ],
+    pybridge:"Python: try: open(file) except FileNotFoundError:  →  Go: f, err := os.Open(file); if err != nil { handle }  |  Go never throws. Every error is explicitly returned and you must deal with it.",
+    resource:{text:"Error handling in Go — go.dev blog (free)",url:"https://go.dev/blog/error-handling-and-go"},
+    tip:"At first, checking err != nil every line feels annoying. But it makes your programs extremely reliable. Cloud infrastructure code cannot afford silent failures — this habit saves production systems."
+  },
+  {
+    title:"Week 6: Goroutines — Go's superpower",
+    sub:"Lightweight concurrency · Python threading is painful, Go makes it trivial",
+    phase:2,
+    days:[
+      {d:"Mon",t:"Run your first goroutine: go doSomething(). Watch it run in background while main continues. Add time.Sleep to observe."},
+      {d:"Tue",t:"The problem: goroutines finish after main exits. Use sync.WaitGroup to wait for all goroutines to complete."},
+      {d:"Wed",t:"Channels: ch := make(chan string). Send a value from goroutine, receive in main. This is safe communication between goroutines."},
+      {d:"Thu",t:"Practical use: ping 5 IP addresses simultaneously using goroutines. Compare time vs doing it one by one."},
+      {d:"Fri",t:"Mini project: a concurrent port scanner. Check ports 1–100 on localhost simultaneously using goroutines. Your networking background makes this meaningful."}
+    ],
+    pybridge:"Python threading is complex and limited by the GIL. Go goroutines are lightweight — you can run thousands simultaneously. go doThing() is all you need to start a goroutine.",
+    resource:{text:"Go concurrency tour — go.dev (free)",url:"https://go.dev/tour/concurrency/1"},
+    tip:"A concurrent port scanner in Go is a real tool. Your networking knowledge means you understand exactly what you are building. This is the week where Go starts feeling powerful."
+  },
+  {
+    title:"Week 7: File system + OS interaction",
+    sub:"Read files, run commands, interact with Linux · Your comfort zone",
+    phase:2,
+    days:[
+      {d:"Mon",t:"Read and write files using os.ReadFile() and os.WriteFile(). Parse a config file line by line using bufio.Scanner."},
+      {d:"Tue",t:"Walk a directory: filepath.Walk() to list all files recursively. Filter by extension. This is like 'find' command in Go."},
+      {d:"Wed",t:"Run shell commands from Go: exec.Command('ls','-la').Output(). Capture stdout and stderr separately."},
+      {d:"Thu",t:"Environment variables: os.Getenv('HOME'), os.Setenv(). Read Linux system info — hostname, username, working directory."},
+      {d:"Fri",t:"Mini project: a system info tool. Print CPU count, memory, disk usage, hostname, IP addresses. Like a custom 'neofetch' in Go."}
+    ],
+    pybridge:"Python: open(file) / os.listdir() / subprocess.run()  →  Go: os.ReadFile() / filepath.Walk() / exec.Command()  |  The concepts are identical. Go's versions are more explicit but safer.",
+    resource:{text:"Go os package docs (free)",url:"https://pkg.go.dev/os"},
+    tip:"This week combines Go with your Linux knowledge. Writing a system info tool in Go that reads /proc/cpuinfo and /proc/meminfo will feel very natural for you."
+  },
+  {
+    title:"Week 8: HTTP and networking in Go",
+    sub:"Build web servers and HTTP clients · Cloud APIs are all HTTP",
+    phase:2,
+    days:[
+      {d:"Mon",t:"Make HTTP requests: http.Get('https://api.github.com'). Read the response body. Parse JSON response using encoding/json."},
+      {d:"Tue",t:"Build a simple HTTP server in 10 lines: http.HandleFunc('/health', handler); http.ListenAndServe(':8080', nil)."},
+      {d:"Wed",t:"JSON encoding and decoding: marshal a struct to JSON, unmarshal JSON into a struct. This is how cloud APIs communicate."},
+      {d:"Thu",t:"Add routes to your server: /health returns OK, /info returns system info JSON, /ping checks if a host is reachable."},
+      {d:"Fri",t:"Mini project: a network health checker API. POST a list of IPs, it pings them all concurrently and returns JSON results."}
+    ],
+    pybridge:"Python: requests.get(url) / Flask app  →  Go: http.Get(url) / http.HandleFunc()  |  Go's built-in HTTP library needs no external packages — unlike Python which needs requests and Flask separately.",
+    resource:{text:"Go net/http package — go.dev (free)",url:"https://pkg.go.dev/net/http"},
+    tip:"By end of this week you will have built a real HTTP API in Go with zero external dependencies. Your networking background helps you understand exactly what is happening at the TCP layer beneath."
+  },
+  {
+    title:"Week 9: CLI tools — your first real Go projects",
+    sub:"Command line tools are Go's sweet spot · Build something useful",
+    phase:3,
+    days:[
+      {d:"Mon",t:"Learn the flag package: flag.String(), flag.Int(), flag.Bool(). Build a CLI tool that accepts --host and --port arguments."},
+      {d:"Tue",t:"Install cobra library: go get github.com/spf13/cobra. This is how Docker and Kubernetes CLIs are built."},
+      {d:"Wed",t:"Build a multi-command CLI: myapp scan --host 192.168.1.1 and myapp info --verbose. Structure with cobra subcommands."},
+      {d:"Thu",t:"Add colored output using fatih/color library. Progress bars using schollz/progressbar. Make your CLI look professional."},
+      {d:"Fri",t:"Project: a network scanner CLI — scan a subnet, show open ports, output as table or JSON. Real tool, real use."}
+    ],
+    pybridge:"Python: argparse / click  →  Go: flag package or cobra  |  Cobra is used to build kubectl, Hugo, and many major CLI tools. Learning it puts you in professional territory immediately.",
+    resource:{text:"Cobra CLI library docs (free)",url:"https://github.com/spf13/cobra"},
+    tip:"Put this CLI tool on GitHub this week. A network scanner written in Go by someone with real networking knowledge is impressive to any DevOps hiring manager."
+  },
+  {
+    title:"Week 10: Working with cloud APIs",
+    sub:"Control AWS from Go · This is what DevOps engineers do",
+    phase:3,
+    days:[
+      {d:"Mon",t:"Install AWS SDK for Go: go get github.com/aws/aws-sdk-go-v2. Configure credentials. List your S3 buckets from Go code."},
+      {d:"Tue",t:"EC2 from Go: list running instances, start and stop instances programmatically. This is Infrastructure as Code."},
+      {d:"Wed",t:"Write a Go program that monitors your EC2 instances and sends an alert if any are stopped unexpectedly."},
+      {d:"Thu",t:"Read CloudWatch metrics from Go: get CPU utilization of an EC2 instance and print a simple graph in terminal."},
+      {d:"Fri",t:"Project: an AWS health dashboard CLI — shows all EC2 instances, their status, CPU, and cost estimate. Pure Go."}
+    ],
+    pybridge:"Python: boto3 library for AWS  →  Go: aws-sdk-go-v2  |  Same concept, Go version is faster and produces a single binary you can deploy anywhere without installing Python or pip.",
+    resource:{text:"AWS SDK for Go v2 — free docs",url:"https://aws.github.io/aws-sdk-go-v2/docs/"},
+    tip:"Combining Go with AWS SDK means you can write tools that automatically manage cloud infrastructure. This is a skill very few people have and companies pay very well for it."
+  },
+  {
+    title:"Week 11: Docker + Kubernetes basics in Go",
+    sub:"Understand the tools written in Go · Read and extend them",
+    phase:3,
+    days:[
+      {d:"Mon",t:"Use Docker SDK for Go: connect to Docker daemon, list containers, start and stop them from Go code."},
+      {d:"Tue",t:"Read a Dockerfile from Go, build an image programmatically. This is how CI/CD pipelines work internally."},
+      {d:"Wed",t:"Install kubectl and explore the Kubernetes Go client library: client-go. List pods in a namespace from Go."},
+      {d:"Thu",t:"Write a Go program that watches for pod crashes in Kubernetes and logs them with timestamp and reason."},
+      {d:"Fri",t:"Project: a container health monitor — lists all running Docker containers, shows CPU and memory usage, alerts if any crash."}
+    ],
+    pybridge:"You are now writing tools that manage the same infrastructure you learned about in the Cloud + DevOps path. Go is the language Docker and Kubernetes are written in — reading their source code becomes possible now.",
+    resource:{text:"Docker SDK for Go (free)",url:"https://docs.docker.com/engine/api/sdk/"},
+    tip:"By this week you are writing Go code that controls Docker and Kubernetes. This is the exact work done by platform engineers at companies like Cloudflare, AWS, and Razorpay."
+  },
+  {
+    title:"Week 12: Build your portfolio project",
+    sub:"One real project beats ten tutorials · Make something you are proud of",
+    phase:3,
+    days:[
+      {d:"Mon",t:"Choose your project from the list below based on your interest. Spend today planning: what inputs, outputs, features."},
+      {d:"Tue",t:"Set up your project structure: cmd/, pkg/, internal/ folders. Initialize Go modules. Create a README.md on GitHub."},
+      {d:"Wed",t:"Build the core feature only. No polish yet. Get it working end to end even if it is rough."},
+      {d:"Thu",t:"Add error handling, logging, and a --help flag. Make it usable by someone else."},
+      {d:"Fri",t:"Write a README with: what it does, how to install, example commands. Push to GitHub. This is your portfolio."}
+    ],
+    pybridge:"Project ideas using your background: (1) Network latency monitor across multiple hosts with history. (2) AWS cost analyzer that shows daily spend per service. (3) Log parser that detects anomalies across server logs. All use your Linux + Networking + Cloud knowledge.",
+    resource:{text:"Awesome Go — project inspiration (free)",url:"https://awesome-go.com"},
+    tip:"One real project on GitHub with a good README is worth more than any certificate for getting your first Go role. Hiring managers look at code, not just qualifications."
+  },
+  {
+    title:"Week 13: Open source + job readiness",
+    sub:"Contribute, connect, apply · Turn 90 days into a career",
+    phase:3,
+    days:[
+      {d:"Mon",t:"Find a beginner-friendly Go open source project on GitHub. Search 'good first issue' label in Go repositories."},
+      {d:"Tue",t:"Fix a small bug or improve documentation in an open source project. Submit your first Pull Request."},
+      {d:"Wed",t:"Update your LinkedIn: add Go to skills, describe your portfolio project, mention your AWS and networking background."},
+      {d:"Thu",t:"Search on LinkedIn and Naukri: 'Go developer', 'Golang cloud', 'DevOps Go'. Note what skills they ask for vs what you have."},
+      {d:"Fri",t:"Apply to 3 positions — even if you feel not fully ready. The application process teaches you what to learn next."}
+    ],
+    pybridge:"Your Python knowledge still has value — many companies use both Go and Python. Mention both in your profile. Some roles use Python for scripting and Go for performance-critical services.",
+    resource:{text:"Golang job board (free)",url:"https://www.golangprojects.com"},
+    tip:"You are 40, with Linux, hardware, networking, Python, and now Go. That combination is genuinely rare. Do not undersell yourself. Remote international companies actively look for people with real systems experience."
+  }
+];
+
+let currentWeek = 0;
+
+function renderDots(){
+  const row = document.getElementById('dot-row');
+  row.innerHTML='';
+  weeks.forEach((w,i)=>{
+    const d=document.createElement('div');
+    d.className='dot'+(i===currentWeek?' active':'');
+    d.title='Week '+(i+1);
+    d.onclick=()=>{currentWeek=i;render();};
+    row.appendChild(d);
+  });
+}
+
+function render(){
+  const w=weeks[currentWeek];
+  const phases=['ph1','ph2','ph3','ph4'];
+  const phaseNames=['Phase 1 — Go fundamentals','Phase 2 — Systems + networking','Phase 3 — Cloud tools + projects'];
+  const badge=document.getElementById('phase-badge');
+  badge.textContent=phaseNames[w.phase-1];
+  badge.className='phase-badge '+phases[w.phase-1];
+  document.getElementById('week-title').textContent=w.title;
+  document.getElementById('week-sub').textContent=w.sub;
+  document.getElementById('week-counter').textContent='Week '+(currentWeek+1)+' of '+weeks.length;
+  document.getElementById('progress-bar').style.width=(((currentWeek+1)/weeks.length)*100).toFixed(0)+'%';
+
+  const dl=document.getElementById('days-list');
+  dl.innerHTML='';
+  w.days.forEach(day=>{
+    const row=document.createElement('div');
+    row.className='day-row';
+    row.innerHTML='<span class="day-label">'+day.d+'</span><span class="day-task">'+day.t+'</span>';
+    dl.appendChild(row);
+  });
+
+  document.getElementById('py-box').textContent='Python bridge: '+w.pybridge;
+  document.getElementById('resource-link').href=w.resource.url;
+  document.getElementById('resource-link').textContent=w.resource.text;
+  document.getElementById('tip-box').textContent='Tip for you: '+w.tip;
+  document.getElementById('prev-btn').disabled=currentWeek===0;
+  document.getElementById('next-btn').disabled=currentWeek===weeks.length-1;
+  renderDots();
+}
+
+function changeWeek(dir){
+  currentWeek=Math.max(0,Math.min(weeks.length-1,currentWeek+dir));
+  render();
+}
+
+render();
+</script>

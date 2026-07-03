@@ -1,0 +1,309 @@
+
+<style>
+.phase-badge { display:inline-block; font-size:11px; font-weight:500; padding:3px 10px; border-radius:20px; margin-bottom:10px; }
+.phase-1 { background:#E6F1FB; color:#0C447C; }
+.phase-2 { background:#E1F5EE; color:#085041; }
+.phase-3 { background:#EEEDFE; color:#3C3489; }
+.day-row { display:flex; gap:10px; align-items:flex-start; padding:8px 0; border-bottom:0.5px solid var(--color-border-tertiary); }
+.day-row:last-child { border-bottom:none; }
+.day-label { font-size:11px; font-weight:500; color:var(--color-text-tertiary); min-width:32px; padding-top:2px; }
+.day-task { font-size:13px; color:var(--color-text-primary); line-height:1.5; }
+.tip-box { background:var(--color-background-secondary); border-left:3px solid #1D9E75; border-radius:0 6px 6px 0; padding:10px 14px; margin-top:12px; font-size:13px; color:var(--color-text-secondary); line-height:1.5; }
+.resource-box { background:var(--color-background-secondary); border-radius:8px; padding:10px 14px; margin-top:10px; font-size:13px; }
+.resource-label { font-size:11px; color:var(--color-text-tertiary); margin-bottom:4px; }
+.resource-link { color:var(--color-text-info); text-decoration:none; font-weight:500; }
+.nav-btn { background:var(--color-background-secondary); border:0.5px solid var(--color-border-secondary); border-radius:8px; padding:8px 18px; font-size:13px; cursor:pointer; color:var(--color-text-primary); }
+.nav-btn:hover { background:var(--color-background-tertiary); }
+.nav-btn:disabled { opacity:0.35; cursor:not-allowed; }
+.week-dots { display:flex; gap:5px; flex-wrap:wrap; justify-content:center; margin:12px 0; }
+.dot { width:10px; height:10px; border-radius:50%; background:var(--color-border-secondary); cursor:pointer; transition:background .2s; }
+.dot.active { background:#378ADD; }
+.dot.phase2 { }
+.dot.phase3 { }
+.dot.done { background:#1D9E75; }
+.week-title { font-size:17px; font-weight:500; color:var(--color-text-primary); margin:0 0 4px; }
+.week-sub { font-size:13px; color:var(--color-text-secondary); margin:0 0 12px; }
+.progress-bar-wrap { height:5px; background:var(--color-border-tertiary); border-radius:3px; margin-bottom:16px; }
+.progress-bar { height:5px; border-radius:3px; background:#378ADD; transition:width .4s; }
+.check-row { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:0.5px solid var(--color-border-tertiary); cursor:pointer; }
+.check-row:last-child { border-bottom:none; }
+.check-row input[type=checkbox] { width:16px; height:16px; cursor:pointer; accent-color:#1D9E75; }
+.check-label { font-size:13px; color:var(--color-text-primary); line-height:1.4; }
+.check-label.done-text { text-decoration:line-through; color:var(--color-text-tertiary); }
+.section-title { font-size:12px; font-weight:500; color:var(--color-text-tertiary); text-transform:uppercase; letter-spacing:.05em; margin:14px 0 6px; }
+</style>
+
+<h2 class="sr-only">90-day Cloud and DevOps learning plan, week by week, for 1 hour per day</h2>
+
+<div style="padding:1rem 0;">
+
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+  <div>
+    <span id="phase-badge" class="phase-badge phase-1">Phase 1 — Cloud Basics</span>
+    <p class="week-title" id="week-title">Week 1: What is the cloud?</p>
+    <p class="week-sub" id="week-sub">Setting up your AWS free account · No prior cloud knowledge needed</p>
+  </div>
+  <div style="text-align:right; font-size:12px; color:var(--color-text-tertiary);" id="week-counter">Week 1 of 13</div>
+</div>
+
+<div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar" style="width:7.7%"></div></div>
+
+<div class="week-dots" id="dot-row"></div>
+
+<div id="card" style="background:var(--color-background-primary); border:0.5px solid var(--color-border-tertiary); border-radius:12px; padding:16px 18px; margin-bottom:14px;">
+
+  <div class="section-title">Daily 1-hour plan (Mon – Fri)</div>
+  <div id="days-list"></div>
+
+  <div id="resource-box" class="resource-box" style="margin-top:12px;">
+    <div class="resource-label">Free resource</div>
+    <a id="resource-link" class="resource-link" href="#" target="_blank"></a>
+  </div>
+
+  <div class="tip-box" id="tip-box"></div>
+
+</div>
+
+<div style="display:flex; justify-content:space-between; align-items:center;">
+  <button class="nav-btn" id="prev-btn" onclick="changeWeek(-1)" disabled>← Previous</button>
+  <button class="nav-btn" onclick="sendPrompt('I finished week ' + (currentWeek+1) + ' of the 90-day Cloud DevOps plan. What should I focus on next?')">Done with this week ↗</button>
+  <button class="nav-btn" id="next-btn" onclick="changeWeek(1)">Next →</button>
+</div>
+
+</div>
+
+<script>
+const weeks = [
+  {
+    title: "Week 1: What is the cloud?",
+    sub: "Setting up your AWS free account · No cost needed",
+    phase: 1,
+    days: [
+      {d:"Mon", t:"Watch: 'Cloud computing in 6 minutes' on YouTube. Write 3 things you understood."},
+      {d:"Tue", t:"Go to aws.amazon.com, create a free account. Explore the dashboard for 20 mins."},
+      {d:"Wed", t:"Read: 'What is AWS?' on AWS docs. Note 5 services you see (just names)."},
+      {d:"Thu", t:"Watch: 'AWS Free Tier explained'. Check which services are free for 12 months."},
+      {d:"Fri", t:"Quiz yourself: What is IaaS, PaaS, SaaS? Write definitions in your own words."}
+    ],
+    resource: { label:"AWS Skill Builder — free account", url:"https://skillbuilder.aws", text:"skillbuilder.aws (free)" },
+    tip:"Your Linux knowledge already gives you an advantage — cloud is just Linux servers that someone else manages."
+  },
+  {
+    title: "Week 2: EC2 — virtual machines in cloud",
+    sub: "Launch your first server in the cloud · Like a remote Linux machine",
+    phase: 1,
+    days: [
+      {d:"Mon", t:"Watch: 'AWS EC2 for beginners'. Understand what a virtual machine in cloud means."},
+      {d:"Tue", t:"In AWS console, go to EC2. Launch a t2.micro Linux instance (free tier). Don't worry if it fails — try again."},
+      {d:"Wed", t:"SSH into your EC2 instance from your Linux terminal. Run 'top', 'df -h', 'ifconfig'."},
+      {d:"Thu", t:"Install Nginx on your EC2 instance. Open port 80 in Security Groups. See your webpage."},
+      {d:"Fri", t:"Stop your instance to save credits. Write: How is EC2 different from your local Linux machine?"}
+    ],
+    resource: { label:"AWS EC2 getting started guide", url:"https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html", text:"AWS EC2 docs (free)" },
+    tip:"You already know SSH and Linux commands. Connecting to EC2 will feel just like connecting to a remote server — because it is."
+  },
+  {
+    title: "Week 3: S3 storage + IAM security",
+    sub: "Cloud storage and user access control",
+    phase: 1,
+    days: [
+      {d:"Mon", t:"Watch: 'AWS S3 in 10 minutes'. Understand buckets, objects, permissions."},
+      {d:"Tue", t:"Create an S3 bucket. Upload a file. Make it public. Access it via a browser URL."},
+      {d:"Wed", t:"Watch: 'AWS IAM explained'. Understand users, roles, policies — it is like Linux file permissions."},
+      {d:"Thu", t:"Create an IAM user with read-only S3 access. Test that they cannot delete files."},
+      {d:"Fri", t:"Review: What are the 3 IAM best practices? Write them. Why is 'root user' dangerous?"}
+    ],
+    resource: { label:"AWS IAM getting started (free)", url:"https://docs.aws.amazon.com/IAM/latest/UserGuide/getting-started.html", text:"AWS IAM docs (free)" },
+    tip:"IAM permissions work exactly like Linux file permissions — read, write, execute for users and groups. You already think this way."
+  },
+  {
+    title: "Week 4: Networking on AWS (VPC)",
+    sub: "Virtual networks · Your networking skills shine here",
+    phase: 1,
+    days: [
+      {d:"Mon", t:"Watch: 'AWS VPC explained simply'. Map it to what you know — subnet, router, firewall."},
+      {d:"Tue", t:"In AWS console, view your default VPC. Identify: subnets, internet gateway, route tables."},
+      {d:"Wed", t:"Create a new VPC manually. Add a public subnet. Attach an internet gateway."},
+      {d:"Thu", t:"Launch an EC2 instance inside your new VPC. Verify it can reach the internet."},
+      {d:"Fri", t:"Draw a diagram on paper: your VPC with subnets, EC2, S3, internet. This is cloud architecture."}
+    ],
+    resource: { label:"AWS VPC getting started", url:"https://docs.aws.amazon.com/vpc/latest/userguide/vpc-getting-started.html", text:"AWS VPC docs (free)" },
+    tip:"You understand subnets, routing, and firewalls from networking. AWS VPC is the same concept — just in the cloud. This week will feel familiar."
+  },
+  {
+    title: "Week 5: Docker — what and why",
+    sub: "Containers are the future · Understand the concept first",
+    phase: 2,
+    days: [
+      {d:"Mon", t:"Watch: 'Docker in 100 seconds' by Fireship on YouTube. Then 'Docker explained simply'."},
+      {d:"Tue", t:"Install Docker on your Linux machine: 'sudo apt install docker.io'. Run 'docker run hello-world'."},
+      {d:"Wed", t:"Run: 'docker run -it ubuntu bash'. You are now inside a container. Run Linux commands."},
+      {d:"Thu", t:"Understand the difference: VM vs Container. Draw it on paper. Write 3 differences."},
+      {d:"Fri", t:"Run: 'docker pull nginx', then 'docker run -p 80:80 nginx'. Open browser at localhost."}
+    ],
+    resource: { label:"Play with Docker — free browser playground", url:"https://labs.play-with-docker.com", text:"play-with-docker.com (free, no install needed)" },
+    tip:"Docker is like a portable Linux environment. Think of it as a lightweight VM. Your Linux skills make you comfortable inside containers immediately."
+  },
+  {
+    title: "Week 6: Docker commands + Dockerfile",
+    sub: "Build your own container images",
+    phase: 2,
+    days: [
+      {d:"Mon", t:"Learn: docker ps, docker images, docker stop, docker rm, docker rmi. Practice each one."},
+      {d:"Tue", t:"Write your first Dockerfile: FROM ubuntu, RUN apt install nginx, EXPOSE 80, CMD nginx."},
+      {d:"Wed", t:"Build your image: 'docker build -t my-nginx .' Then run it: 'docker run -p 80:80 my-nginx'."},
+      {d:"Thu", t:"Modify your Dockerfile. Add a custom HTML file. Rebuild. See changes in browser."},
+      {d:"Fri", t:"Push your image to Docker Hub (create free account). This is how teams share containers."}
+    ],
+    resource: { label:"Docker official getting started tutorial", url:"https://docs.docker.com/get-started/", text:"docs.docker.com/get-started (free)" },
+    tip:"A Dockerfile is like a bash script that builds a server from scratch. You already understand bash logic — this is the same thinking."
+  },
+  {
+    title: "Week 7: Docker networking + volumes",
+    sub: "Make containers talk to each other",
+    phase: 2,
+    days: [
+      {d:"Mon", t:"Watch: 'Docker networking explained'. Understand bridge, host, overlay networks."},
+      {d:"Tue", t:"Create two containers. Make them talk to each other using a Docker network."},
+      {d:"Wed", t:"Learn Docker volumes: 'docker run -v /mydata:/data nginx'. Data persists after container stops."},
+      {d:"Thu", t:"Practice: run a MySQL container with a volume so data is not lost when container restarts."},
+      {d:"Fri", t:"Troubleshoot: run 'docker inspect', 'docker logs', 'docker exec -it container bash'. These are your debugging tools."}
+    ],
+    resource: { label:"Docker networking docs", url:"https://docs.docker.com/network/", text:"docs.docker.com/network (free)" },
+    tip:"Docker networking uses the same concepts as physical networking — bridges, routing, port forwarding. Your networking background is a big advantage here."
+  },
+  {
+    title: "Week 8: Docker Compose",
+    sub: "Run multiple containers together with one file",
+    phase: 2,
+    days: [
+      {d:"Mon", t:"Watch: 'Docker Compose in 12 minutes'. Understand why it replaces long docker run commands."},
+      {d:"Tue", t:"Install docker-compose. Write a simple docker-compose.yml with nginx and a web app."},
+      {d:"Wed", t:"Run 'docker-compose up' and 'docker-compose down'. Practice start/stop/restart."},
+      {d:"Thu", t:"Add a MySQL service to your docker-compose.yml. Connect it to your web app."},
+      {d:"Fri", t:"Project: build a 2-container app (web + database) using docker-compose. This is real-world DevOps."}
+    ],
+    resource: { label:"Docker Compose getting started", url:"https://docs.docker.com/compose/gettingstarted/", text:"docs.docker.com/compose (free)" },
+    tip:"By end of this week, you can run a full web application with one command. That is what companies pay DevOps engineers for."
+  },
+  {
+    title: "Week 9: Bash scripting for automation",
+    sub: "Automate repetitive tasks · Your Linux skills level up",
+    phase: 3,
+    days: [
+      {d:"Mon", t:"Review bash basics: variables, if-else, for loops. Write a script that prints system info."},
+      {d:"Tue", t:"Write a script that checks if a service (nginx) is running and restarts it if not."},
+      {d:"Wed", t:"Write a script that backs up a folder to S3 using AWS CLI (install aws cli today)."},
+      {d:"Thu", t:"Add cron job: run your backup script every night at 2am using crontab -e."},
+      {d:"Fri", t:"Write a script that launches an EC2 instance using AWS CLI. This is Infrastructure as Code basics."}
+    ],
+    resource: { label:"AWS CLI getting started (free)", url:"https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html", text:"AWS CLI docs (free)" },
+    tip:"You likely already know some bash. This week is about combining your Linux scripting with cloud APIs. This skill is highly valued."
+  },
+  {
+    title: "Week 10: AWS CLI + cloud from terminal",
+    sub: "Control the cloud from your Linux terminal",
+    phase: 3,
+    days: [
+      {d:"Mon", t:"Configure AWS CLI: 'aws configure'. Enter your IAM access keys. Run 'aws s3 ls'."},
+      {d:"Tue", t:"Practice: 'aws ec2 describe-instances', 'aws ec2 start-instances'. Control EC2 from terminal."},
+      {d:"Wed", t:"Write a bash script: if EC2 is stopped, start it. If running, show its IP address."},
+      {d:"Thu", t:"Explore CloudWatch basics: view logs, set a CPU usage alert on your EC2 instance."},
+      {d:"Fri", t:"Review all AWS services you have used. Make a 1-page cheat sheet with commands."}
+    ],
+    resource: { label:"AWS CLI command reference", url:"https://docs.aws.amazon.com/cli/latest/reference/", text:"AWS CLI reference (free)" },
+    tip:"Controlling cloud infrastructure from a terminal is exactly what senior DevOps engineers do daily. You are building real professional skills now."
+  },
+  {
+    title: "Week 11: AWS Cloud Practitioner exam prep",
+    sub: "The certification that gets you noticed · Start studying",
+    phase: 3,
+    days: [
+      {d:"Mon", t:"Download free study guide: 'AWS Cloud Practitioner Essentials' on AWS Skill Builder."},
+      {d:"Tue", t:"Study: Cloud concepts domain (26% of exam) — cloud benefits, deployment models, pricing."},
+      {d:"Wed", t:"Study: Security domain (25% of exam) — IAM, shared responsibility model, compliance."},
+      {d:"Thu", t:"Study: Technology domain (33% of exam) — core services you already used this month."},
+      {d:"Fri", t:"Take a free practice quiz on ExamTopics.com. Note which areas need more review."}
+    ],
+    resource: { label:"AWS Cloud Practitioner Essentials (free course)", url:"https://skillbuilder.aws/search?searchText=cloud+practitioner+essentials&page=1", text:"AWS Skill Builder — free course" },
+    tip:"You have actually used most of these services hands-on. The exam asks about things you already did. Hands-on experience is your best study material."
+  },
+  {
+    title: "Week 12: Practice tests + weak areas",
+    sub: "Fix gaps before the exam · Aim for 80%+ on practice tests",
+    phase: 3,
+    days: [
+      {d:"Mon", t:"Take a full 65-question practice test on ExamTopics or Udemy free resources. Time yourself."},
+      {d:"Tue", t:"Review every wrong answer. Read the AWS doc page for each topic you missed."},
+      {d:"Wed", t:"Revise: billing and pricing models (often tricky). Understand On-Demand vs Reserved vs Spot."},
+      {d:"Thu", t:"Take another practice test. You should score higher than Monday. If not, revisit Week 11."},
+      {d:"Fri", t:"Create flashcards for 20 key terms. Review them on your commute or during breaks."}
+    ],
+    resource: { label:"ExamTopics free practice questions", url:"https://www.examtopics.com/exams/amazon/aws-certified-cloud-practitioner/", text:"examtopics.com (free practice Qs)" },
+    tip:"The exam costs around Rs 15,000. Book it only when you are scoring 80%+ on practice tests. Do not rush — one pass is better than two attempts."
+  },
+  {
+    title: "Week 13: Final review + book your exam",
+    sub: "You made it to the end · Now make it official",
+    phase: 3,
+    days: [
+      {d:"Mon", t:"Final practice test: full 65 questions, timed. Target 80%+. If below 75%, delay by 2 weeks."},
+      {d:"Tue", t:"Go to aws.amazon.com/certification. Schedule your exam at a nearby test center in Kolkata."},
+      {d:"Wed", t:"Light review only: read your cheat sheet, flashcards. No new topics today."},
+      {d:"Thu", t:"Rest. Light walk. Sleep 8 hours. Your brain needs consolidation, not more input."},
+      {d:"Fri", t:"Exam day. Arrive early. Read each question twice. Trust your 3 months of hands-on work."}
+    ],
+    resource: { label:"AWS Certification scheduling", url:"https://aws.amazon.com/certification/certified-cloud-practitioner/", text:"aws.amazon.com/certification" },
+    tip:"You earned this. 40 years old, 1 hour a day, 13 weeks of real work. The certificate is just proof of what you already know."
+  }
+];
+
+let currentWeek = 0;
+
+function renderDots() {
+  const row = document.getElementById('dot-row');
+  row.innerHTML = '';
+  weeks.forEach((w, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === currentWeek ? ' active' : '');
+    d.title = 'Week ' + (i+1);
+    d.onclick = () => { currentWeek = i; render(); };
+    row.appendChild(d);
+  });
+}
+
+function render() {
+  const w = weeks[currentWeek];
+  document.getElementById('phase-badge').textContent = 
+    w.phase === 1 ? 'Phase 1 — Cloud basics' : w.phase === 2 ? 'Phase 2 — Docker' : 'Phase 3 — Automation + cert';
+  document.getElementById('phase-badge').className = 'phase-badge phase-' + w.phase;
+  document.getElementById('week-title').textContent = w.title;
+  document.getElementById('week-sub').textContent = w.sub;
+  document.getElementById('week-counter').textContent = 'Week ' + (currentWeek+1) + ' of ' + weeks.length;
+  document.getElementById('progress-bar').style.width = (((currentWeek+1)/weeks.length)*100).toFixed(0) + '%';
+
+  const dl = document.getElementById('days-list');
+  dl.innerHTML = '';
+  w.days.forEach(day => {
+    const row = document.createElement('div');
+    row.className = 'day-row';
+    row.innerHTML = '<span class="day-label">' + day.d + '</span><span class="day-task">' + day.t + '</span>';
+    dl.appendChild(row);
+  });
+
+  document.getElementById('resource-link').href = w.resource.url;
+  document.getElementById('resource-link').textContent = w.resource.text;
+  document.getElementById('tip-box').textContent = 'Tip for you: ' + w.tip;
+
+  document.getElementById('prev-btn').disabled = currentWeek === 0;
+  document.getElementById('next-btn').disabled = currentWeek === weeks.length - 1;
+  renderDots();
+}
+
+function changeWeek(dir) {
+  currentWeek = Math.max(0, Math.min(weeks.length-1, currentWeek+dir));
+  render();
+}
+
+render();
+</script>

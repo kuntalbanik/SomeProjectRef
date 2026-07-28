@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Production-Grade Golang — Practice Checklist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0f1115;
+    --bg-panel: #161920;
+    --bg-panel-2: #1b1f28;
+    --line: #262b36;
+    --line-soft: #1e222b;
+    --text: #e7e9ee;
+    --text-dim: #939aab;
+    --text-faint: #5b6272;
+    --go-cyan: #00ADD8;
+    --go-cyan-bright: #4dd0f0;
+    --go-yellow: #FFD43B;
+    --done-green: #4caf7d;
+    --done-green-bg: rgba(76,175,125,0.10);
+    --danger: #e0637a;
+    --radius: 10px;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --bn: 'Hind Siliguri', 'JetBrains Mono', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 12% -10%, rgba(0,173,216,0.12), transparent 45%),
+      radial-gradient(circle at 100% 5%, rgba(255,212,59,0.05), transparent 40%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--bn);
+    line-height:1.5;
+    min-height:100vh;
+    padding-bottom:80px;
+  }
+  ::selection{ background:rgba(0,173,216,0.35); }
+
+  .topbar{
+    position:sticky; top:0; z-index:50;
+    background:rgba(15,17,21,0.93);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-inner{
+    max-width:900px; margin:0 auto; padding:14px 22px;
+    display:flex; align-items:center; gap:16px;
+  }
+  .dots{ display:flex; gap:6px; flex-shrink:0; }
+  .dots span{ width:9px; height:9px; border-radius:50%; display:block; }
+  .dots span:nth-child(1){ background:#e0637a; }
+  .dots span:nth-child(2){ background:var(--go-yellow); }
+  .dots span:nth-child(3){ background:var(--done-green); }
+  .topbar-title{
+    font-family:var(--mono); font-size:12.5px; color:var(--text-dim);
+    letter-spacing:.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .topbar-progress{ margin-left:auto; display:flex; align-items:center; gap:10px; flex-shrink:0; }
+  .topbar-progress-track{ width:130px; height:6px; background:var(--line-soft); border-radius:99px; overflow:hidden; }
+  .topbar-progress-fill{
+    height:100%; width:0%; border-radius:99px;
+    background:linear-gradient(90deg, var(--go-cyan), var(--done-green));
+    transition:width .4s ease;
+  }
+  .topbar-progress-text{ font-family:var(--mono); font-size:12px; color:var(--go-cyan-bright); font-weight:600; white-space:nowrap;}
+
+  .hero{ max-width:900px; margin:0 auto; padding:46px 22px 26px; }
+  .hero-eyebrow{
+    font-family:var(--mono); font-size:12px; color:var(--go-yellow);
+    letter-spacing:.14em; text-transform:uppercase; margin-bottom:14px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .hero-eyebrow::before{ content:"package main"; color:var(--go-cyan-bright); }
+  h1{
+    font-family:var(--mono); font-weight:800; font-size:clamp(24px,4vw,36px);
+    margin:0 0 12px; letter-spacing:-0.01em; color:#fff;
+  }
+  h1 .accent{ color:var(--go-cyan-bright); }
+  .hero p{ color:var(--text-dim); font-size:15.5px; max-width:660px; margin:0 0 22px; }
+  .hero-stats{ display:flex; gap:10px; flex-wrap:wrap; }
+  .stat-chip{
+    font-family:var(--mono); font-size:12.5px; color:var(--text-dim);
+    border:1px solid var(--line); background:var(--bg-panel);
+    padding:7px 12px; border-radius:99px; display:flex; align-items:center; gap:7px;
+  }
+  .stat-chip b{ color:var(--text); font-weight:700; }
+  .stat-chip.done b{ color:var(--done-green); }
+
+  .note{ max-width:900px; margin:0 auto 30px; padding:0 22px; }
+  .note-box{
+    border:1px solid var(--line); border-left:3px solid var(--go-cyan);
+    background:var(--bg-panel); border-radius:8px; padding:14px 16px;
+    font-size:13.5px; color:var(--text-dim);
+  }
+  .note-box b{ color:var(--text); }
+  .note-box.source{ border-left-color:var(--go-yellow); }
+
+  .wrap{ max-width:900px; margin:0 auto; padding:0 22px; display:flex; flex-direction:column; gap:14px; }
+
+  details.level{
+    border:1px solid var(--line); border-radius:var(--radius);
+    background:var(--bg-panel); overflow:hidden;
+  }
+  details.level[open]{ border-color:#2f5c6a; }
+  details.level > summary{
+    list-style:none; cursor:pointer;
+    padding:16px 18px; display:flex; align-items:center; gap:14px;
+    user-select:none;
+  }
+  details.level > summary::-webkit-details-marker{ display:none; }
+  .lvl-num{
+    font-family:var(--mono); font-weight:800; font-size:12.5px;
+    color:var(--bg); background:var(--go-cyan-bright);
+    width:30px; height:30px; border-radius:7px;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .lvl-titles{ flex:1; min-width:0; }
+  .lvl-title{ font-family:var(--mono); font-weight:700; font-size:14.5px; color:#fff; }
+  .lvl-sub{ font-size:12.5px; color:var(--text-faint); margin-top:2px; }
+  .lvl-count{ font-family:var(--mono); font-size:12px; color:var(--text-dim); flex-shrink:0; min-width:44px; text-align:right; }
+  .lvl-count.complete{ color:var(--done-green); }
+  .chev{ width:16px; height:16px; flex-shrink:0; color:var(--text-faint); transition:transform .2s ease; }
+  details.level[open] .chev{ transform:rotate(90deg); }
+
+  .lvl-progress-track{ height:3px; background:var(--line-soft); width:100%; }
+  .lvl-progress-fill{ height:100%; background:var(--go-cyan); transition:width .3s ease; }
+  .lvl-progress-fill.complete{ background:var(--done-green); }
+
+  .lvl-body{ padding:4px 18px 18px; border-top:1px solid var(--line-soft); }
+
+  .ex-item{ padding:13px 4px; border-bottom:1px solid var(--line-soft); }
+  .ex-item:last-child{ border-bottom:none; }
+  .ex-row{ display:flex; align-items:flex-start; gap:12px; }
+
+  .ex-check{
+    flex-shrink:0; width:20px; height:20px; margin-top:2px;
+    border-radius:6px; border:1.5px solid var(--line);
+    background:var(--bg-panel-2); cursor:pointer; position:relative;
+    transition:all .15s ease; appearance:none; -webkit-appearance:none;
+  }
+  .ex-check:hover{ border-color:var(--go-cyan-bright); }
+  .ex-check:checked{ background:var(--done-green); border-color:var(--done-green); }
+  .ex-check:checked::after{
+    content:""; position:absolute; left:6px; top:2px;
+    width:5px; height:10px; border:solid var(--bg); border-width:0 2px 2px 0;
+    transform:rotate(45deg);
+  }
+
+  .ex-text{ flex:1; min-width:0; }
+  .ex-code{
+    font-family:var(--mono); font-size:11px; color:var(--go-cyan-bright);
+    background:rgba(0,173,216,0.08); border:1px solid rgba(0,173,216,0.2);
+    padding:1px 7px; border-radius:5px; display:inline-block; margin-bottom:4px;
+  }
+  .ex-title{ font-family:var(--mono); font-size:13px; font-weight:600; color:var(--text); margin-bottom:4px; }
+  .ex-desc{ font-size:13.5px; color:var(--text-dim); margin-bottom:8px; }
+  .ex-item.done .ex-title{ color:var(--done-green); }
+  .ex-item.done .ex-desc{ color:var(--text-faint); }
+  .ex-item.done{ background:var(--done-green-bg); border-radius:6px; }
+
+  .ex-info{
+    margin-top:6px; margin-left:32px;
+    background:var(--bg-panel-2); border:1px solid var(--line-soft);
+    border-left:3px solid var(--go-yellow);
+    border-radius:6px; padding:9px 12px;
+    font-size:12.5px; color:var(--text-dim); line-height:1.55;
+  }
+  .ex-info b{ color:var(--go-yellow); font-weight:600; }
+
+  .footer{
+    max-width:900px; margin:34px auto 0; padding:20px 22px 0;
+    border-top:1px solid var(--line);
+  }
+  .reset-btn{
+    font-family:var(--mono); font-size:12px; color:var(--text-dim);
+    background:var(--bg-panel); border:1px solid var(--line);
+    padding:8px 14px; border-radius:7px; cursor:pointer; margin-top:14px;
+  }
+  .reset-btn:hover{ border-color:var(--danger); color:var(--danger); }
+
+  @media (max-width:560px){
+    .topbar-title{ display:none; }
+    .lvl-sub{ display:none; }
+    .ex-info{ margin-left:0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <div class="topbar-title">production_go.go — 14 sections</div>
+    <div class="topbar-progress">
+      <div class="topbar-progress-track"><div class="topbar-progress-fill" id="topFill"></div></div>
+      <div class="topbar-progress-text" id="topText">0 / 0</div>
+    </div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">production checklist</div>
+  <h1>Production-Grade <span class="accent">Golang</span> Tracker</h1>
+  <p>Ardan Labs-এর "Ultimate Go" syllabus অনুযায়ী সাজানো — শুধু syntax না, বরং Go internals (memory, scheduler, GC, concurrency) কেন এভাবে কাজ করে সেটা বোঝার জন্য। প্রতিটা exercise নিজে হাতে code করে test করো, তারপর নিচের info অংশ পড়ে বুঝে নাও কোথায়/কেন ব্যবহার হয়।</p>
+  <div class="hero-stats">
+    <div class="stat-chip">📦 <b id="statTotal">0</b> exercises</div>
+    <div class="stat-chip">🧩 14 sections</div>
+    <div class="stat-chip done">✅ <b id="statDone">0</b> completed</div>
+  </div>
+</div>
+
+<div class="note">
+  <div class="note-box source">
+    <b>Source:</b> এই structure William Kennedy (Ardan Labs)-এর <b>"Ultimate Go"</b> course-এর syllabus থেকে নেওয়া — Fortune 500 কোম্পানির engineer-দের train করার জন্য ব্যবহৃত, Go community-তে সবচেয়ে respected production-level Go course হিসেবে পরিচিত।
+  </div>
+</div>
+<div class="note">
+  <div class="note-box">
+    <b>Note:</b> Standalone HTML file — tab বন্ধ করলে tick reset হয়ে যাবে (কোনো storage নেই)। প্রতিটা section শেষে screenshot নিয়ে progress track করতে পারো।
+  </div>
+</div>
+
+<div class="wrap" id="levelsWrap"></div>
+
+<div class="footer">
+  <button class="reset-btn" onclick="resetAll()">↺ Reset all checkmarks</button>
+</div>
+<p style="max-width:900px;margin:14px auto 0;padding:0 22px;font-family:var(--mono);font-size:11.5px;color:var(--text-faint);">Based on Ardan Labs' Ultimate Go syllabus — practice exercises + concept notes for self-study.</p>
+
+<script>
+const LEVELS = [
+{ title:"1. Design Guidelines", sub:"Mindset before writing production code", exercises:[
+  ["1.1 Prepare Your Mind","নিজের ভাষায় ৩টা জিনিস লেখো যেগুলো তুমি production Go code লেখার সময় priority দেবে (readability vs cleverness)।","","Production Go লেখার আগের mental shift — 'clever/compact code' এর বদলে readable, simple, boring code লেখার মানসিকতা। এটা কোনো syntax না, বরং একটা discipline।"],
+  ["1.2 Productivity vs. Performance","একই কাজের দুইটা version লেখো — একটা readability-focused, একটা speed-focused — পার্থক্য compare করো।","","Go by default productivity/simplicity-কে priority দেয়। Performance-এর জন্য optimize তখনই করবে যখন সত্যিকারের প্রয়োজন প্রমাণিত হয় (profiling দিয়ে), আন্দাজে না।"],
+  ["1.3 Correctness vs. Performance","ইচ্ছাকৃতভাবে একটা bug রেখে দ্রুত code লেখো, তারপর আগে correctness ঠিক করো, এরপর optimize করো।","","Correctness সবসময় performance-এর আগে আসে — ভুল উত্তর দ্রুত পাওয়ার কোনো মানে নেই। Production system-এ এটা non-negotiable rule।"],
+  ["1.4 Code Reviews","নিজের লেখা কোনো code-এ `go vet` এবং `golangci-lint` চালাও, যা যা issue দেখায় ঠিক করো।","go vet · golangci-lint","Structured code review culture consistency বজায় রাখে। Automated tool (vet/lint) human review-এর আগে সাধারণ ভুল ধরে ফেলে — production team-এ standard practice।"],
+  ["1.5 If Performance Matters","একটা function-এর জন্য `testing.B` দিয়ে benchmark লেখো, ফলাফলে bottleneck দেখলে তবেই optimize করো।","testing.B","Performance work সবসময় data-driven হতে হবে (profiling/benchmarking দিয়ে), কখনো আন্দাজ করে optimize করা যাবে না — এটাই Go performance culture-এর মূল কথা।"]
+]},
+{ title:"2. Memory & Data Semantics", sub:"Variables, structs, pointers, GC", exercises:[
+  ["2.1 Variables","var, :=, এবং zero value দিয়ে variable declare করো, %T দিয়ে type print করো।","var, :=, %T","Go-তে প্রতিটা variable-এর একটা zero value থাকে (int=0, string=\"\", bool=false) — এই concept ভাষার অনেক জায়গায় behavior ঠিক করে দেয়।"],
+  ["2.2 Struct Types","কয়েকটা field সহ একটা struct define করো, named field literal দিয়ে instance বানাও।","struct","Struct হলো Go-তে data model করার মূল উপায় (class নেই)। Production code-এর প্রায় সবকিছুই struct-ভিত্তিক।"],
+  ["2.3.1 Pointers Pt.1 (Pass by Value)","struct value হিসেবে function-এ পাঠাও, ভেতরে modify করো, caller-এ কোনো change হয় না দেখো।","func(t T)","Go default pass-by-value — এই concept না বুঝলে 'আমার change apply হচ্ছে না কেন' জাতীয় বাগ বারবার হবে।"],
+  ["2.3.2 Pointers Pt.2 (Sharing Data)","struct pointer (*T) হিসেবে পাঠাও, ভেতরে modify করো, caller-এ change দেখা যায় verify করো।","func(t *T)","Pointer দিয়ে function boundary পার হয়ে data share/mutate করা হয় copy না করেই — memory-efficient এবং mutation দরকার হলে ব্যবহার হয়।"],
+  ["2.3.3 Pointers Pt.3 (Escape Analysis)","`go build -gcflags=\"-m\"` দিয়ে দেখো কোন variable heap-এ escape করছে।","-gcflags=\"-m\"","Compiler নিজে ঠিক করে variable stack না heap-এ যাবে। এটা বোঝা perf-sensitive code-এ জরুরি, কারণ heap allocation বেশি হলে GC-র উপর চাপ বাড়ে।"],
+  ["2.3.4 Pointers Pt.3 (Stack Growth)","একটা deep recursive function লিখে ছোট example-এ stack growth behavior পর্যবেক্ষণ করো।","recursion","প্রতিটা goroutine ছোট (~2KB) stack নিয়ে শুরু হয়, প্রয়োজনে বেড়ে যায় — এটাই OS thread-এর তুলনায় goroutine-কে এত হালকা করে তোলে।"],
+  ["2.3.5 Pointers Pt.3 (Garbage Collection)","`runtime.ReadMemStats` দিয়ে heap allocation ও GC-র statistics দেখো।","runtime.ReadMemStats","Go concurrent, tri-color mark-and-sweep GC ব্যবহার করে। কোন value heap-এ escape করছে সেটা বোঝা মানে GC-র উপর চাপ বোঝা — latency-sensitive service-এর জন্য critical।"],
+  ["2.4 Constants","`iota` ব্যবহার করে একটা enum-এর মতো constant group বানাও, untyped constant দিয়ে arithmetic করো।","iota","Go-এর constant system ভিন্ন — untyped constant-এর arbitrary precision থাকে, `iota` দিয়ে enum-এর মতো pattern তৈরি হয়।"],
+  ["Addendum: GC Deep Dive","`GODEBUG=gctrace=1` দিয়ে একটা program চালিয়ে GC-র trace output পড়ো ও বোঝার চেষ্টা করো।","GODEBUG=gctrace=1","Production Go engineer-রা latency-sensitive service-এ GC behavior monitor করে — এই trace output পড়তে পারা একটা advanced production-debugging দক্ষতা।"]
+]},
+{ title:"3. Data Structures", sub:"Arrays, slices, maps — value vs reference semantics", exercises:[
+  ["3.1 Arrays Pt.1 (Mechanical Sympathy)","Array iterate করা বনাম linked-list-এর মতো scattered structure iterate করার speed benchmark করে compare করো।","benchmark","'Mechanical sympathy' মানে CPU/cache আসলে কীভাবে কাজ করে সেটা মাথায় রেখে code লেখা — contiguous memory (array/slice) CPU cache-friendly হওয়ায় দ্রুত।"],
+  ["3.2.1 Arrays Pt.2 (Semantics)","একটা array copy করো (value semantics) বনাম slice pass করো (reference-এর মতো semantics) — পার্থক্য দেখো।","[N]T vs []T","Array হলো fixed-size value type — assign করলে পুরোটা copy হয়। এটা slice থেকে আলাদা আচরণ।"],
+  ["3.2.2 Arrays Pt.3 (Range Mechanics)","Array-এর উপর range করো, loop variable mutate করে দেখো original array বদলায় কিনা।","range","`range` প্রতিটা element-এর একটা COPY দেয় — loop variable বদলালে original array-তে কোনো প্রভাব পড়ে না। এটা একটা common Go গোঁজামিল-বাগের জায়গা।"],
+  ["3.3.1 Slices Pt.1 (Declare/Len/Cap)","`make()` দিয়ে slice বানাও, `len()` আর `cap()` চেক করো।","make, len, cap","Slice আসলে (pointer, length, capacity)-এর একটা struct যেটা underlying array-কে wrap করে — reference-এর মতো আচরণ করে।"],
+  ["3.3.2 Slices Pt.2 (Appending)","Capacity-র বেশি append করো, append-এর আগে-পরে pointer address print করে reallocation দেখো।","append","`append()` মাঝে মাঝে নতুন backing array বানায়, মাঝে মাঝে বানায় না — এটা না বুঝলে subtle bug/performance সমস্যা হয়।"],
+  ["3.3.3 Slices Pt.3 (Slice of Slices)","একটা slice-কে slice করো (s[1:3]), sub-slice modify করে original-এ effect দেখো।","s[low:high]","Sub-slice একই underlying array share করে — মানে unexpected জায়গায় mutation 'leak' করতে পারে। এটা classic Go gotcha।"],
+  ["3.3.4 Slices Pt.4 (References)","Slice function-এ পাঠাও, element mutate করো, caller-এ change দেখা যায় verify করো।","func(s []T)","Slice header pass-by-value হলেও, তার underlying array shared — তাই pass-by-value + reference-এর মতো আচরণ একসাথে থাকে।"],
+  ["3.3.5 Slices Pt.5 (Strings & Slices)","একটা বাংলা/unicode string-কে []byte আর []rune-এ convert করে len() compare করো।","[]byte, []rune","String আসলে UTF-8 byte sequence — `len()` byte count দেয়, character count না। Internationalization-এর জন্য এটা জানা জরুরি।"],
+  ["3.3.6 Slices Pt.6 (Range Mechanics)","String-এর উপর range করে rune index আর byte index-এর পার্থক্য observe করো।","range (string)","String-এর উপর range করলে UTF-8 rune automatically decode হয়, index এক-এক করে না বেড়ে variable byte-width অনুযায়ী বাড়ে।"],
+  ["3.4 Maps","map[string]int বানাও, iterate করো (unordered লক্ষ্য করো), 'comma-ok' idiom দিয়ে missing key handle করো।","v, ok := m[k]","Go map হলো hash table, iteration order ইচ্ছাকৃতভাবে random। 'comma-ok' idiom Go-এর সবচেয়ে ব্যবহৃত core pattern-গুলোর একটা।"]
+]},
+{ title:"4. Decoupling", sub:"Methods, interfaces, embedding, exporting", exercises:[
+  ["4.1.1 Methods Pt.1 (Value & Pointer Receiver)","একই type-এ value receiver আর pointer receiver দিয়ে দুইটা method লেখো, পার্থক্য দেখো।","func (t T) / func (t *T)","Receiver type বাছাই ঠিক করে method original data mutate করতে পারবে কিনা, আর interface satisfy করার rule-ও এর উপর নির্ভর করে।"],
+  ["4.1.2 Methods Pt.2 (Method Variables)","একটা method-কে variable-এ assign করো (method value/expression) এবং call করো।","method value","Go-তে function first-class value — এটা callback pattern লেখা সহজ করে দেয়।"],
+  ["4.2.1 Interfaces Pt.1 (Polymorphism)","একটা method সহ interface বানাও, ২টা আলাদা struct দিয়ে implement করো, interface accept করা function লেখো।","interface","Go-এর implicit interface satisfaction (কোনো 'implements' keyword নেই) — এটাই idiomatic Go design-এর কেন্দ্রবিন্দু।"],
+  ["4.2.2 Interfaces Pt.2 (Method Sets)","দেখাও যে pointer-receiver method থাকলে শুধু *T interface satisfy করে, T করে না।","method set","এই 'method set' rule নতুনদের জন্য confusing compile error-এর একটা বড় কারণ — value বনাম pointer method set বুঝতেই হবে।"],
+  ["4.2.3 Interfaces Pt.3 (Storage by Value)","একটা struct-কে interface variable-এ রাখো, %T দিয়ে internal representation দেখো।","%T","Interface value ভেতরে (type, value) জোড়া store করে রাখে — এটা Go runtime-এর একটা core concept।"],
+  ["4.2.4 Interfaces Pt.4 (Type Assertion)","Type assertion (v, ok := i.(T)) এবং type switch ব্যবহার করে অজানা type gracefully handle করো।","i.(T), switch","Interface থেকে concrete type ফেরত পাওয়ার উপায় — error handling ও generics আসার আগে generic-এর মতো code-এ প্রচুর ব্যবহার হতো।"],
+  ["4.3 Embedding","একটা struct-কে আরেকটার ভেতরে embed করো (composition), embedded method সরাসরি call করো।","embedding","Go-তে inheritance নেই — embedding হলো Go-এর code-reuse পদ্ধতি ('has-a', 'is-a' না)।"],
+  ["4.4 Exporting","একটা package বানাও যেখানে exported (capital letter) আর unexported identifier আছে, main-এ import করো।","Capital = exported","Go নাম দিয়ে encapsulation করে (public/private keyword নেই) — প্রথম letter capital মানেই সেটা package-এর বাইরে থেকে visible।"]
+]},
+{ title:"5. Composition", sub:"Design guidelines for decoupled, testable code", exercises:[
+  ["5.1 Grouping Types","একই feature-এর সব type/interface এক জায়গায় group করো — 'kind অনুযায়ী' না 'feature অনুযায়ী' grouping কেন ভালো ভাবো।","package design","Idiomatic Go project structure principle — package বানাও 'কী করে' সেই অনুযায়ী, 'কী ধরনের object' সেই অনুযায়ী না।"],
+  ["5.2.1 Decoupling","একটা function যেটা concrete struct-এর উপর নির্ভর করে, সেটাকে ছোট একটা interface-এর উপর নির্ভরশীল করে refactor করো।","interface param","'Accept interfaces, return structs' — testable, decoupled Go code লেখার সবচেয়ে গুরুত্বপূর্ণ guideline।"],
+  ["5.3.1 Conversion & Assertions Pt.1","Compatible দুইটা type-এর মধ্যে explicit conversion করো।","T(x)","Go-তে implicit conversion নেই, সব explicit — সুবিধার চেয়ে safety-কে priority দেওয়া হয়েছে।"],
+  ["5.3.2 Conversion & Assertions Pt.2","একটা interface-কে আরেকটা বেশি specific interface-এ safely assert করো।","i.(OtherInterface)","Optional behavior check করতে ব্যবহার হয় (যেমন io.Closer কোনো object optionally implement করে কিনা)।"],
+  ["5.4 Interface Pollution","একটা অপ্রয়োজনীয় interface (যার একটাই implementation, বাস্তব কোনো কারণ নেই) খুঁজে বের করে সরিয়ে দাও।","anti-pattern","'দরকার নেই এমন interface দিয়ে design করো না' — over-abstraction Go-এর সবচেয়ে common anti-pattern।"],
+  ["5.5 Mocking","একটা ছোট interface বানাও এবং external service call করা function unit-test করতে mock implementation লেখো।","mock","Interface থাকলে test-এ আসল DB/network এ না গিয়ে dependency mock করা যায়।"]
+]},
+{ title:"6. Error Handling", sub:"Errors as values, wrapping, custom error types", exercises:[
+  ["6.1 Default Error Values","errors.New() এবং fmt.Errorf() দিয়ে সাধারণ error তৈরি করে return করো।","errors.New, fmt.Errorf","Go-তে error একটা value (exception না) — explicit ভাবে return হয়, explicit ভাবে check হয় (`if err != nil`)।"],
+  ["6.2 Error Variables","Sentinel error define করো (var ErrNotFound = errors.New(...)) এবং errors.Is() দিয়ে compare করো।","errors.Is","Sentinel error pattern caller-কে নির্দিষ্ট error-kind চেক করতে দেয়।"],
+  ["6.3 Types as Context","error interface implement করা একটা custom error struct/type বানাও, errors.As() দিয়ে extract করো।","errors.As","Custom error type শুধু string message না, structured context (field name, code ইত্যাদি) বহন করতে পারে।"],
+  ["6.4 Behavior as Context","একটা error type বানাও যাতে Temporary() bool method আছে, interface assertion দিয়ে সেই behavior চেক করো।","behavior check","Exact type চেক না করে error কী BEHAVIOR expose করছে সেটা চেক করা (যেমন: 'এটা কি retry করা যাবে?')।"],
+  ["6.5 Find the Bug","ইচ্ছাকৃতভাবে ভুল error-handling code লেখো (err ignore করা, বা wrapped error-কে == দিয়ে compare করা), তারপর ঠিক করো।","common bugs","Production-এ real bug এভাবেই হয় — err ignore করা, wrapped error ভুলভাবে compare করা।"],
+  ["6.6 Wrapping Errors","fmt.Errorf(\"...: %w\", err) দিয়ে wrap করো, errors.Unwrap()/Is()/As() দিয়ে unwrap করো।","%w","Error wrapping পুরো error chain-এর context ধরে রাখে, programmatically inspect করাও যায় — Go 1.13+ থেকে এটাই modern standard।"]
+]},
+{ title:"7. Packaging", sub:"Package-oriented project design", exercises:[
+  ["7.1 Language Mechanics & Design Guidelines","একটা ছোট project বানাও যেখানে একাধিক package আছে, প্রতিটার clear public API আছে।","package layout","Package design compile time, testability, এবং API clarity-কে সরাসরি প্রভাবিত করে।"],
+  ["7.2 Package-Oriented Design","একটা generic 'utils' জাতীয় package-কে meaningful, purpose-named package-এ ভেঙে refactor করো।","no 'utils' package","Ardan Labs-এর signature philosophy — generic 'util'/'common' package এড়িয়ে চলো, package-এর নাম দাও সেটা কী দেয় তার উপর ভিত্তি করে।"]
+]},
+{ title:"8. Goroutines", sub:"Go's concurrency primitive", exercises:[
+  ["8.1 OS Scheduler Mechanics","OS-level thread scheduling ও context-switch খরচ নিয়ে পড়ো, goroutine-এর সাথে তুলনা করে নোট লেখো।","OS threads","OS thread scheduling (preemptive, ব্যয়বহুল context switch) বুঝলে বোঝা যায় কেন goroutine-এর দরকার হলো।"],
+  ["8.2 Go Scheduler Mechanics","runtime.GOMAXPROCS(0) এবং runtime.NumGoroutine() print করো, GOMAXPROCS বদলে experiment করো।","GOMAXPROCS","Go scheduler অনেক goroutine (G)-কে অল্প কিছু OS thread (M)-এর উপর logical processor (P) দিয়ে multiplex করে — এটাই বিখ্যাত 'M:N scheduler' মডেল।"],
+  ["8.3 Creating Goroutines","`go func(){}()` দিয়ে ৫টা goroutine চালাও, sync.WaitGroup দিয়ে সবগুলোর শেষ হওয়ার জন্য wait করো।","go func(), sync.WaitGroup","সবচেয়ে বেশি ব্যবহৃত concurrency primitive — OS thread-এর তুলনায় অনেক হালকা (~2KB starting stack)।"]
+]},
+{ title:"9. Data Races", sub:"Detecting and fixing concurrent access bugs", exercises:[
+  ["9.1 Managing Data Races","একটা ইচ্ছাকৃত race condition লেখো (২টা goroutine একসাথে shared variable বাড়াচ্ছে), `go run -race` দিয়ে চালাও, তারপর sync.Mutex বা channel দিয়ে ঠিক করো।","go run -race","`-race` detector production Go workflow-তে বাধ্যতামূলক টুল — deployment-এর আগে concurrency bug ধরে ফেলার জন্য।"]
+]},
+{ title:"10. Channels", sub:"Signaling and communication between goroutines", exercises:[
+  ["10.1 Signaling Semantics","Unbuffered channel দিয়ে দুইটা goroutine-এর মধ্যে completion signal পাঠাও (ডেটা ছাড়া, শুধু signal)।","unbuffered chan","Channel মূলত signaling/synchronization-এর জন্য, শুধু data transfer না — 'Don't communicate by sharing memory; share memory by communicating' — Go-এর মূলমন্ত্র।"],
+  ["10.2 Basic Patterns","Buffered channel দিয়ে basic producer-consumer pattern implement করো।","buffered chan","একদম foundational concurrency pattern, প্রায় প্রতিটা Go service-এ কোনো না কোনোভাবে ব্যবহার হয়।"],
+  ["10.3 Fan Out","একটা goroutine N-টা worker goroutine spawn করবে যারা একটা channel থেকে একসাথে কাজ process করে — এই pattern বানাও।","fan-out","স্বাধীন কাজ parallelize করতে ব্যবহার হয় (যেমন একসাথে একাধিক file/request process করা)।"],
+  ["10.4 Wait for Task","একটা 'done' channel দিয়ে main-কে নির্দিষ্ট goroutine-এর কাজ শেষ হওয়া পর্যন্ত wait করাও।","done channel","Coordination pattern — WaitGroup-এর বিকল্প বা সহযোগী হিসেবে ব্যবহার হয়।"],
+  ["10.5 Pooling","একটা fixed সংখ্যক goroutine-এর worker pool বানাও যারা shared job channel থেকে কাজ নেয়।","worker pool","Concurrency-কে সীমিত রেখে system resource overwhelm হওয়া থেকে বাঁচায় — production-এ load-এর সময় critical।"],
+  ["10.6 Fan Out Semaphore","Buffered channel-কে semaphore হিসেবে ব্যবহার করে সর্বোচ্চ N-টা concurrent goroutine-এ সীমিত রাখো।","semaphore pattern","Channel দিয়ে semaphore pattern — max concurrency explicit ভাবে নিয়ন্ত্রণ করে।"],
+  ["10.7 Fan Out Bounded","Fan-out-কে bounded concurrency আর result-collection channel-এর সাথে combine করো।","bounded fan-out","Result aggregation সহ bounded parallel processing-এর জন্য একটা production pattern।"],
+  ["10.8 Drop Pattern","System capacity-তে পৌঁছালে block না করে নতুন কাজ 'drop' করে দেয় এমন একটা channel-based pattern বানাও।","drop pattern","High-throughput system-এ ব্যবহার হয় যেখানে block করা drop করার চেয়ে খারাপ (যেমন: logging, metrics under overload)।"],
+  ["10.9 Cancellation Pattern","context.Context আর cancel ব্যবহার করে একাধিক goroutine-কে cooperatively বন্ধ করো।","context.Context","Timeout/cancellation ছড়িয়ে দেওয়ার জন্য এটাই THE standard Go pattern — goroutine ও API boundary জুড়ে।"]
+]},
+{ title:"11. Concurrency Patterns", sub:"Higher-level resilience patterns", exercises:[
+  ["11.1 Failure Detection","একটা goroutine বানাও যা আরেকটা worker-এর 'liveness' monitor করে (heartbeat channel দিয়ে), সাড়া না দিলে restart করে।","heartbeat pattern","Production service-এ self-healing pattern দরকার হয় — এটা অনেকটা circuit-breaker/health-check design-এর মতো।"]
+]},
+{ title:"12. Testing", sub:"Go's built-in testing toolkit", exercises:[
+  ["12.1 Basic Unit Testing","একটা _test.go file-এ সাধারণ TestXxx function লিখে `go test` চালাও।","go test","Go-এর built-in testing package — basic কাজের জন্য বাইরের কোনো framework লাগে না।"],
+  ["12.2 Table Unit Testing","Test-গুলোকে table-driven pattern-এ rewrite করো (input+expected-এর একটা slice of struct দিয়ে)।","table-driven test","Idiomatic Go testing style — কম code-এ অনেক case cover করে, প্রতিটা serious Go codebase-এ standard।"],
+  ["12.3 Mocking Web Server Response","httptest.NewServer দিয়ে একটা HTTP dependency mock করো test-এ।","httptest.NewServer","আসল network-এ না গিয়ে HTTP client code test করা যায় — reliable CI pipeline-এর জন্য জরুরি।"],
+  ["12.4 Testing Internal Endpoints","httptest.NewRecorder দিয়ে সরাসরি একটা HTTP handler function test করো, real server ছাড়াই।","httptest.NewRecorder","HTTP handler দ্রুত ও isolated ভাবে test করার উপায়।"],
+  ["12.5 Sub Tests","t.Run() দিয়ে একটা test function-এর ভেতরে নামযুক্ত subtest বানাও।","t.Run","একই বিষয়ের test case organize করে, `go test -run` দিয়ে নির্দিষ্ট subtest filter/run করা যায়।"],
+  ["12.6 Code Coverage","`go test -cover` এবং `go tool cover -html` চালিয়ে coverage visualize করো।","go tool cover","Production-এ ship করার আগে কোন code path test হয়নি সেটা খুঁজে বের করার standard টুল।"]
+]},
+{ title:"13. Benchmarking", sub:"Measuring performance the right way", exercises:[
+  ["13.1 Basic Benchmarking","একটা BenchmarkXxx function লিখে `go test -bench=.` চালাও।","go test -bench","Go-এর built-in benchmarking — ns/op measure করে, optimize করার আগে এটা must।"],
+  ["13.2 Validate Benchmarking","b.ReportAllocs() ব্যবহার করে benchmark output-এ allocs/op চেক করো।","b.ReportAllocs()","'Optimization' সত্যিই allocation কমিয়েছে কিনা যাচাই করে, শুধু অনুমান না।"],
+  ["13.3 CPU-Bound Benchmarking","একটা CPU-heavy function (যেমন sorting) benchmark করো, দুইটা algorithm implementation compare করো।","CPU-bound","Compute-heavy code path-এর জন্য benchmarking pattern।"],
+  ["13.4 IO-Bound Benchmarking","File/network IO করা একটা function benchmark করো, ফলাফলে variance বেশি কেন বোঝার চেষ্টা করো।","IO-bound","IO-bound benchmark ভিন্নভাবে আচরণ করে (external variance থাকে) — শেখায় কখন benchmarking সঠিক টুল না (তখন tracing দরকার)।"]
+]},
+{ title:"14. Profiling & Tracing", sub:"Deep production debugging tools", exercises:[
+  ["14.1 Profiling Guidelines","কখন/কেন profile করা উচিত (শুধু benchmark সমস্যা দেখালে) তা নিয়ে একটা ছোট নোট লেখো।","guideline","নিয়ম: আগে measure করো, কখনো আন্দাজ করে bottleneck ধরে নিও না।"],
+  ["14.2 Stack Traces","ইচ্ছাকৃতভাবে একটা panic ঘটাও (যেমন nil pointer dereference), stack trace পড়ে বোঝার চেষ্টা করো।","panic trace","দ্রুত stack trace পড়তে পারা একটা core production-debugging দক্ষতা।"],
+  ["14.3 Micro Level Optimization","একটা ছোট program-এ `pprof` দিয়ে CPU profile নাও, সবচেয়ে বেশি সময়-খরচকারী function খুঁজে বের করো।","pprof (CPU)","pprof হলো Go-এর standard profiler — ঠিক কোন লাইনে CPU সময় খরচ হচ্ছে সেটা বের করতে ব্যবহার হয়।"],
+  ["14.4 Macro Level Optimization","pprof heap profile দিয়ে একটা program-এর memory allocation hotspot খুঁজে বের করো।","pprof (heap)","Macro-level মানে architecture/allocation pattern বদলানো, heap profile data দিয়ে guided।"],
+  ["14.5 Execution Tracing","`go tool trace` দিয়ে একটা concurrent program-এর goroutine scheduling/blocking সময়ের সাথে visualize করো।","go tool trace","Execution tracer দেখায় ঠিক কীভাবে goroutine interleave করছে, block হচ্ছে, GC pause হচ্ছে — Go production debugging-এর সবচেয়ে গভীর স্তর।"]
+]}
+];
+
+const wrap = document.getElementById('levelsWrap');
+let totalCount = 0;
+
+LEVELS.forEach((lvl, li) => {
+  const details = document.createElement('details');
+  details.className = 'level';
+  if (li === 0) details.open = true;
+
+  const summary = document.createElement('summary');
+  summary.innerHTML = `
+    <div class="lvl-num">${String(li+1).padStart(2,'0')}</div>
+    <div class="lvl-titles">
+      <div class="lvl-title">${lvl.title}</div>
+      <div class="lvl-sub">${lvl.sub}</div>
+    </div>
+    <div class="lvl-count" id="count-${li}">0/${lvl.exercises.length}</div>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
+  `;
+  details.appendChild(summary);
+
+  const progressTrack = document.createElement('div');
+  progressTrack.className = 'lvl-progress-track';
+  progressTrack.innerHTML = `<div class="lvl-progress-fill" id="fill-${li}" style="width:0%"></div>`;
+  details.appendChild(progressTrack);
+
+  const body = document.createElement('div');
+  body.className = 'lvl-body';
+
+  lvl.exercises.forEach((ex, ei) => {
+    totalCount++;
+    const [title, desc, code, info] = ex;
+    const item = document.createElement('div');
+    item.className = 'ex-item';
+    const codeChip = code ? `<span class="ex-code">${code}</span><br>` : '';
+    item.innerHTML = `
+      <div class="ex-row">
+        <input type="checkbox" class="ex-check" id="chk-${li}-${ei}" data-level="${li}">
+        <div class="ex-text">
+          ${codeChip}
+          <div class="ex-title">${title}</div>
+          <div class="ex-desc">${desc}</div>
+          <div class="ex-info"><b>ℹ️ কী কাজে লাগে:</b> ${info}</div>
+        </div>
+      </div>
+    `;
+    body.appendChild(item);
+  });
+
+  details.appendChild(body);
+  wrap.appendChild(details);
+});
+
+document.getElementById('statTotal').textContent = totalCount;
+
+function updateAll(){
+  let doneTotal = 0;
+  LEVELS.forEach((lvl, li) => {
+    const checks = document.querySelectorAll(`input[data-level="${li}"]`);
+    let doneCount = 0;
+    checks.forEach(c => { if (c.checked) doneCount++; });
+    doneTotal += doneCount;
+
+    document.getElementById(`count-${li}`).textContent = `${doneCount}/${lvl.exercises.length}`;
+    document.getElementById(`count-${li}`).classList.toggle('complete', doneCount === lvl.exercises.length);
+    const pct = (doneCount / lvl.exercises.length) * 100;
+    const fill = document.getElementById(`fill-${li}`);
+    fill.style.width = pct + '%';
+    fill.classList.toggle('complete', pct === 100);
+  });
+
+  document.getElementById('statDone').textContent = doneTotal;
+  document.getElementById('topText').textContent = `${doneTotal} / ${totalCount}`;
+  document.getElementById('topFill').style.width = totalCount ? (doneTotal/totalCount*100) + '%' : '0%';
+}
+
+wrap.addEventListener('change', (e) => {
+  if (e.target.classList.contains('ex-check')) {
+    e.target.closest('.ex-item').classList.toggle('done', e.target.checked);
+    updateAll();
+  }
+});
+
+function resetAll(){
+  if(!confirm('সব checkmark মুছে ফেলতে চাও?')) return;
+  document.querySelectorAll('.ex-check').forEach(c => {
+    c.checked = false;
+    c.closest('.ex-item').classList.remove('done');
+  });
+  updateAll();
+}
+
+updateAll();
+</script>
+
+</body>
+</html>

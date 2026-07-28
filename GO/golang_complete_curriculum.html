@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golang — Complete Production Curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0f1115;
+    --bg-panel: #161920;
+    --bg-panel-2: #1b1f28;
+    --bg-code: #0a0c10;
+    --line: #262b36;
+    --line-soft: #1e222b;
+    --text: #e7e9ee;
+    --text-dim: #939aab;
+    --text-faint: #5b6272;
+    --go-cyan: #00ADD8;
+    --go-cyan-bright: #4dd0f0;
+    --go-yellow: #FFD43B;
+    --done-green: #4caf7d;
+    --done-green-bg: rgba(76,175,125,0.10);
+    --danger: #e0637a;
+    --purple: #a78bfa;
+    --radius: 10px;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --bn: 'Hind Siliguri', 'JetBrains Mono', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 12% -10%, rgba(0,173,216,0.12), transparent 45%),
+      radial-gradient(circle at 100% 5%, rgba(255,212,59,0.05), transparent 40%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--bn);
+    line-height:1.5;
+    min-height:100vh;
+    padding-bottom:80px;
+  }
+  ::selection{ background:rgba(0,173,216,0.35); }
+
+  .topbar{
+    position:sticky; top:0; z-index:50;
+    background:rgba(15,17,21,0.94);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-inner{
+    max-width:920px; margin:0 auto; padding:14px 22px;
+    display:flex; align-items:center; gap:16px;
+  }
+  .dots{ display:flex; gap:6px; flex-shrink:0; }
+  .dots span{ width:9px; height:9px; border-radius:50%; display:block; }
+  .dots span:nth-child(1){ background:#e0637a; }
+  .dots span:nth-child(2){ background:var(--go-yellow); }
+  .dots span:nth-child(3){ background:var(--done-green); }
+  .topbar-title{
+    font-family:var(--mono); font-size:12.5px; color:var(--text-dim);
+    letter-spacing:.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .topbar-progress{ margin-left:auto; display:flex; align-items:center; gap:10px; flex-shrink:0; }
+  .topbar-progress-track{ width:130px; height:6px; background:var(--line-soft); border-radius:99px; overflow:hidden; }
+  .topbar-progress-fill{
+    height:100%; width:0%; border-radius:99px;
+    background:linear-gradient(90deg, var(--go-cyan), var(--done-green));
+    transition:width .4s ease;
+  }
+  .topbar-progress-text{ font-family:var(--mono); font-size:12px; color:var(--go-cyan-bright); font-weight:600; white-space:nowrap;}
+
+  .hero{ max-width:920px; margin:0 auto; padding:44px 22px 24px; }
+  .hero-eyebrow{
+    font-family:var(--mono); font-size:12px; color:var(--go-yellow);
+    letter-spacing:.12em; text-transform:uppercase; margin-bottom:14px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .hero-eyebrow::before{ content:"package main"; color:var(--go-cyan-bright); }
+  h1{
+    font-family:var(--mono); font-weight:800; font-size:clamp(22px,4vw,34px);
+    margin:0 0 12px; letter-spacing:-0.01em; color:#fff;
+  }
+  h1 .accent{ color:var(--go-cyan-bright); }
+  .hero p{ color:var(--text-dim); font-size:15px; max-width:680px; margin:0 0 18px; }
+  .hero-stats{ display:flex; gap:10px; flex-wrap:wrap; }
+  .stat-chip{
+    font-family:var(--mono); font-size:12px; color:var(--text-dim);
+    border:1px solid var(--line); background:var(--bg-panel);
+    padding:6px 11px; border-radius:99px; display:flex; align-items:center; gap:6px;
+  }
+  .stat-chip b{ color:var(--text); font-weight:700; }
+  .stat-chip.done b{ color:var(--done-green); }
+
+  .part-label{
+    max-width:920px; margin:26px auto 10px; padding:0 22px;
+    font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--purple); display:flex; align-items:center; gap:10px;
+  }
+  .part-label::after{ content:""; flex:1; height:1px; background:var(--line); }
+
+  .note{ max-width:920px; margin:0 auto 22px; padding:0 22px; }
+  .note-box{
+    border:1px solid var(--line); border-left:3px solid var(--go-cyan);
+    background:var(--bg-panel); border-radius:8px; padding:13px 16px;
+    font-size:13px; color:var(--text-dim);
+  }
+  .note-box b{ color:var(--text); }
+
+  .wrap{ max-width:920px; margin:0 auto; padding:0 22px; display:flex; flex-direction:column; gap:12px; }
+
+  details.level{ border:1px solid var(--line); border-radius:var(--radius); background:var(--bg-panel); overflow:hidden; }
+  details.level[open]{ border-color:#2f5c6a; }
+  details.level > summary{ list-style:none; cursor:pointer; padding:15px 18px; display:flex; align-items:center; gap:14px; user-select:none; }
+  details.level > summary::-webkit-details-marker{ display:none; }
+  .lvl-num{
+    font-family:var(--mono); font-weight:800; font-size:12px;
+    color:var(--bg); background:var(--go-cyan-bright);
+    width:28px; height:28px; border-radius:7px;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .lvl-titles{ flex:1; min-width:0; }
+  .lvl-title{ font-family:var(--mono); font-weight:700; font-size:14px; color:#fff; }
+  .lvl-sub{ font-size:12px; color:var(--text-faint); margin-top:2px; }
+  .lvl-count{ font-family:var(--mono); font-size:11.5px; color:var(--text-dim); flex-shrink:0; min-width:40px; text-align:right; }
+  .lvl-count.complete{ color:var(--done-green); }
+  .chev{ width:15px; height:15px; flex-shrink:0; color:var(--text-faint); transition:transform .2s ease; }
+  details.level[open] .chev{ transform:rotate(90deg); }
+
+  .lvl-progress-track{ height:3px; background:var(--line-soft); width:100%; }
+  .lvl-progress-fill{ height:100%; background:var(--go-cyan); transition:width .3s ease; }
+  .lvl-progress-fill.complete{ background:var(--done-green); }
+
+  .lvl-body{ padding:4px 18px 16px; border-top:1px solid var(--line-soft); }
+
+  .ex-item{ padding:14px 4px; border-bottom:1px solid var(--line-soft); }
+  .ex-item:last-child{ border-bottom:none; }
+  .ex-row{ display:flex; align-items:flex-start; gap:12px; }
+
+  .ex-check{
+    flex-shrink:0; width:20px; height:20px; margin-top:2px;
+    border-radius:6px; border:1.5px solid var(--line);
+    background:var(--bg-panel-2); cursor:pointer; position:relative;
+    transition:all .15s ease; appearance:none; -webkit-appearance:none;
+  }
+  .ex-check:hover{ border-color:var(--go-cyan-bright); }
+  .ex-check:checked{ background:var(--done-green); border-color:var(--done-green); }
+  .ex-check:checked::after{
+    content:""; position:absolute; left:6px; top:2px;
+    width:5px; height:10px; border:solid var(--bg); border-width:0 2px 2px 0;
+    transform:rotate(45deg);
+  }
+
+  .ex-text{ flex:1; min-width:0; }
+  .ex-title{ font-family:var(--mono); font-size:13px; font-weight:600; color:var(--text); margin-bottom:4px; }
+  .ex-desc{ font-size:13px; color:var(--text-dim); margin-bottom:8px; }
+  .ex-item.done .ex-title{ color:var(--done-green); }
+  .ex-item.done .ex-desc{ color:var(--text-faint); }
+  .ex-item.done{ background:var(--done-green-bg); border-radius:6px; }
+
+  .ex-info{
+    margin-top:8px; background:var(--bg-panel-2); border:1px solid var(--line-soft);
+    border-left:3px solid var(--go-yellow); border-radius:6px; padding:9px 12px;
+    font-size:12px; color:var(--text-dim); line-height:1.55;
+  }
+  .ex-info b{ color:var(--go-yellow); font-weight:600; }
+
+  .ex-code-wrap{ margin-top:8px; border-radius:8px; overflow:hidden; border:1px solid var(--line); }
+  .ex-code-head{
+    background:#14171e; padding:6px 12px; font-family:var(--mono); font-size:10.5px;
+    color:var(--text-faint); display:flex; align-items:center; gap:6px; border-bottom:1px solid var(--line);
+  }
+  .ex-code-head::before{ content:"●"; color:var(--go-cyan); font-size:8px; }
+  pre.ex-code{
+    margin:0; padding:12px 14px; background:var(--bg-code); overflow-x:auto;
+    font-family:var(--mono); font-size:11.5px; line-height:1.65; color:#d4d8e0;
+    white-space:pre;
+  }
+  .ex-practice{
+    margin-top:8px; background:rgba(0,173,216,0.06); border:1px solid rgba(0,173,216,0.18);
+    border-left:3px solid var(--go-cyan); border-radius:6px; padding:9px 12px;
+    font-size:12.5px; color:var(--text-dim); line-height:1.55;
+  }
+  .ex-practice b{ color:var(--go-cyan-bright); font-weight:600; }
+
+  .footer{ max-width:920px; margin:34px auto 0; padding:20px 22px 0; border-top:1px solid var(--line); }
+  .reset-btn{
+    font-family:var(--mono); font-size:12px; color:var(--text-dim);
+    background:var(--bg-panel); border:1px solid var(--line);
+    padding:8px 14px; border-radius:7px; cursor:pointer; margin-top:14px;
+  }
+  .reset-btn:hover{ border-color:var(--danger); color:var(--danger); }
+
+  @media (max-width:560px){
+    .topbar-title{ display:none; }
+    .lvl-sub{ display:none; }
+    pre.ex-code{ font-size:10.5px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <div class="topbar-title">complete_golang.go — 13 chapters</div>
+    <div class="topbar-progress">
+      <div class="topbar-progress-track"><div class="topbar-progress-fill" id="topFill"></div></div>
+      <div class="topbar-progress-text" id="topText">0 / 0</div>
+    </div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">complete curriculum</div>
+  <h1>Golang — <span class="accent">Zero to Production</span></h1>
+  <p>তোমার দেওয়া curriculum (Core Language → Concurrency → Web Architecture) + production-এ যা যা লাগবে তার বাকি অংশ (Testing, Database, Observability, Deployment, Security, Generics) একসাথে। প্রতিটা topic-এ code example আছে — নিজে টাইপ করে চালাও, তারপর নিচের practice exercise করো।</p>
+  <div class="hero-stats">
+    <div class="stat-chip">📦 <b id="statTotal">0</b> topics</div>
+    <div class="stat-chip">🧩 13 chapters</div>
+    <div class="stat-chip">💻 code examples সহ</div>
+    <div class="stat-chip done">✅ <b id="statDone">0</b> completed</div>
+  </div>
+</div>
+
+<div class="note">
+  <div class="note-box">
+    <b>Note:</b> Standalone HTML file — tab বন্ধ করলে tick reset হয়ে যাবে (কোনো storage নেই)। প্রতিটা code নিজে <code style="color:var(--go-cyan-bright)">go run</code> দিয়ে চালিয়ে দেখো, শুধু পড়ে গেলে হবে না।
+  </div>
+</div>
+
+<div class="part-label">Part I — Core Language & Memory Architecture</div>
+<div class="wrap" id="wrap-1"></div>
+
+<div class="part-label">Part II — Resiliency, Errors & Concurrency</div>
+<div class="wrap" id="wrap-2"></div>
+
+<div class="part-label">Part III — Web Architecture, Testing & Data</div>
+<div class="wrap" id="wrap-3"></div>
+
+<div class="part-label">Part IV — Observability, Structure, Ops & Security</div>
+<div class="wrap" id="wrap-4"></div>
+
+<div class="footer">
+  <button class="reset-btn" onclick="resetAll()">↺ Reset all checkmarks</button>
+</div>
+<p style="max-width:920px;margin:14px auto 0;padding:0 22px;font-family:var(--mono);font-size:11px;color:var(--text-faint);">Curriculum: user-provided Part I–III + added Testing/DB/Observability/Structure/Ops/Security chapters for full production coverage.</p>
+
+<script>
+const CH = {
+"1": { title:"1. Lexical Elements, Variable Lifecycles & Type System", sub:"Modules, variables, zero-values, constants, control flow, loops", part:1, items:[
+  ["1.1 Init & Dependency Scoping","go mod দিয়ে project ও dependency setup করো, semantic versioning বোঝো।",
+   "Go modules হলো dependency management system। go.mod-এ module path, Go version, dependencies থাকে; go.sum-এ security checksum। Semantic versioning (v1.2.3) মেনে চললে update-এ breaking change ধরা পড়ে।",
+`// terminal
+go mod init github.com/yourname/myproject
+go get github.com/gin-gonic/gin@v1.9.1
+go mod tidy   // unused import সরায়, missing import যোগ করে`,
+   "নিজের একটা ছোট project বানাও go mod init দিয়ে, একটা বাইরের package install করো, go.mod/go.sum ওপেন করে দেখো কী লেখা আছে।"],
+  ["1.2 Variable Declaration Paradigms","var, :=, এবং scope (block/package/global) বোঝো।",
+   "var দিয়ে explicit declaration, := দিয়ে short declaration (শুধু function-এর ভেতরে চলে)। Scope ঠিক করে কোথা থেকে variable access করা যাবে।",
+`package main
+import "fmt"
+var globalCount int // package scope
+func main() {
+    var name string = "Rahim" // explicit
+    age := 40                 // short + inference
+    {
+        city := "Habra" // block scope
+        fmt.Println(city)
+    }
+    fmt.Println(name, age, globalCount)
+}`,
+   "একই নামের variable ভিন্ন scope-এ (global, function, block) declare করে দেখাও কোনটা কোথা থেকে দেখা যায়, কোনটা যায় না।"],
+  ["1.3 The Zero-Value Mechanism","প্রতিটা type-এর default zero value কী হয় দেখো।",
+   "Go-তে কোনো variable কখনো 'uninitialized garbage' থাকে না — int=0, string=\"\", bool=false, pointer/slice/map/interface=nil। এটা memory safety guarantee দেয়।",
+`package main
+import "fmt"
+type User struct {
+    Name string
+    Age  int
+}
+func main() {
+    var i int
+    var s string
+    var b bool
+    var p *int
+    var u User
+    fmt.Println(i, s, b, p, u)
+}`,
+   "একটা struct বানাও int, string, bool, slice, map, pointer field সহ — কোনো value না দিয়ে instance বানাও, প্রতিটা field-এর zero value print করো।"],
+  ["1.4 Constants & iota","Typed/untyped constant এবং iota দিয়ে enum বানাও।",
+   "const compile-time-এ ঠিক হয়। Untyped constant প্রয়োজন অনুযায়ী যেকোনো compatible type-এ বসতে পারে। iota একটা auto-incrementing counter, enum বানাতে ব্যবহার হয়।",
+`package main
+import "fmt"
+type Weekday int
+const (
+    Sunday Weekday = iota // 0
+    Monday                // 1
+    Tuesday               // 2
+)
+func main() {
+    fmt.Println(Sunday, Monday, Tuesday)
+}`,
+   "iota দিয়ে একটা 'Status' enum বানাও (Pending, Active, Closed), প্রতিটার জন্য String() method লিখে readable output দাও।"],
+  ["1.5 Control Flow Mechanics","Bracket-free if/switch, initialization statement, fallthrough বোঝো।",
+   "if/switch-এ condition-এর চারপাশে bracket লাগে না। if-এর ভেতরে initialization statement লেখা যায়। switch-এ automatic break হয়, fallthrough ছাড়া পরের case-এ যায় না।",
+`package main
+import "fmt"
+func classify(n int) string {
+    switch {
+    case n < 0:
+        return "negative"
+    case n == 0:
+        return "zero"
+    default:
+        return "positive"
+    }
+}
+func main() {
+    if v := 10; v > 0 {
+        fmt.Println(classify(v))
+    }
+}`,
+   "একটা function লেখো যা if-এর ভেতরে initialization statement ব্যবহার করে map lookup করে, আর switch দিয়ে number থেকে grade (A/B/C/F) বের করে।"],
+  ["1.6 The Monolithic Loop (for)","Classic, while-এর মতো, infinite for — সব একটাই keyword দিয়ে।",
+   "Go-তে একটাই loop keyword — for। Go 1.22+ থেকে প্রতিটা range iteration-এ variable-এর নতুন copy তৈরি হয় (আগে reuse হতো, goroutine-এ bug হতো)।",
+`package main
+import "fmt"
+func main() {
+    for i := 0; i < 3; i++ { fmt.Println("classic:", i) }
+    n := 0
+    for n < 3 { fmt.Println("while-like:", n); n++ }
+    for i := 0; i < 3; i++ {
+        go func() { fmt.Println("goroutine i:", i) }()
+    }
+}`,
+   "Go 1.22-এর আগে ও পরের loop-variable capture behavior পার্থক্য নোট করে দেখাও (var দিয়ে explicit capture করে পুরনো behavior emulate করো)।"]
+]},
+"2": { title:"2. Data Structures & Iteration Mechanics", sub:"Arrays, slices, maps, range", part:1, items:[
+  ["2.1 Array Structures","Fixed-size, value-type array বোঝো।",
+   "Array-এর size type-এর অংশ ([5]int আর [10]int আলাদা type), fixed-size, value-type (assign/pass করলে পুরো copy হয়)।",
+`package main
+import "fmt"
+func main() {
+    a := [5]int{1, 2, 3, 4, 5}
+    b := a // পুরো copy
+    b[0] = 100
+    fmt.Println(a, b) // a বদলাবে না
+}`,
+   "দুইটা array বানাও, একটাকে আরেকটায় assign করো, change করে দেখাও অন্যটা প্রভাবিত হয় না — slice দিয়ে একই experiment করে পার্থক্য দেখো।"],
+  ["2.2 Slice Internals & Dynamics","Pointer+Length+Capacity header, append reallocation বোঝো।",
+   "Slice হলো (pointer, length, capacity)-এর তিন-শব্দের header — underlying array-কে 'দেখার জানালা'। append() capacity ফুরালে নতুন (সাধারণত দ্বিগুণ) backing array বানায়।",
+`package main
+import "fmt"
+func main() {
+    s := make([]int, 0, 2)
+    for i := 0; i < 5; i++ {
+        s = append(s, i)
+        fmt.Printf("len=%d cap=%d ptr=%p\\n", len(s), cap(s), s)
+    }
+}`,
+   "উপরের কোড চালিয়ে দেখো ঠিক কোন point-এ capacity doubling হচ্ছে এবং pointer address বদলে যাচ্ছে।"],
+  ["2.3 Map Architecture","Hash table, comparable key, comma-ok idiom বোঝো।",
+   "Map internally hash table। Key অবশ্যই 'comparable' হতে হবে। Missing key access করলে zero value দেয়, তাই 'comma-ok' (v, ok := m[k]) দিয়ে key আছে কিনা চেক করতে হয়।",
+`package main
+import "fmt"
+func main() {
+    scores := map[string]int{"Rahim": 85, "Karim": 90}
+    if v, ok := scores["Rahim"]; ok {
+        fmt.Println("Found:", v)
+    }
+    if _, ok := scores["Jamal"]; !ok {
+        fmt.Println("Jamal not found")
+    }
+}`,
+   "একটা map[string][]int বানাও (group data), comma-ok দিয়ে missing key safely handle করো, delete() দিয়ে একটা key মুছে দাও।"],
+  ["2.4 High-Efficiency Iteration (range)","String rune decoding, value-copy overhead বোঝো।",
+   "range string-এর উপর গেলে UTF-8 rune decode করে। Slice/array-এ range প্রতিটা element-এর copy দেয় — বড় struct হলে index দিয়ে access বেশি efficient।",
+`package main
+import "fmt"
+func main() {
+    for i, r := range "বাংলা" {
+        fmt.Printf("byte-index=%d rune=%c\\n", i, r)
+    }
+    nums := []int{10, 20, 30}
+    for i := range nums {
+        nums[i] *= 2 // index দিয়ে direct mutate
+    }
+    fmt.Println(nums)
+}`,
+   "একটা []struct{Name string; Score int} slice বানাও, range দিয়ে value copy modify করে দেখাও original বদলায় না, index দিয়ে modify করে দেখাও বদলায়।"]
+]},
+"3": { title:"3. Structs, Methods & Implicit Interfaces (+ Generics)", sub:"Composite types, receivers, interfaces, type-safety", part:1, items:[
+  ["3.1 Composite Types via Structs","Struct tags, JSON serialization, field ordering বোঝো।",
+   "Struct field-এ tag (`json:\"name\"`) লাগিয়ে serialization control করা যায়। Field ordering memory alignment/padding প্রভাবিত করে।",
+`package main
+import (
+    "encoding/json"
+    "fmt"
+)
+type User struct {
+    Name string \`json:"name"\`
+    Age  int    \`json:"age"\`
+}
+func main() {
+    u := User{Name: "Rahim", Age: 40}
+    b, _ := json.Marshal(u)
+    fmt.Println(string(b))
+}`,
+   "একটা struct বানাও JSON tag সহ, Marshal দিয়ে JSON বানাও, Unmarshal দিয়ে আবার struct-এ ফেরত আনো।"],
+  ["3.2 Pointer Mechanics","Address-of, dereference, no pointer arithmetic বোঝো।",
+   "& দিয়ে address, * দিয়ে dereference। Go-তে pointer arithmetic (p+1) নিষিদ্ধ — এটা C-এর তুলনায় বড় safety পার্থক্য।",
+`package main
+import "fmt"
+func increment(n *int) { *n = *n + 1 }
+func main() {
+    x := 10
+    increment(&x)
+    fmt.Println(x) // 11
+}`,
+   "একটা linked-list-এর মতো struct বানাও (Node{Value int; Next *Node}), pointer দিয়ে ৩টা node জোড়া দাও, traverse করে print করো।"],
+  ["3.3 Method Declarations & Receivers","Value vs pointer receiver, mutation boundary বোঝো।",
+   "Value receiver struct-এর copy পায়, mutate করলে original বদলায় না। Pointer receiver original data mutate করতে পারে।",
+`package main
+import "fmt"
+type Counter struct{ count int }
+func (c Counter) ShowValue() int { return c.count }
+func (c *Counter) Increment()     { c.count++ }
+func main() {
+    c := Counter{}
+    c.Increment()
+    c.Increment()
+    fmt.Println(c.ShowValue()) // 2
+}`,
+   "একটা BankAccount struct বানাও, Deposit ও Withdraw method pointer receiver দিয়ে লেখো, insufficient balance হলে error return করো।"],
+  ["3.4 Implicit Interface Satisfaction","'implements' keyword ছাড়া polymorphism বোঝো।",
+   "Go-তে কোনো type interface-এর সব method থাকলেই automatically সেটা satisfy করে। Interface internally (itab, data pointer) জোড়া রাখে।",
+`package main
+import "fmt"
+type Shape interface { Area() float64 }
+type Circle struct{ Radius float64 }
+func (c Circle) Area() float64 { return 3.14159 * c.Radius * c.Radius }
+type Rectangle struct{ W, H float64 }
+func (r Rectangle) Area() float64 { return r.W * r.H }
+func printArea(s Shape) { fmt.Printf("Area: %.2f\\n", s.Area()) }
+func main() {
+    printArea(Circle{Radius: 5})
+    printArea(Rectangle{W: 4, H: 3})
+}`,
+   "একটা Shape interface বানাও, ৩টা struct (Circle, Rectangle, Triangle) দিয়ে implement করো, []Shape slice-এ total area যোগ করো।"],
+  ["3.5 Type Introspection","Type assertion ও type switch দিয়ে safe casting বোঝো।",
+   "Type assertion (v, ok := i.(T)) দিয়ে interface থেকে concrete type বের করা, type switch দিয়ে একাধিক সম্ভাব্য type handle করা।",
+`package main
+import "fmt"
+func describe(i any) {
+    switch v := i.(type) {
+    case int:
+        fmt.Println("int:", v*2)
+    case string:
+        fmt.Println("string:", v+"!")
+    default:
+        fmt.Println("unknown")
+    }
+}
+func main() {
+    describe(10)
+    describe("hello")
+}`,
+   "একটা []any slice বানাও যেখানে int, string, bool মেশানো আছে, type switch দিয়ে প্রতিটার জন্য আলাদা কাজ করো।"],
+  ["3.6 Generics (Go 1.18+)","Type parameter ও constraint দিয়ে reusable code বোঝো।",
+   "Generics দিয়ে একই function/struct বিভিন্ন type-এর জন্য টাইপ-সেফটি বজায় রেখে reuse করা যায় (আগে interface{}/any বা code generation লাগত)।",
+`package main
+import "fmt"
+type Number interface { int | int64 | float64 }
+func Sum[T Number](nums []T) T {
+    var total T
+    for _, n := range nums { total += n }
+    return total
+}
+func main() {
+    fmt.Println(Sum([]int{1, 2, 3}))
+    fmt.Println(Sum([]float64{1.5, 2.5}))
+}`,
+   "একটা generic Max[T constraints.Ordered](a, b T) T function লেখো যা int, float64, string সবকিছুর জন্য কাজ করে।"]
+]},
+"4": { title:"4. Defensive Error Engineering & Resource Lifecycle", sub:"Errors as values, defer, wrapping, panic/recover", part:2, items:[
+  ["4.1 The Explicit Error Paradigm","error interface, sentinel error বোঝো।",
+   "error একটা built-in interface। Go-তে exception নেই — error explicit return value হিসেবে পাঠানো হয়। Sentinel error একটা predefined error variable।",
+`package main
+import (
+    "errors"
+    "fmt"
+)
+var ErrNotFound = errors.New("item not found")
+func findItem(id int) (string, error) {
+    if id != 1 { return "", ErrNotFound }
+    return "Widget", nil
+}
+func main() {
+    _, err := findItem(5)
+    if errors.Is(err, ErrNotFound) {
+        fmt.Println("Handled: item missing")
+    }
+}`,
+   "দুইটা sentinel error (ErrInvalidInput, ErrNotFound) return করা function লেখো, errors.Is() দিয়ে caller-এ আলাদা করে handle করো।"],
+  ["4.2 Resource Clean-up via Defer","Deferred execution, guaranteed cleanup বোঝো।",
+   "defer দিয়ে function call পিছিয়ে দেওয়া হয় — surrounding function শেষ হওয়ার ঠিক আগে চলে (error/return যাই হোক)। File/mutex clean-up guarantee করতে ব্যবহার হয়।",
+`package main
+import (
+    "fmt"
+    "os"
+)
+func readFile(path string) error {
+    f, err := os.Open(path)
+    if err != nil { return err }
+    defer f.Close()
+    fmt.Println("reading:", f.Name())
+    return nil
+}
+func main() { readFile("go.mod") }`,
+   "একটা function লেখো যা mutex Lock করে, defer দিয়ে Unlock guarantee করো, একাধিক return path থাকলেও Unlock miss না হয় প্রমাণ করো।"],
+  ["4.3 Modern Error Wrapping","%w দিয়ে wrap, errors.Is/As দিয়ে introspection বোঝো।",
+   "fmt.Errorf(\"...: %w\", err) দিয়ে error 'wrap' হয় — original ধরে রেখে নতুন context যোগ হয়। errors.As() দিয়ে chain থেকে নির্দিষ্ট custom error TYPE বের করা যায়।",
+`package main
+import (
+    "errors"
+    "fmt"
+)
+type ValidationError struct{ Field string }
+func (e *ValidationError) Error() string { return "invalid: " + e.Field }
+func validate() error { return &ValidationError{Field: "email"} }
+func process() error {
+    if err := validate(); err != nil {
+        return fmt.Errorf("process failed: %w", err)
+    }
+    return nil
+}
+func main() {
+    err := process()
+    var ve *ValidationError
+    if errors.As(err, &ve) {
+        fmt.Println("field with issue:", ve.Field)
+    }
+}`,
+   "একটা ৩-level function call chain বানাও, প্রতি layer-এ %w দিয়ে wrap করো, শেষে errors.As() দিয়ে original custom error বের করো।"],
+  ["4.4 Panic and Recovery","panic flow, recover() দিয়ে crash আটকানো বোঝো।",
+   "panic() মানে normal execution বন্ধ করে stack unwind (bug/crash-এর জন্য, normal error handling-এ ব্যবহার না)। recover() শুধু deferred function-এর ভেতর কাজ করে, crash আটকায়।",
+`package main
+import "fmt"
+func safeDivide(a, b int) (result int, err error) {
+    defer func() {
+        if r := recover(); r != nil {
+            err = fmt.Errorf("recovered: %v", r)
+        }
+    }()
+    result = a / b
+    return result, nil
+}
+func main() {
+    res, err := safeDivide(10, 0)
+    fmt.Println(res, err)
+}`,
+   "একটা HTTP handler simulate করো যেখানে ইচ্ছাকৃতভাবে panic হয় (nil map write / index out of range), একটা recover middleware লিখে দেখাও পুরো program crash না করে শুধু সেই request fail করছে।"]
+]},
+"5": { title:"5. Advanced Concurrency: Goroutines & Channels", sub:"Scheduler, channels, select, sync package", part:2, items:[
+  ["5.1 The Go Runtime Scheduler","M:N scheduler model, lightweight goroutine stack বোঝো।",
+   "Go-এর M:N scheduler অনেক goroutine (G)-কে অল্প OS thread (M)-এর উপর logical processor (P) দিয়ে multiplex করে। Goroutine stack মাত্র ~2KB দিয়ে শুরু হয়।",
+`package main
+import (
+    "fmt"
+    "runtime"
+)
+func main() {
+    fmt.Println("CPUs:", runtime.NumCPU())
+    fmt.Println("GOMAXPROCS:", runtime.GOMAXPROCS(0))
+    fmt.Println("Goroutines:", runtime.NumGoroutine())
+}`,
+   "হাজার হাজার goroutine (go func(){ time.Sleep(time.Second) }()) চালিয়ে runtime.NumGoroutine() দিয়ে দেখো এটা কতটা lightweight — একই সংখ্যক OS thread কেন বাস্তবসম্মত না নোট করো।"],
+  ["5.2 Communication via Channels","Unbuffered vs buffered, directional channel বোঝো।",
+   "Unbuffered channel-এ send তখনই শেষ হয় যখন receive হয় (strict sync)। Buffered channel queue-এর মতো। বন্ধ channel-এ write করলে বা দুইবার close করলে panic হয়।",
+`package main
+import "fmt"
+func producer(ch chan<- int) {
+    for i := 1; i <= 3; i++ { ch <- i }
+    close(ch)
+}
+func main() {
+    ch := make(chan int, 2)
+    go producer(ch)
+    for v := range ch {
+        fmt.Println("received:", v)
+    }
+}`,
+   "একটা unbuffered আর একটা buffered channel দিয়ে একই producer-consumer লিখে timing/blocking-এর পার্থক্য লক্ষ্য করো।"],
+  ["5.3 Multiplexing with Select","Non-blocking channel ops, timeout, default case বোঝো।",
+   "select একাধিক channel operation-এর মধ্যে যেটা আগে ready হয় সেটা চালায়। time.After() দিয়ে timeout বসানো common pattern।",
+`package main
+import (
+    "fmt"
+    "time"
+)
+func main() {
+    ch := make(chan string)
+    go func() {
+        time.Sleep(2 * time.Second)
+        ch <- "data ready"
+    }()
+    select {
+    case msg := <-ch:
+        fmt.Println(msg)
+    case <-time.After(1 * time.Second):
+        fmt.Println("timeout")
+    }
+}`,
+   "দুইটা channel থেকে একসাথে data আসছে এমন select লেখো, সাথে timeout ও default case যোগ করে পার্থক্য observe করো।"],
+  ["5.4 Sync Package Primitives","WaitGroup, Mutex/RWMutex, Once, -race flag বোঝো।",
+   "sync.WaitGroup একাধিক goroutine শেষ হওয়ার জন্য wait করে। sync.Mutex race condition থেকে বাঁচায়। sync.Once ঠিক একবার run guarantee করে। -race flag data race detect করে।",
+`package main
+import (
+    "fmt"
+    "sync"
+)
+func main() {
+    var mu sync.Mutex
+    var wg sync.WaitGroup
+    counter := 0
+    for i := 0; i < 100; i++ {
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            mu.Lock()
+            counter++
+            mu.Unlock()
+        }()
+    }
+    wg.Wait()
+    fmt.Println("Final:", counter) // always 100
+}`,
+   "উপরের কোড থেকে Lock/Unlock সরিয়ে `go run -race` দিয়ে চালাও, data race detector output পড়ো, তারপর ঠিক করো।"]
+]},
+"6": { title:"6. Production HTTP Services & Context", sub:"net/http, middleware, hardening, context propagation", part:3, items:[
+  ["6.1 Standard Networking (net/http)","HandlerFunc, ServeMux দিয়ে built-in web server বোঝো।",
+   "net/http Go-এর built-in web server/client library — বাইরের framework ছাড়াই production-ready। HandlerFunc দিয়ে handler, ServeMux দিয়ে route।",
+`package main
+import (
+    "encoding/json"
+    "net/http"
+)
+func helloHandler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(map[string]string{"message": "Hello"})
+}
+func main() {
+    mux := http.NewServeMux()
+    mux.HandleFunc("/hello", helloHandler)
+    http.ListenAndServe(":8080", mux)
+}`,
+   "একটা /users endpoint বানাও — GET-এ JSON list return করে, POST-এ body থেকে JSON parse করে in-memory slice-এ নতুন user যোগ করে।"],
+  ["6.2 Middleware Architecture","Cross-cutting concern (logging, auth) চেইন করা বোঝো।",
+   "Middleware একটা handler-কে wrap করে অতিরিক্ত কাজ (logging, auth, recovery) যোগ করে, তারপর আসল handler call করে।",
+`package main
+import (
+    "log"
+    "net/http"
+    "time"
+)
+func loggingMiddleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        start := time.Now()
+        next.ServeHTTP(w, r)
+        log.Printf("%s %s took %v", r.Method, r.URL.Path, time.Since(start))
+    })
+}
+func main() {
+    mux := http.NewServeMux()
+    mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        w.Write([]byte("home"))
+    })
+    http.ListenAndServe(":8080", loggingMiddleware(mux))
+}`,
+   "একটা authMiddleware লেখো যা 'Authorization' header না থাকলে 401 দেয়, নইলে পরের handler-এ পাঠায় — loggingMiddleware-এর সাথে chain করো।"],
+  ["6.3 Hardening HTTP Deployments","ReadTimeout, WriteTimeout, IdleTimeout সেট করা বোঝো।",
+   "Default ListenAndServe production-এ risky — কোনো timeout নেই মানে slow/malicious client server আটকে দিতে পারে (slowloris attack)। Explicit timeout সেট করা hardening-এর অংশ।",
+`package main
+import (
+    "net/http"
+    "time"
+)
+func main() {
+    srv := &http.Server{
+        Addr:         ":8080",
+        ReadTimeout:  5 * time.Second,
+        WriteTimeout: 10 * time.Second,
+        IdleTimeout:  120 * time.Second,
+    }
+    srv.ListenAndServe()
+}`,
+   "Explicit timeout-সহ একটা http.Server বানাও, একটা ইচ্ছাকৃত ধীর handler (time.Sleep) বানিয়ে WriteTimeout সেটাকে কাটে কিনা পরীক্ষা করো।"],
+  ["6.4 Request-Scoped Lifecycles (Context)","WithTimeout/WithCancel দিয়ে cascading cancellation বোঝো।",
+   "context.WithTimeout/WithCancel দিয়ে request-এর deadline/cancel signal downstream পর্যন্ত ছড়ানো যায় — client disconnect করলে পুরো chain বন্ধ হয়, resource নষ্ট হয় না।",
+`package main
+import (
+    "context"
+    "fmt"
+    "time"
+)
+func slowOperation(ctx context.Context) error {
+    select {
+    case <-time.After(3 * time.Second):
+        return nil
+    case <-ctx.Done():
+        return ctx.Err()
+    }
+}
+func main() {
+    ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+    defer cancel()
+    if err := slowOperation(ctx); err != nil {
+        fmt.Println("cancelled:", err)
+    }
+}`,
+   "একটা HTTP handler লেখো যেখানে r.Context() থেকে 2-second timeout context বানাও, একটা 'DB call' simulate করো যা সেই context respect করে বন্ধ হয়।"],
+  ["6.5 Context Metadata Propagation","WithValue দিয়ে trace ID/user info পাঠানো বোঝো।",
+   "context.WithValue দিয়ে request-scoped data (Trace ID, user info) function chain জুড়ে পাঠানো যায়, global variable ছাড়াই। শুধু metadata-র জন্য, business parameter-এর বদলি না।",
+`package main
+import (
+    "context"
+    "fmt"
+)
+type ctxKey string
+const traceIDKey ctxKey = "traceID"
+func handleRequest(ctx context.Context) {
+    ctx = context.WithValue(ctx, traceIDKey, "abc-123")
+    processDownstream(ctx)
+}
+func processDownstream(ctx context.Context) {
+    if id, ok := ctx.Value(traceIDKey).(string); ok {
+        fmt.Println("Trace ID:", id)
+    }
+}
+func main() { handleRequest(context.Background()) }`,
+   "middleware-এ প্রতিটা request-এ unique trace ID generate করে context-এ বসাও, handler ও একটা helper function-এ সেই ID বের করে log করো।"]
+]},
+"7": { title:"7. Testing, Benchmarking & Profiling", sub:"Quality assurance — added chapter for production readiness", part:3, items:[
+  ["7.1 Table-Driven Unit Testing","Idiomatic Go test pattern বোঝো।",
+   "Go built-in testing package দিয়ে বাইরের framework ছাড়াই test লেখা যায়। Table-driven pattern — input+expected-এর slice বানিয়ে loop করে test — কম কোডে অনেক case cover করে।",
+`package main
+import "testing"
+func Add(a, b int) int { return a + b }
+func TestAdd(t *testing.T) {
+    cases := []struct{ a, b, want int }{
+        {1, 2, 3}, {0, 0, 0}, {-1, 1, 0},
+    }
+    for _, c := range cases {
+        if got := Add(c.a, c.b); got != c.want {
+            t.Errorf("Add(%d,%d)=%d; want %d", c.a, c.b, got, c.want)
+        }
+    }
+}`,
+   "নিজের একটা function-এর জন্য table-driven test লেখো অন্তত ৫টা case সহ (normal, edge, error), `go test -v` চালাও।"],
+  ["7.2 HTTP Handler Testing (httptest)","Real server ছাড়াই handler test বোঝো।",
+   "httptest.NewRecorder()/NewRequest() দিয়ে real server না চালিয়েই HTTP handler সরাসরি test করা যায় — দ্রুত, isolated, CI-friendly।",
+`package main
+import (
+    "net/http"
+    "net/http/httptest"
+    "testing"
+)
+func TestHelloHandler(t *testing.T) {
+    req := httptest.NewRequest(http.MethodGet, "/hello", nil)
+    rec := httptest.NewRecorder()
+    helloHandler(rec, req)
+    if rec.Code != http.StatusOK {
+        t.Errorf("expected 200, got %d", rec.Code)
+    }
+}`,
+   "6.1-এ বানানো /users handler-এর জন্য httptest দিয়ে test লেখো — GET পাঠিয়ে status code ও body check করো।"],
+  ["7.3 Benchmarking","testing.B দিয়ে ns/op ও allocation measure বোঝো।",
+   "BenchmarkXxx(b *testing.B) দিয়ে function performance measure হয় (ns/op)। b.ReportAllocs() দিয়ে memory allocation-ও দেখা যায় — optimization সত্যি কাজ করলো কিনা যাচাই করতে।",
+`package main
+import "testing"
+func BenchmarkAdd(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        Add(3, 4)
+    }
+}`,
+   "একই কাজ করা দুইটা function (+ operator vs strings.Builder) বেঞ্চমার্ক করে speed/allocation compare করো।"],
+  ["7.4 Profiling with pprof","Live CPU/memory profiling বোঝো।",
+   "net/http/pprof import করলে running server-এ live CPU/memory profile endpoint যোগ হয় — production service-এর bottleneck খুঁজতে ব্যবহার হয়, code না থামিয়েই।",
+`package main
+import (
+    "net/http"
+    _ "net/http/pprof"
+)
+func main() {
+    http.ListenAndServe(":6060", nil)
+    // visit: http://localhost:6060/debug/pprof/
+}`,
+   "pprof import করে server চালাও, browser-এ /debug/pprof/ ভিজিট করে কী কী profile পাওয়া যায় (heap, goroutine, cpu) দেখো।"]
+]},
+"8": { title:"8. Databases & Persistence", sub:"database/sql, pooling, migrations, injection prevention", part:3, items:[
+  ["8.1 database/sql Basics","Common SQL interface, driver import বোঝো।",
+   "Go-এর built-in database/sql package যেকোনো SQL database-এর জন্য common interface দেয়, driver আলাদা import হয় (side-effect import দিয়ে)।",
+`package main
+import (
+    "database/sql"
+    _ "github.com/lib/pq"
+)
+func main() {
+    db, err := sql.Open("postgres", "postgres://user:pass@localhost/mydb?sslmode=disable")
+    if err != nil { panic(err) }
+    defer db.Close()
+    rows, _ := db.Query("SELECT id, name FROM users WHERE age > $1", 18)
+    defer rows.Close()
+    for rows.Next() {
+        var id int
+        var name string
+        rows.Scan(&id, &name)
+    }
+}`,
+   "SQLite (ফাইল-based, সহজ setup) দিয়ে users table বানাও, INSERT ও SELECT query চালাও।"],
+  ["8.2 Connection Pooling","sql.DB পুরো একটা pool, tuning parameter বোঝো।",
+   "sql.DB আসলে একটা connection POOL। SetMaxOpenConns/SetMaxIdleConns/SetConnMaxLifetime দিয়ে pool tune করা হয় — production load handle করতে জরুরি।",
+`db.SetMaxOpenConns(25)
+db.SetMaxIdleConns(25)
+db.SetConnMaxLifetime(5 * time.Minute)`,
+   "Pool settings বদলে (খুব কম vs বেশি MaxOpenConns) behavior-এর পার্থক্য পড়ে/experiment করে বোঝো।"],
+  ["8.3 Migrations & Schema Management","Version-controlled schema change বোঝো।",
+   "Schema change (নতুন column/table) version-controlled ভাবে track করতে migration tool (golang-migrate, goose) ব্যবহার হয় — manual SQL চালানো production-এ risky।",
+`// terminal (golang-migrate)
+migrate create -ext sql -dir migrations add_users_table
+migrate -database "postgres://..." -path migrations up`,
+   "golang-migrate দিয়ে দুইটা migration ফাইল বানাও (up/down) users table-এর জন্য, apply ও rollback দুটোই test করো।"],
+  ["8.4 SQL Injection Prevention","Parameterized query বোঝো।",
+   "Parameterized query ($1, ?) দিয়ে user input কখনো SQL code হিসেবে execute হয় না — এটাই SQL injection থেকে বাঁচার মূল উপায়। String concatenation দিয়ে query বানানো কখনো করা উচিত না।",
+`// ভুল (injection ঝুঁকি):
+query := "SELECT * FROM users WHERE name = '" + userInput + "'"
+// সঠিক:
+rows, _ := db.Query("SELECT * FROM users WHERE name = $1", userInput)`,
+   "একটা 'vulnerable' query string concatenation দিয়ে লেখো, তারপর সেটাকে parameterized query-তে রূপান্তর করো, ব্যাখ্যা করো কেন প্রথমটা বিপজ্জনক।"]
+]},
+"9": { title:"9. Observability — Logging, Metrics, Tracing", sub:"Production visibility — added chapter", part:4, items:[
+  ["9.1 Structured Logging (log/slog)","JSON structured log বোঝো।",
+   "Go 1.21+ থেকে built-in log/slog দিয়ে structured (key-value/JSON) logging করা যায় — log aggregation tool (ELK, Loki) সহজে parse করতে পারে, plain text-এর চেয়ে অনেক useful।",
+`package main
+import (
+    "log/slog"
+    "os"
+)
+func main() {
+    logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+    logger.Info("user logged in", "user_id", 42, "ip", "192.168.1.1")
+}`,
+   "slog দিয়ে HTTP middleware লেখো যা প্রতিটা request-এ method, path, status, duration structured log হিসেবে print করে।"],
+  ["9.2 Metrics (Prometheus)","Request count/latency expose করা বোঝো।",
+   "Application health/performance measure করতে metrics expose করা হয় — Prometheus client দিয়ে /metrics endpoint বানানো হয়, যা monitoring system periodically scrape করে।",
+`package main
+import (
+    "net/http"
+    "github.com/prometheus/client_golang/prometheus"
+    "github.com/prometheus/client_golang/prometheus/promhttp"
+)
+var requestCount = prometheus.NewCounter(prometheus.CounterOpts{
+    Name: "http_requests_total",
+})
+func main() {
+    prometheus.MustRegister(requestCount)
+    http.Handle("/metrics", promhttp.Handler())
+    http.ListenAndServe(":8080", nil)
+}`,
+   "একটা HTTP handler-এ প্রতিটা request-এ counter বাড়াও, /metrics endpoint-এ গিয়ে raw Prometheus output দেখো।"],
+  ["9.3 Distributed Tracing Basics","OpenTelemetry দিয়ে request journey track করা বোঝো।",
+   "Microservice-এ একটা request একাধিক service পার হয় — distributed tracing (OpenTelemetry) দিয়ে পুরো journey একটা trace ID দিয়ে track করা যায়।",
+`// conceptual — OpenTelemetry span
+ctx, span := tracer.Start(ctx, "processOrder")
+defer span.End()
+span.SetAttributes(attribute.String("order.id", orderID))`,
+   "OpenTelemetry-র official Go quickstart অনুসরণ করে একটা simple trace বানাও ও console-এ output দেখো।"],
+  ["9.4 Health Checks & Readiness Probes","/healthz এবং /readyz endpoint বোঝো।",
+   "Production deployment (বিশেষত Kubernetes)-এ /healthz (liveness) ও /readyz (readiness) endpoint দরকার, যাতে orchestrator বুঝতে পারে service চলছে ও traffic নেওয়ার জন্য প্রস্তুত কিনা।",
+`func healthHandler(w http.ResponseWriter, r *http.Request) {
+    w.WriteHeader(http.StatusOK)
+}
+func readyHandler(w http.ResponseWriter, r *http.Request) {
+    if !dbIsConnected() {
+        w.WriteHeader(http.StatusServiceUnavailable)
+        return
+    }
+    w.WriteHeader(http.StatusOK)
+}`,
+   "/healthz ও /readyz বানাও, readyz-এ একটা fake dependency check (bool flag) যোগ করো যা false হলে 503 দেয়।"]
+]},
+"10": { title:"10. Project Structure & Dependency Management", sub:"Package design, internal/, constructor injection — added chapter", part:4, items:[
+  ["10.1 Package-Oriented Design","'utils' এড়িয়ে feature-based package বোঝো।",
+   "Generic 'utils'/'common' package এড়িয়ে চলা উচিত — package-এর নাম হওয়া উচিত সেটা কী কাজ করে তার উপর ভিত্তি করে।",
+`// ভালো:
+/internal/auth/
+/internal/payment/
+// এড়িয়ে চলো:
+/internal/utils/
+/internal/common/`,
+   "একটা 'utils'-ভর্তি ছোট project কল্পনা করে সেটাকে feature-based package-এ ভেঙে refactor করো।"],
+  ["10.2 The internal/ Directory Convention","Compiler-enforced private API বোঝো।",
+   "Go compiler internal/ নামের directory বিশেষভাবে চেনে — এর ভেতরের package শুধু একই module-এর মধ্যে থেকেই import করা যায়।",
+`myproject/
+  internal/auth/   <- বাইরের module import করতে পারবে না
+  pkg/client/      <- বাইরে থেকে import করা যায়
+  cmd/server/main.go`,
+   "একটা internal/ package বানাও, আলাদা module থেকে সেটা import করার চেষ্টা করো, compiler error দেখো।"],
+  ["10.3 Dependency Injection (Constructor Pattern)","Interface-based constructor injection বোঝো।",
+   "Go-তে formal DI framework সাধারণত লাগে না — constructor injection (dependency-কে interface parameter হিসেবে নেওয়া) দিয়েই decoupled, testable code হয়।",
+`type UserRepo interface {
+    FindByID(id int) (*User, error)
+}
+type UserService struct { repo UserRepo }
+func NewUserService(repo UserRepo) *UserService {
+    return &UserService{repo: repo}
+}`,
+   "একটা UserService বানাও constructor-এ interface নিয়ে, production-এ real DB repo আর test-এ mock repo বসিয়ে দেখাও একই code দুই জায়গায় কাজ করছে।"]
+]},
+"11": { title:"11. CLI Tools & Configuration Management", sub:"flag, env config, Cobra — added chapter", part:4, items:[
+  ["11.1 Command-line Flags","Built-in flag package বোঝো।",
+   "Go-এর built-in flag package দিয়ে সহজ CLI argument parse করা যায় (--port=8080 জাতীয়) — ছোট tool-এর জন্য বাইরের library লাগে না।",
+`package main
+import (
+    "flag"
+    "fmt"
+)
+func main() {
+    port := flag.Int("port", 8080, "server port")
+    flag.Parse()
+    fmt.Println("Starting on port:", *port)
+}`,
+   "একটা CLI tool বানাও যা --name আর --count flag নেয়, নামটা count বার print করে।"],
+  ["11.2 Environment-based Configuration","os.Getenv দিয়ে config load করা বোঝো।",
+   "Production app-এ config hardcode না করে environment variable/.env থেকে load করা standard — একই code বিভিন্ন environment-এ (dev/staging/prod) আলাদা config দিয়ে চলতে পারে।",
+`package main
+import (
+    "fmt"
+    "os"
+)
+func main() {
+    dbURL := os.Getenv("DATABASE_URL")
+    if dbURL == "" { dbURL = "localhost:5432" }
+    fmt.Println("Using DB:", dbURL)
+}`,
+   "একটা Config struct বানাও যা os.Getenv দিয়ে ৩টা value load করে (PORT, DB_URL, LOG_LEVEL), missing হলে sensible default দেয়।"],
+  ["11.3 CLI Apps with Cobra","Subcommand-based CLI (kubectl-এর মতো) বোঝো।",
+   "বড় CLI tool (একাধিক subcommand) বানাতে Cobra library জনপ্রিয় — kubectl, docker, hugo Cobra দিয়ে বানানো।",
+`var rootCmd = &cobra.Command{Use: "mytool"}
+var greetCmd = &cobra.Command{
+    Use: "greet [name]",
+    Run: func(cmd *cobra.Command, args []string) {
+        fmt.Println("Hello,", args[0])
+    },
+}
+func main() {
+    rootCmd.AddCommand(greetCmd)
+    rootCmd.Execute()
+}`,
+   "Cobra install করে একটা CLI বানাও যাতে ২টা subcommand আছে (যেমন 'greet' আর 'version')।"]
+]},
+"12": { title:"12. Deployment & Production Readiness", sub:"Docker, graceful shutdown, build optimization — added chapter", part:4, items:[
+  ["12.1 Multi-stage Docker Builds","Small final image বানানো বোঝো।",
+   "Go binary self-contained (runtime dependency লাগে না) — multi-stage Docker build দিয়ে শুধু compiled binary নিয়ে একটা ছোট (কয়েক MB) final image বানানো যায়।",
+`FROM golang:1.22 AS builder
+WORKDIR /app
+COPY . .
+RUN go build -o server .
+
+FROM alpine:latest
+COPY --from=builder /app/server /server
+CMD ["/server"]`,
+   "নিজের একটা Go HTTP server-এর জন্য multi-stage Dockerfile লেখো, single-stage বনাম multi-stage image size compare করো।"],
+  ["12.2 Graceful Shutdown","SIGTERM/SIGINT handle করে চলমান request শেষ করা বোঝো।",
+   "Production server signal পেলে সাথে সাথে বন্ধ না হয়ে চলমান request শেষ করার সময় দেওয়া উচিত — না হলে user-এর মাঝপথের request নষ্ট হতে পারে।",
+`srv := &http.Server{Addr: ":8080"}
+go srv.ListenAndServe()
+
+stop := make(chan os.Signal, 1)
+signal.Notify(stop, os.Interrupt)
+<-stop
+
+ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+defer cancel()
+srv.Shutdown(ctx)`,
+   "গ্রেসফুল শাটডাউন সহ একটা server বানাও, Ctrl+C চাপার সময় একটা চলমান slow request থাকলে সেটা শেষ হতে দেয় কিনা পরীক্ষা করো।"],
+  ["12.3 Build Flags & Binary Optimization","ldflags দিয়ে size কমানো, version inject করা বোঝো।",
+   "go build -ldflags=\"-s -w\" দিয়ে debug symbol সরিয়ে binary size কমানো যায়। Version info build-time-এ inject করাও common practice।",
+`go build -ldflags="-s -w -X main.version=1.2.3" -o server .`,
+   "main.go-তে var version string রাখো, উপরের flag দিয়ে build করে print করো, flag ছাড়া/সহ binary size compare করো।"]
+]},
+"13": { title:"13. Security Fundamentals", sub:"Validation, JWT, rate limiting, secure defaults — added chapter", part:4, items:[
+  ["13.1 Input Validation & Sanitization","User input কখনো trust না করা বোঝো।",
+   "User থেকে আসা যেকোনো input কখনো trust করা উচিত না — length, format, allowed-value validate করার পরই ব্যবহার করা উচিত।",
+`func validateEmail(email string) error {
+    if len(email) == 0 || len(email) > 254 {
+        return errors.New("invalid email length")
+    }
+    if !strings.Contains(email, "@") {
+        return errors.New("invalid email format")
+    }
+    return nil
+}`,
+   "একটা registration handler বানাও যেখানে email, password (min length), age (positive number) — সবকিছু validate করে যথাযথ error message দেয়।"],
+  ["13.2 JWT-based Authentication","Stateless token-based auth বোঝো।",
+   "JWT একটা signed token — login করলে server token দেয়, পরের প্রতিটা request-এ সেই token যাচাই করে user identify করা হয়, session storage ছাড়াই।",
+`import "github.com/golang-jwt/jwt/v5"
+
+token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+    "user_id": 42,
+    "exp":     time.Now().Add(time.Hour).Unix(),
+})
+signedToken, _ := token.SignedString([]byte("secret-key"))`,
+   "একটা login endpoint বানাও যা সফল হলে JWT দেয়, আরেকটা protected endpoint বানাও যা Authorization header-এর JWT verify করে।"],
+  ["13.3 Rate Limiting","Token-bucket দিয়ে abuse আটকানো বোঝো।",
+   "একই client থেকে অতিরিক্ত request (brute-force, abuse) আটকাতে rate limiting middleware ব্যবহার হয় — golang.org/x/time/rate একটা token-bucket rate limiter দেয়।",
+`import "golang.org/x/time/rate"
+
+limiter := rate.NewLimiter(5, 10) // 5 req/sec, burst 10
+func rateLimitMiddleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        if !limiter.Allow() {
+            http.Error(w, "too many requests", http.StatusTooManyRequests)
+            return
+        }
+        next.ServeHTTP(w, r)
+    })
+}`,
+   "Rate limiter middleware বানাও, দ্রুত পরপর অনেক request পাঠিয়ে (loop দিয়ে) 429 status code পাওয়া test করো।"],
+  ["13.4 Secure Defaults (Secrets & TLS)","Hardcoded secret এড়ানো বোঝো।",
+   "Production-এ secret (API key, DB password) কখনো code-এ hardcode বা git-এ commit করা উচিত না — environment variable বা secret manager ব্যবহার করা উচিত।",
+`// হার্ডকোড (ভুল):
+apiKey := "sk-12345-secret"
+// সঠিক:
+apiKey := os.Getenv("API_KEY")
+if apiKey == "" {
+    log.Fatal("API_KEY not set")
+}`,
+   ".gitignore বানাও যা .env-কে git track থেকে বাদ দেয়, একটা .env.example বানাও (আসল value ছাড়া) যাতে বোঝা যায় কী কী env variable দরকার।"]
+]}
+};
+
+const PARTS_WRAP = {1:"wrap-1", 2:"wrap-2", 3:"wrap-3", 4:"wrap-4"};
+let totalCount = 0;
+
+function esc(s){
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+Object.keys(CH).forEach((key) => {
+  const ch = CH[key];
+  const wrap = document.getElementById(PARTS_WRAP[ch.part]);
+
+  const details = document.createElement('details');
+  details.className = 'level';
+  if (key === "1") details.open = true;
+
+  const summary = document.createElement('summary');
+  summary.innerHTML = `
+    <div class="lvl-num">${key}</div>
+    <div class="lvl-titles">
+      <div class="lvl-title">${esc(ch.title)}</div>
+      <div class="lvl-sub">${esc(ch.sub)}</div>
+    </div>
+    <div class="lvl-count" id="count-${key}">0/${ch.items.length}</div>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
+  `;
+  details.appendChild(summary);
+
+  const progressTrack = document.createElement('div');
+  progressTrack.className = 'lvl-progress-track';
+  progressTrack.innerHTML = `<div class="lvl-progress-fill" id="fill-${key}" style="width:0%"></div>`;
+  details.appendChild(progressTrack);
+
+  const body = document.createElement('div');
+  body.className = 'lvl-body';
+
+  ch.items.forEach((it, ei) => {
+    totalCount++;
+    const [title, desc, info, code, practice] = it;
+    const item = document.createElement('div');
+    item.className = 'ex-item';
+
+    item.innerHTML = `
+      <div class="ex-row">
+        <input type="checkbox" class="ex-check" id="chk-${key}-${ei}" data-level="${key}">
+        <div class="ex-text">
+          <div class="ex-title">${esc(title)}</div>
+          <div class="ex-desc">${esc(desc)}</div>
+          <div class="ex-info"><b>ℹ️ কী কাজে লাগে:</b> ${esc(info)}</div>
+        </div>
+      </div>
+    `;
+
+    const codeWrap = document.createElement('div');
+    codeWrap.className = 'ex-code-wrap';
+    codeWrap.innerHTML = `<div class="ex-code-head">example.go</div>`;
+    const pre = document.createElement('pre');
+    pre.className = 'ex-code';
+    pre.textContent = code;
+    codeWrap.appendChild(pre);
+    item.querySelector('.ex-text').appendChild(codeWrap);
+
+    const practiceDiv = document.createElement('div');
+    practiceDiv.className = 'ex-practice';
+    practiceDiv.innerHTML = `<b>✏️ Practice:</b> ${esc(practice)}`;
+    item.querySelector('.ex-text').appendChild(practiceDiv);
+
+    body.appendChild(item);
+  });
+
+  details.appendChild(body);
+  wrap.appendChild(details);
+});
+
+document.getElementById('statTotal').textContent = totalCount;
+
+function updateAll(){
+  let doneTotal = 0;
+  Object.keys(CH).forEach((key) => {
+    const ch = CH[key];
+    const checks = document.querySelectorAll(`input[data-level="${key}"]`);
+    let doneCount = 0;
+    checks.forEach(c => { if (c.checked) doneCount++; });
+    doneTotal += doneCount;
+
+    document.getElementById(`count-${key}`).textContent = `${doneCount}/${ch.items.length}`;
+    document.getElementById(`count-${key}`).classList.toggle('complete', doneCount === ch.items.length);
+    const pct = (doneCount / ch.items.length) * 100;
+    const fill = document.getElementById(`fill-${key}`);
+    fill.style.width = pct + '%';
+    fill.classList.toggle('complete', pct === 100);
+  });
+
+  document.getElementById('statDone').textContent = doneTotal;
+  document.getElementById('topText').textContent = `${doneTotal} / ${totalCount}`;
+  document.getElementById('topFill').style.width = totalCount ? (doneTotal/totalCount*100) + '%' : '0%';
+}
+
+document.body.addEventListener('change', (e) => {
+  if (e.target.classList.contains('ex-check')) {
+    e.target.closest('.ex-item').classList.toggle('done', e.target.checked);
+    updateAll();
+  }
+});
+
+function resetAll(){
+  if(!confirm('সব checkmark মুছে ফেলতে চাও?')) return;
+  document.querySelectorAll('.ex-check').forEach(c => {
+    c.checked = false;
+    c.closest('.ex-item').classList.remove('done');
+  });
+  updateAll();
+}
+
+updateAll();
+</script>
+
+</body>
+</html>

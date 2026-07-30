@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editing Reference Sheet — গ্রামার চিট শিট</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Source+Sans+3:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2b3a; --ink-soft:#33475c;
+    --paper:#efe9db; --paper-raised:#f8f4ea; --paper-dark:#e2dac6;
+    --accent:#a33d2e; --accent-soft:#c65e4c;
+    --gold:#a4823b; --muted:#6b6459; --line:#d8cfb8; --done:#4f6b4a; --wrong:#a33d2e;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;scroll-behavior:smooth;}
+  body{ background:var(--paper); background-image:repeating-linear-gradient(0deg, rgba(28,43,58,0.025) 0px, rgba(28,43,58,0.025) 1px, transparent 1px, transparent 32px); color:var(--ink); font-family:'Source Sans 3', sans-serif; min-height:100vh; }
+  .bn{ font-family:'Noto Sans Bengali','Source Sans 3',sans-serif; }
+  code, .mono{ font-family:'JetBrains Mono', monospace; }
+
+  header{
+    padding:20px 32px; border-bottom:2px solid var(--ink); position:sticky; top:0; z-index:20;
+    background:linear-gradient(180deg, var(--paper-raised), var(--paper));
+  }
+  .header-top{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:14px; }
+  .brand{display:flex; align-items:center; gap:14px;}
+  .seal{ width:46px;height:46px;border-radius:50%; background:radial-gradient(circle at 35% 30%, var(--accent-soft), var(--accent) 70%); display:flex;align-items:center;justify-content:center; box-shadow:0 3px 0 rgba(0,0,0,0.15), inset 0 0 0 3px rgba(255,255,255,0.25); flex-shrink:0; }
+  .seal svg{width:22px;height:22px;fill:#fbe9c9;}
+  h1{ font-family:'Fraunces', serif; font-weight:700; font-size:1.4rem; margin:0; }
+  .tagline{ margin:2px 0 0; color:var(--muted); font-size:0.85rem; }
+  .stat{ font-size:0.8rem; color:var(--muted); text-align:right; }
+
+  .search-wrap{ position:relative; }
+  #searchInput{
+    width:100%; padding:12px 16px 12px 42px; border:1.5px solid var(--ink); border-radius:6px;
+    background:var(--paper-raised); font-family:'Source Sans 3',sans-serif; font-size:0.98rem; color:var(--ink);
+  }
+  #searchInput:focus{ outline:2px solid var(--gold); outline-offset:1px; }
+  .search-wrap::before{ content:"🔍"; position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:0.95rem; opacity:0.6; }
+  #searchCount{ font-size:0.78rem; color:var(--muted); margin-top:6px; }
+
+  .layout{ display:flex; }
+  nav.sidebar{ width:280px; flex-shrink:0; border-right:2px solid var(--ink); position:sticky; top:132px; align-self:flex-start; max-height:calc(100vh - 132px); overflow-y:auto; background:var(--paper-raised); }
+  .toc-item{ padding:10px 18px; cursor:pointer; font-size:0.87rem; border-left:3px solid transparent; display:flex; justify-content:space-between; }
+  .toc-item:hover{ background:var(--paper-dark); }
+  .toc-item .n{ color:var(--muted); font-size:0.76rem; }
+
+  main{ flex:1; padding:28px 40px 100px; max-width:920px; }
+  .intro{ background:var(--paper-raised); border:1px solid var(--line); border-left:4px solid var(--gold); padding:18px 22px; border-radius:2px; margin-bottom:30px; line-height:1.75; }
+  .intro p{ margin:0 0 8px; }
+  .intro p:last-child{ margin-bottom:0; }
+
+  section.cat{ margin-bottom:44px; }
+  .cat-title{ font-family:'Fraunces', serif; font-size:1.35rem; font-weight:700; margin:0 0 4px; padding-top:10px; border-top:2px solid var(--ink); }
+  .cat-sub{ color:var(--muted); font-size:0.88rem; margin:0 0 18px; }
+
+  .cards{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:760px){ .cards{ grid-template-columns:1fr; } }
+
+  .card{ background:var(--paper-raised); border:1px solid var(--line); border-radius:3px; padding:16px 18px; box-shadow:2px 3px 0 rgba(28,43,58,0.05); }
+  .card.hidden{ display:none; }
+  .card-title{ font-family:'Fraunces',serif; font-weight:600; font-size:1rem; margin:0 0 8px; color:var(--ink); }
+  .trick{ background:#fbf3e2; border:1px dashed var(--gold); border-radius:2px; padding:9px 12px; font-size:0.86rem; line-height:1.55; margin-bottom:10px; }
+  .trick b{ color:var(--gold); }
+  .wr{ font-size:0.87rem; line-height:1.6; margin-bottom:4px; }
+  .wr .x{ color:var(--wrong); }
+  .wr .x::before{ content:"✗ "; }
+  .wr .o{ color:var(--done); }
+  .wr .o::before{ content:"✓ "; }
+  .note{ font-size:0.82rem; color:var(--muted); margin-top:6px; line-height:1.55; }
+  .mini-table{ width:100%; border-collapse:collapse; font-size:0.82rem; margin-top:8px; }
+  .mini-table th, .mini-table td{ border:1px solid var(--line); padding:5px 8px; text-align:left; }
+  .mini-table th{ background:var(--paper-dark); font-weight:600; }
+
+  .full-card{ grid-column:1/-1; }
+
+  #noResults{ display:none; text-align:center; padding:40px 0; color:var(--muted); }
+
+  footer{ text-align:center; padding:30px; color:var(--muted); font-size:0.82rem; border-top:1px solid var(--line); }
+
+  @media (max-width:820px){
+    .layout{ flex-direction:column; }
+    nav.sidebar{ display:none; }
+    main{ padding:20px 18px 80px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="brand">
+      <div class="seal"><svg viewBox="0 0 24 24"><path d="M3 5h18v14H3V5zm2 2v.01L12 12l7-4.99V7l-7 5-7-5zm0 3.24V17h14V10.24l-6.5 4.64a1 1 0 01-1 0L5 10.24z"/></svg></div>
+      <div>
+        <h1>Editing Reference Sheet</h1>
+        <p class="tagline bn">লেখা শেষে এডিট করার সময় দ্রুত দেখে নেওয়ার জন্য — কোনো বই বা ইন্টারনেট সার্চ ছাড়াই</p>
+      </div>
+    </div>
+    <div class="stat bn" id="totalStat"></div>
+  </div>
+  <div class="search-wrap">
+    <input type="text" id="searchInput" placeholder="যেমন লিখুন: since, passive, comma, article, modal..." oninput="filterCards()">
+  </div>
+  <div id="searchCount" class="bn"></div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main>
+    <div class="intro bn">
+      <p><b>এই শিটটা কীভাবে ব্যবহার করবেন:</b> লেখা শেষ করার পর, দ্বিতীয়বার পড়ার সময় যেখানে সন্দেহ হবে ("এটা ঠিক লিখলাম তো?"), সেই শব্দটা ওপরের সার্চ বক্সে টাইপ করুন — যেমন "since" বা "comma" বা "passive"। পুরো পেজ স্ক্রল করে পড়তে হবে না।</p>
+      <p>প্রতিটা কার্ডে একটা <b>"ট্রিক"</b> দেওয়া আছে — এটা মুখস্থ করার নিয়ম নয়, বরং একটা দ্রুত মানসিক পরীক্ষা যা দিয়ে মুহূর্তেই বুঝে ফেলতে পারবেন কোনটা ঠিক। সাথে ভুল ও সঠিক বাক্যের উদাহরণ (✗ / ✓) আছে।</p>
+    </div>
+
+    <section class="cat" id="cat-basics">
+      <h2 class="cat-title">১. Foundation Quick-Checks (ভিত্তি)</h2>
+      <p class="cat-sub bn">Parts of speech নিয়ে সাধারণত ভুল হয় না, তাই এখানে শুধু সবচেয়ে বেশি হোঁচট খাওয়া জায়গাগুলো রাখা হলো।</p>
+      <div class="cards">
+        <div class="card"><div class="card-title">A / An — কখন কোনটা</div>
+          <div class="trick bn"><b>ট্রিক:</b> বানান নয়, <b>উচ্চারণ</b> দেখুন। শব্দটা vowel sound (a,e,i,o,u ধ্বনি) দিয়ে শুরু হলে "an", consonant sound দিয়ে শুরু হলে "a"।</div>
+          <div class="wr"><span class="x">a hour</span></div><div class="wr"><span class="o">an hour</span> (h নীরব, উচ্চারণ vowel দিয়ে)</div>
+          <div class="wr"><span class="x">an university</span></div><div class="wr"><span class="o">a university</span> (u উচ্চারণ "yu", consonant sound)</div>
+        </div>
+        <div class="card"><div class="card-title">The — কখন বসাবেন</div>
+          <div class="trick bn"><b>ট্রিক:</b> নিজেকে জিজ্ঞেস করুন — "পাঠক কি জানে আমি ঠিক কোন জিনিসটার কথা বলছি?" হ্যাঁ হলে "the", নাহলে "a/an" বা কিছুই না।</div>
+          <div class="wr"><span class="x">Please send the report.</span> (কোন রিপোর্ট, প্রথমবার উল্লেখ)</div>
+          <div class="wr"><span class="o">Please send a report.</span> → পরের বাক্যে: <span class="o">The report should include...</span></div>
+        </div>
+        <div class="card"><div class="card-title">অনিয়মিত Plural (Irregular Nouns)</div>
+          <div class="trick bn"><b>ট্রিক:</b> এই তালিকাটা মুখস্থ রাখাই সহজ — এগুলোতে "s" যোগ হয় না।</div>
+          <table class="mini-table"><tr><th>Singular</th><th>Plural</th></tr>
+          <tr><td>man</td><td>men</td></tr><tr><td>woman</td><td>women</td></tr>
+          <tr><td>child</td><td>children</td></tr><tr><td>person</td><td>people</td></tr>
+          <tr><td>information</td><td>information (uncountable)</td></tr>
+          <tr><td>equipment</td><td>equipment (uncountable)</td></tr></table>
+        </div>
+        <div class="card"><div class="card-title">Countable vs Uncountable</div>
+          <div class="trick bn"><b>ট্রিক:</b> "one X, two X" বলা যায় কিনা ভাবুন। না গেলে সেটা uncountable — তার আগে "a/an" বা plural "s" বসবে না।</div>
+          <div class="wr"><span class="x">an information, informations</span></div>
+          <div class="wr"><span class="o">a piece of information</span> / <span class="o">some information</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cat" id="cat-tense">
+      <h2 class="cat-title">২. Tense &amp; Verb Usage (কাল ও ক্রিয়াপদ)</h2>
+      <p class="cat-sub bn">এডিটিং-এ সবচেয়ে বেশি ভুল ধরা পড়ে এই অংশেই — তাই এখানে সবচেয়ে বেশি কার্ড আছে।</p>
+      <div class="cards">
+        <div class="card full-card"><div class="card-title">১২টি Tense-এর Structure Formula (Quick Table)</div>
+          <div class="trick bn"><b>ব্যবহার:</b> কোনো tense-এ বাক্য বানাতে গিয়ে গঠন ভুলে গেলে এই টেবিলটা দেখুন। V1 = base form (go), V2 = past form (went), V3 = past participle (gone)।</div>
+          <table class="mini-table"><tr><th>Tense</th><th>Affirmative গঠন</th><th>উদাহরণ</th></tr>
+          <tr><td>Present Indefinite</td><td>Subject + V1(s/es) + Object</td><td>He <b>writes</b> a report.</td></tr>
+          <tr><td>Present Continuous</td><td>Subject + am/is/are + V+ing</td><td>He <b>is writing</b> a report.</td></tr>
+          <tr><td>Present Perfect</td><td>Subject + has/have + V3</td><td>He <b>has written</b> a report.</td></tr>
+          <tr><td>Present Perfect Continuous</td><td>Subject + has/have + been + V+ing</td><td>He <b>has been writing</b> since noon.</td></tr>
+          <tr><td>Past Indefinite</td><td>Subject + V2</td><td>He <b>wrote</b> a report.</td></tr>
+          <tr><td>Past Continuous</td><td>Subject + was/were + V+ing</td><td>He <b>was writing</b> a report.</td></tr>
+          <tr><td>Past Perfect</td><td>Subject + had + V3</td><td>He <b>had written</b> it before I arrived.</td></tr>
+          <tr><td>Past Perfect Continuous</td><td>Subject + had + been + V+ing</td><td>He <b>had been writing</b> for an hour.</td></tr>
+          <tr><td>Future Indefinite</td><td>Subject + will/shall + V1</td><td>He <b>will write</b> a report.</td></tr>
+          <tr><td>Future Continuous</td><td>Subject + will/shall + be + V+ing</td><td>He <b>will be writing</b> at 5 PM.</td></tr>
+          <tr><td>Future Perfect</td><td>Subject + will/shall + have + V3</td><td>He <b>will have written</b> it by then.</td></tr>
+          <tr><td>Future Perfect Continuous</td><td>Subject + will/shall + have + been + V+ing</td><td>He <b>will have been writing</b> for 2 hours by 5 PM.</td></tr>
+          </table>
+          <div class="note bn"><b>Negative:</b> be/have/will-এর ঠিক পরে "not" বসান (is <b>not</b> writing, has <b>not</b> written)। <b>Interrogative:</b> auxiliary (am/is/are/has/have/had/will) verb-টাকে subject-এর আগে নিয়ে আসুন (<b>Has</b> he written the report?)।</div>
+        </div>
+
+        <div class="card full-card"><div class="card-title">"Be verb + V3" আসলে কী — Passive Voice-এর মূল ফর্মুলা</div>
+          <div class="trick bn"><b>ফর্মুলা:</b> be verb (am/is/are/was/were/been/being) + Verb-এর 3rd form (V3/past participle) = Passive Voice। এটা কোনো আলাদা tense নয় — এটা বলার একটা <b>ধরন (voice)</b>, যেকোনো tense-এর সাথেই এই প্যাটার্নে বসতে পারে।</div>
+          <table class="mini-table"><tr><th>Tense</th><th>Active</th><th>Passive (be + V3)</th></tr>
+          <tr><td>Present Indefinite</td><td>He writes the report.</td><td>The report <b>is written</b> by him.</td></tr>
+          <tr><td>Present Continuous</td><td>He is writing the report.</td><td>The report <b>is being written</b> by him.</td></tr>
+          <tr><td>Present Perfect</td><td>He has written the report.</td><td>The report <b>has been written</b> by him.</td></tr>
+          <tr><td>Past Indefinite</td><td>He wrote the report.</td><td>The report <b>was written</b> by him.</td></tr>
+          <tr><td>Future Indefinite</td><td>He will write the report.</td><td>The report <b>will be written</b> by him.</td></tr>
+          </table>
+          <div class="note bn">লক্ষ্য করুন: tense যেটাই হোক, verb সবসময় V3 (3rd form) থাকে — শুধু be verb-টা বদলায় (is/was/has been/will be ইত্যাদি) tense অনুযায়ী।</div>
+        </div>
+
+        <div class="card full-card"><div class="card-title">Subject-Verb Agreement</div>
+          <div class="trick bn"><b>ট্রিক:</b> Subject আর Verb-এর মাঝে যত শব্দ থাকুক, সেগুলো আড়াল করে দিন (কল্পনায় মুছে ফেলুন) — শুধু আসল subject আর verb পাশাপাশি রেখে পড়ুন, তাহলেই ভুল কানে ধরা পড়বে।</div>
+          <div class="wr"><span class="x">The list of items <s>are</s> on the table.</span></div>
+          <div class="wr"><span class="o">The list</span> (subject) <span class="o">is</span> on the table. — "of items" আড়ালযোগ্য অংশ</div>
+          <div class="note bn">Each, every, either, neither, everyone, everybody — এগুলো সবসময় singular verb নেয় (Everyone <b>is</b> ready, Every student <b>has</b> submitted)।</div>
+        </div>
+        <div class="card"><div class="card-title">Present Perfect vs Past Simple</div>
+          <div class="trick bn"><b>ট্রিক:</b> নিজেকে জিজ্ঞেস করুন — কাজটার প্রভাব কি এখনো আছে/প্রাসঙ্গিক? হ্যাঁ হলে Present Perfect (has/have + V3)। শুধু অতীতে ঘটে শেষ হয়ে গেছে, এখনকার সাথে সম্পর্ক নেই? তাহলে Past Simple।</div>
+          <div class="wr"><span class="x">I finished the report yesterday and it is with the manager now.</span></div>
+          <div class="wr"><span class="o">I have finished the report</span>, and it is with the manager now.</div>
+        </div>
+        <div class="card"><div class="card-title">Since vs For</div>
+          <div class="trick bn"><b>ট্রিক:</b> "Since" একটা নির্দিষ্ট সময়বিন্দুর সাথে বসে (since 2020, since Monday, since morning)। "For" একটা সময়ের দৈর্ঘ্যের সাথে বসে (for 3 years, for two weeks)।</div>
+          <div class="wr"><span class="x">I have worked here since 5 years.</span></div>
+          <div class="wr"><span class="o">I have worked here for 5 years</span> / <span class="o">since 2021</span>.</div>
+        </div>
+        <div class="card"><div class="card-title">Present Continuous for Future Plans</div>
+          <div class="trick bn"><b>ট্রিক:</b> আগে থেকে ঠিক করা, নিশ্চিত ভবিষ্যৎ পরিকল্পনার জন্য "will" এর বদলে present continuous ব্যবহার করলে বেশি natural শোনায়।</div>
+          <div class="wr"><span class="x">I will meet the client tomorrow.</span> (তথ্য হিসেবে ঠিক, কিন্তু কম natural)</div>
+          <div class="wr"><span class="o">I am meeting the client tomorrow.</span> (আগে থেকে ঠিক করা প্ল্যান)</div>
+        </div>
+        <div class="card"><div class="card-title">If Clause-এ Was → Were</div>
+          <div class="trick bn"><b>ট্রিক:</b> কাল্পনিক/অবাস্তব পরিস্থিতি বোঝাতে (hypothetical) "I/he/she/it" এর সাথেও "was" এর বদলে ফরমাল লেখায় "were" বসে।</div>
+          <div class="wr"><span class="x">If I was you, I would apply.</span></div>
+          <div class="wr"><span class="o">If I were you, I would apply.</span></div>
+        </div>
+        <div class="card"><div class="card-title">Finite vs Non-Finite Verb</div>
+          <div class="trick bn"><b>ট্রিক:</b> Finite verb-এ subject অনুযায়ী রূপ বদলায় এবং tense বোঝায় (he works, she worked)। Non-finite verb (to work, working, worked-as-adjective) কখনো একা বাক্যের মূল ক্রিয়া হতে পারে না — এটার সাথে সবসময় একটা finite verb লাগবে।</div>
+          <div class="wr"><span class="x">He working on the report.</span> (working একা মূল verb হতে পারে না)</div>
+          <div class="wr"><span class="o">He is working</span> on the report. / He, <span class="o">working</span> quickly, finished on time.</div>
+        </div>
+        <div class="card"><div class="card-title">Gerund vs Infinitive after Verbs</div>
+          <div class="trick bn"><b>ট্রিক:</b> কিছু verb-এর পরে সবসময় -ing (enjoy, avoid, consider, suggest, finish), কিছুর পরে সবসময় to+verb (want, decide, plan, agree, hope)। নিশ্চিত না হলে verb-টা সার্চ করে "verb patterns" দেখে নিন — এটা মুখস্থের মতো তালিকা, ট্রিক নেই, শুধু বেশি পড়ে অভ্যস্ত হতে হয়।</div>
+          <div class="wr"><span class="x">I enjoy to read</span> the news. / <span class="x">I want reading</span> the report.</div>
+          <div class="wr"><span class="o">I enjoy reading</span> the news. / <span class="o">I want to read</span> the report.</div>
+        </div>
+        <div class="card"><div class="card-title">Preposition + Verb = সবসময় -ing</div>
+          <div class="trick bn"><b>ট্রিক:</b> এটা সবচেয়ে নির্ভরযোগ্য নিয়মগুলোর একটা — কোনো preposition (in, on, for, of, about, to-as-preposition) এর পরে verb এলে সেটা সবসময় -ing form হবে, কখনো base form নয়।</div>
+          <div class="wr"><span class="x">interested to learn</span> (ভুল যদি "to" preposition অর্থে হয়) — তবে "interested to know" প্রচলিত ব্যতিক্রম</div>
+          <div class="wr"><span class="o">good at solving</span> problems, <span class="o">look forward to hearing</span>, <span class="o">after finishing</span> the work</div>
+        </div>
+        <div class="card full-card"><div class="card-title">Modal Verbs — দ্রুত অর্থের চার্ট</div>
+          <table class="mini-table"><tr><th>Modal</th><th>মূল ব্যবহার</th></tr>
+          <tr><td>can / could</td><td>সামর্থ্য, অনুমতি (could = নরম/অতীত)</td></tr>
+          <tr><td>may / might</td><td>সম্ভাবনা, ভদ্র অনুমতি (might = কম নিশ্চিত)</td></tr>
+          <tr><td>must</td><td>বাধ্যবাধকতা, জোরালো অনুমান</td></tr>
+          <tr><td>should / ought to</td><td>পরামর্শ, উচিত</td></tr>
+          <tr><td>would</td><td>ভদ্র অনুরোধ, কাল্পনিক ফলাফল</td></tr></table>
+          <div class="note bn">সব modal-এর পরে verb-এর base form বসে, to/s কিছুই লাগে না — He <b>can go</b> (can to go বা can goes নয়)।</div>
+        </div>
+        <div class="card"><div class="card-title">Phrasal Verb: Separable কিনা</div>
+          <div class="trick bn"><b>ট্রিক:</b> Object যদি pronoun হয় (it, him, her, them), তাহলে separable phrasal verb-এর মাঝে সেটা বসাতেই হবে, শেষে নয়।</div>
+          <div class="wr"><span class="x">Please fill out it.</span></div>
+          <div class="wr"><span class="o">Please fill it out.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cat" id="cat-sentence">
+      <h2 class="cat-title">৩. Sentence Structure &amp; Transformation</h2>
+      <p class="cat-sub bn">বাক্যের গঠন ও রূপান্তর সংক্রান্ত দ্রুত-চেক।</p>
+      <div class="cards">
+        <div class="card"><div class="card-title">Active → Passive দ্রুত রূপান্তর</div>
+          <div class="trick bn"><b>ট্রিক:</b> Object-কে subject বানান → be verb (is/was/are/were) + main verb-এর V3 বসান → পুরনো subject "by" দিয়ে শেষে বসান (অনেক সময় বাদও দেওয়া যায়)।</div>
+          <div class="wr">Active: The manager <span class="o">approved</span> the request.</div>
+          <div class="wr">Passive: The request <span class="o">was approved</span> (by the manager).</div>
+        </div>
+        <div class="card"><div class="card-title">কখন Passive ব্যবহার করবেন</div>
+          <div class="trick bn"><b>ট্রিক:</b> কে করলো সেটা গুরুত্বপূর্ণ না হলে, বা প্রক্রিয়া/ফলাফলের ওপর জোর দিতে চাইলে passive ব্যবহার করুন — রিপোর্ট ও অফিসিয়াল লেখায় এটা খুব স্বাভাবিক।</div>
+          <div class="wr"><span class="note bn">Report: <span class="o">The data was collected over three months.</span> (কে collect করলো সেটা গৌণ)</span></div>
+        </div>
+        <div class="card"><div class="card-title">Direct → Indirect Speech: Tense শিফট</div>
+          <table class="mini-table"><tr><th>Direct</th><th>Indirect</th></tr>
+          <tr><td>Present Simple</td><td>Past Simple</td></tr>
+          <tr><td>Present Continuous</td><td>Past Continuous</td></tr>
+          <tr><td>Present Perfect</td><td>Past Perfect</td></tr>
+          <tr><td>will</td><td>would</td></tr>
+          <tr><td>can</td><td>could</td></tr></table>
+          <div class="wr"><span class="x">He said, "I <u>am</u> busy."</span> → <span class="x">He said that he is busy.</span></div>
+          <div class="wr"><span class="o">He said that he <u>was</u> busy.</span></div>
+        </div>
+        <div class="card"><div class="card-title">Simple / Compound / Complex চেনার ট্রিক</div>
+          <div class="trick bn"><b>ট্রিক:</b> একটাই subject-verb জোড়া থাকলে Simple। দুটো সমান গুরুত্বের বাক্য "and/but/or" দিয়ে জোড়া থাকলে Compound। একটা মূল বাক্যের সাথে একটা নির্ভরশীল (dependent) বাক্য (because/although/which/that দিয়ে শুরু) থাকলে Complex।</div>
+          <div class="wr">Simple: <span class="o">He finished the report.</span></div>
+          <div class="wr">Compound: He finished the report, <span class="o">and</span> he sent it.</div>
+          <div class="wr">Complex: <span class="o">Although</span> he was tired, he finished the report.</div>
+        </div>
+        <div class="card"><div class="card-title">Degrees of Comparison — দ্রুত রূপান্তর</div>
+          <div class="trick bn"><b>ট্রিক:</b> ১-২ সিলেবলের শব্দে -er/-est যোগ হয়, ৩+ সিলেবলের শব্দে more/most বসে — দুটো একসাথে বসাবেন না।</div>
+          <div class="wr"><span class="x">more better, most beautifullest</span></div>
+          <div class="wr"><span class="o">better</span> (good এর comparative), <span class="o">more beautiful</span></div>
+        </div>
+        <div class="card"><div class="card-title">Comma Splice / Run-on ঠিক করা</div>
+          <div class="trick bn"><b>ট্রিক:</b> দুটো সম্পূর্ণ বাক্যকে শুধু কমা দিয়ে জোড়া লাগানো যায় না। হয় একটা সংযোজক (and/but/so) যোগ করুন, নয়তো কমার বদলে সেমিকোলন (;) বা পূর্ণ যতিচিহ্ন (.) বসান।</div>
+          <div class="wr"><span class="x">The server crashed, we lost the data.</span></div>
+          <div class="wr"><span class="o">The server crashed, so we lost the data.</span> / <span class="o">The server crashed; we lost the data.</span></div>
+        </div>
+        <div class="card"><div class="card-title">Parallel Structure (সমান্তরাল গঠন)</div>
+          <div class="trick bn"><b>ট্রিক:</b> একটা তালিকায় (list) সব আইটেম একই ব্যাকরণিক রূপে থাকতে হবে — সব -ing, বা সব to+verb, মিশ্রণ চলবে না।</div>
+          <div class="wr"><span class="x">The job requires typing, to organize files, and communication skills.</span></div>
+          <div class="wr"><span class="o">The job requires typing, organizing files, and communicating.</span></div>
+        </div>
+        <div class="card"><div class="card-title">Joining Sentences with Participle</div>
+          <div class="trick bn"><b>ট্রিক:</b> দুটো ছোট বাক্যে একই subject থাকলে, দ্বিতীয়টাকে -ing (বর্তমান) বা V3 (passive) দিয়ে সংক্ষিপ্ত phrase বানিয়ে প্রথম বাক্যের সাথে জোড়া দিন।</div>
+          <div class="wr">Separate: He saw the error. He fixed it immediately.</div>
+          <div class="wr"><span class="o">Seeing the error, he fixed it immediately.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cat" id="cat-advanced">
+      <h2 class="cat-title">৪. Advanced Grammar &amp; Usage</h2>
+      <div class="cards">
+        <div class="card"><div class="card-title">Noun Clause চেনার ট্রিক</div>
+          <div class="trick bn"><b>ট্রিক:</b> পুরো clause-টাকে "it" বা "something" দিয়ে বদলে বাক্যটা এখনো ঠিক থাকে কিনা দেখুন — থাকলে সেটা noun clause।</div>
+          <div class="wr"><span class="o">What he said</span> surprised everyone. → "It surprised everyone" — এখনো ঠিক আছে, তাই এটা noun clause।</div>
+        </div>
+        <div class="card"><div class="card-title">Adjective (Relative) Clause চেনার ট্রিক</div>
+          <div class="trick bn"><b>ট্রিক:</b> Clause-টা যদি একটা noun-কে describe/বিশেষায়িত করে এবং who/which/that/whose দিয়ে শুরু হয়, সেটা adjective clause।</div>
+          <div class="wr">The man <span class="o">who called yesterday</span> is my client. ("who called yesterday" — "man"-কে describe করছে)</div>
+        </div>
+        <div class="card"><div class="card-title">Comma with Which/Who — কখন লাগবে</div>
+          <div class="trick bn"><b>ট্রিক:</b> তথ্যটা বাদ দিলে বাক্যের মূল অর্থ নষ্ট হয় কিনা ভাবুন। না হলে (অতিরিক্ত তথ্য) কমা লাগবে। হ্যাঁ হলে (অপরিহার্য তথ্য) কমা লাগবে না।</div>
+          <div class="wr">Essential: The laptop <span class="o">that has a scratch</span> is mine. (কমা নেই — নির্দিষ্ট করছে কোনটা)</div>
+          <div class="wr">Extra info: My laptop<span class="o">, which is two years old,</span> still works fine. (কমা আছে — বাদ দিলেও বাক্য ঠিক থাকে)</div>
+        </div>
+        <div class="card full-card"><div class="card-title">Conditionals — দ্রুত টেবিল</div>
+          <table class="mini-table"><tr><th>ধরন</th><th>গঠন</th><th>কখন</th></tr>
+          <tr><td>Zero</td><td>If + present, present</td><td>সাধারণ সত্য/নিয়ম</td></tr>
+          <tr><td>First</td><td>If + present, will + verb</td><td>বাস্তবসম্মত ভবিষ্যৎ সম্ভাবনা</td></tr>
+          <tr><td>Second</td><td>If + past, would + verb</td><td>কাল্পনিক/অসম্ভাব্য বর্তমান</td></tr>
+          <tr><td>Third</td><td>If + past perfect, would have + V3</td><td>অতীতের কাল্পনিক ফলাফল (যা হয়নি)</td></tr></table>
+          <div class="wr"><span class="o">If you submit it today, it will be processed tomorrow.</span> (First)</div>
+          <div class="wr"><span class="o">If I had known earlier, I would have fixed it.</span> (Third)</div>
+        </div>
+        <div class="card"><div class="card-title">Much/Many, Little/Few — দ্রুত পার্থক্য</div>
+          <div class="trick bn"><b>ট্রিক:</b> Countable noun (গণনাযোগ্য) হলে many/few, uncountable হলে much/little।</div>
+          <div class="wr"><span class="x">much errors, many information</span></div>
+          <div class="wr"><span class="o">many errors</span> (countable), <span class="o">much information</span> (uncountable)</div>
+        </div>
+        <div class="card"><div class="card-title">Some vs Any</div>
+          <div class="trick bn"><b>ট্রিক:</b> ইতিবাচক (affirmative) বাক্যে "some", প্রশ্ন ও নেতিবাচক বাক্যে "any"। ব্যতিক্রম: অনুরোধ/অফারের প্রশ্নে "some" (Would you like some tea?)।</div>
+          <div class="wr"><span class="x">I don't have some time.</span></div>
+          <div class="wr"><span class="o">I don't have any time.</span> / I have <span class="o">some</span> time.</div>
+        </div>
+        <div class="card full-card"><div class="card-title">Punctuation — দ্রুত চেকলিস্ট</div>
+          <div class="wr"><b>Comma (,):</b> তালিকায়, দুটো independent clause-এর মাঝে (and/but দিয়ে), অতিরিক্ত তথ্যের চারপাশে, এবং introductory phrase-এর পর (<span class="o">After the meeting, we left.</span>)</div>
+          <div class="wr"><b>Semicolon (;):</b> দুটো সম্পর্কিত সম্পূর্ণ বাক্যকে সংযোজক ছাড়াই জোড়া দিতে (<span class="o">The report was late; the client was unhappy.</span>)</div>
+          <div class="wr"><b>Colon (:):</b> তালিকা বা ব্যাখ্যা শুরু করার আগে (<span class="o">We need three things: time, budget, and staff.</span>)</div>
+          <div class="wr"><b>Apostrophe ('s):</b> মালিকানার জন্য (the client's request), plural-এ শুধু "s" — এর সাথে apostrophe নয় (<span class="x">client's</span> when meaning multiple clients — should be <span class="o">clients'</span>)</div>
+        </div>
+        <div class="card"><div class="card-title">Capitalization — দ্রুত চেক</div>
+          <div class="trick bn"><b>ট্রিক:</b> বাক্যের শুরু, নাম (নিজের/প্রতিষ্ঠানের/স্থানের), মাস-বার-উৎসব, এবং designation যখন নামের ঠিক আগে বসে (Manager Karim) — এইগুলোতেই Capital হবে, সাধারণ noun-এ নয়।</div>
+          <div class="wr"><span class="x">the Manager will decide</span> (সাধারণভাবে বললে)</div>
+          <div class="wr"><span class="o">The manager will decide</span> / <span class="o">Manager Karim will decide</span> (নামের আগে বসলে Capital)</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cat" id="cat-word">
+      <h2 class="cat-title">৫. Word Choice &amp; Prepositions</h2>
+      <div class="cards">
+        <div class="card full-card"><div class="card-title">সবচেয়ে বেশি ভুল হওয়া Preposition জোড়া</div>
+          <table class="mini-table"><tr><th>সঠিক জোড়া</th><th>সাধারণ ভুল</th></tr>
+          <tr><td>interested <b>in</b></td><td>interested <s>at/for</s></td></tr>
+          <tr><td>married <b>to</b></td><td>married <s>with</s></td></tr>
+          <tr><td>good <b>at</b></td><td>good <s>in</s></td></tr>
+          <tr><td>depend <b>on</b></td><td>depend <s>of</s></td></tr>
+          <tr><td>discuss <b>(কিছু বসবে না)</b></td><td>discuss <s>about</s></td></tr>
+          <tr><td>reply <b>to</b> a letter</td><td>reply <s>of</s> a letter</td></tr>
+          <tr><td>arrive <b>at/in</b></td><td>arrive <s>to</s></td></tr>
+          <tr><td>consist <b>of</b></td><td>consist <s>from</s></td></tr>
+          </table>
+        </div>
+        <div class="card"><div class="card-title">Synonym আপগ্রেড — কুইক লিস্ট</div>
+          <table class="mini-table"><tr><th>Common</th><th>Professional</th></tr>
+          <tr><td>good</td><td>excellent, effective</td></tr>
+          <tr><td>bad</td><td>poor, adverse</td></tr>
+          <tr><td>big</td><td>significant, substantial</td></tr>
+          <tr><td>show</td><td>demonstrate, indicate</td></tr>
+          <tr><td>tell</td><td>inform, notify</td></tr></table>
+        </div>
+        <div class="card"><div class="card-title">One Word Substitution — অফিস-প্রাসঙ্গিক</div>
+          <table class="mini-table"><tr><th>বাক্যাংশ</th><th>এক শব্দে</th></tr>
+          <tr><td>a person who studies/researches something new</td><td>researcher</td></tr>
+          <tr><td>impossible to read (handwriting)</td><td>illegible</td></tr>
+          <tr><td>cannot be avoided</td><td>inevitable</td></tr>
+          <tr><td>done without any payment</td><td>voluntary</td></tr></table>
+        </div>
+        <div class="card"><div class="card-title">Prefix/Suffix — দ্রুত অর্থ বদল</div>
+          <table class="mini-table"><tr><th>যোগ</th><th>অর্থ</th><th>উদাহরণ</th></tr>
+          <tr><td>re-</td><td>আবার</td><td>resend, reschedule</td></tr>
+          <tr><td>un-/in-/dis-</td><td>বিপরীত/নেতিবাচক</td><td>unable, incomplete, disagree</td></tr>
+          <tr><td>-able/-ible</td><td>করা যায় এমন</td><td>manageable, visible</td></tr>
+          <tr><td>-tion/-sion</td><td>verb থেকে noun</td><td>decide→decision</td></tr></table>
+        </div>
+      </div>
+    </section>
+
+    <section class="cat" id="cat-bonus">
+      <h2 class="cat-title">৬. Bonus — যা সাধারণত কেউ জিজ্ঞেসই করে না</h2>
+      <p class="cat-sub bn">এগুলো ভুল হয় প্রায় সবার লেখাতেই, কিন্তু "এটা তো জানিই" মনে হয় বলে কেউ চেক করে না। এডিটিং-এ এই তালিকাটা সবচেয়ে বেশি কাজে দেয়।</p>
+      <div class="cards">
+        <div class="card full-card"><div class="card-title">প্রায়ই গুলিয়ে ফেলা শব্দ-জোড়া (Confused Word Pairs)</div>
+          <table class="mini-table"><tr><th>শব্দ</th><th>অর্থ</th><th>উদাহরণ</th></tr>
+          <tr><td>it's</td><td>it is / it has (সংক্ষেপ)</td><td>It's raining.</td></tr>
+          <tr><td>its</td><td>মালিকানা (possessive)</td><td>The company changed its policy.</td></tr>
+          <tr><td>their</td><td>মালিকানা</td><td>They finished their report.</td></tr>
+          <tr><td>there</td><td>স্থান</td><td>The file is over there.</td></tr>
+          <tr><td>they're</td><td>they are</td><td>They're coming today.</td></tr>
+          <tr><td>then</td><td>সময়/পরে</td><td>Finish this, then send it.</td></tr>
+          <tr><td>than</td><td>তুলনা</td><td>This is better than that.</td></tr>
+          <tr><td>affect</td><td>verb — প্রভাব ফেলা</td><td>Rain affected the schedule.</td></tr>
+          <tr><td>effect</td><td>noun — প্রভাব/ফলাফল</td><td>The effect was significant.</td></tr>
+          <tr><td>advice</td><td>noun — পরামর্শ</td><td>He gave good advice.</td></tr>
+          <tr><td>advise</td><td>verb — পরামর্শ দেওয়া</td><td>I advise you to wait.</td></tr>
+          <tr><td>your</td><td>মালিকানা</td><td>Your report is ready.</td></tr>
+          <tr><td>you're</td><td>you are</td><td>You're doing well.</td></tr>
+          </table>
+        </div>
+
+        <div class="card"><div class="card-title">Preposition of Time — In / On / At</div>
+          <div class="trick bn"><b>ট্রিক:</b> বড় থেকে ছোট সময়ের দিকে যান — In (মাস/বছর/ঋতু) → On (দিন/তারিখ) → At (নির্দিষ্ট সময়)।</div>
+          <table class="mini-table"><tr><th>Preposition</th><th>ব্যবহার</th><th>উদাহরণ</th></tr>
+          <tr><td>in</td><td>মাস, বছর, সকাল/বিকেল</td><td>in July, in 2026, in the morning</td></tr>
+          <tr><td>on</td><td>দিন, তারিখ</td><td>on Monday, on July 30</td></tr>
+          <tr><td>at</td><td>নির্দিষ্ট সময়, রাত</td><td>at 5 PM, at night</td></tr></table>
+        </div>
+
+        <div class="card"><div class="card-title">Adjective-এর ক্রম (Order)</div>
+          <div class="trick bn"><b>ট্রিক:</b> একাধিক adjective একসাথে বসলে এই ক্রম মেনে চলুন: মতামত → আকার → বয়স → আকৃতি → রঙ → উৎপত্তি → উপাদান → উদ্দেশ্য → Noun।</div>
+          <div class="wr"><span class="x">a wooden old beautiful table</span></div>
+          <div class="wr"><span class="o">a beautiful old wooden table</span> (মতামত → বয়স → উপাদান)</div>
+        </div>
+
+        <div class="card"><div class="card-title">সংক্ষিপ্ত ও পরিষ্কার লেখা (Trim the Wordiness)</div>
+          <div class="trick bn"><b>ট্রিক:</b> এই বাক্যাংশগুলো দেখলেই ছোট করে ফেলুন — অর্থ একই থাকবে, লেখা পরিষ্কার হবে।</div>
+          <table class="mini-table"><tr><th>বড় বাক্যাংশ</th><th>সংক্ষিপ্ত</th></tr>
+          <tr><td>in order to</td><td>to</td></tr>
+          <tr><td>due to the fact that</td><td>because</td></tr>
+          <tr><td>at this point in time</td><td>now</td></tr>
+          <tr><td>in the event that</td><td>if</td></tr>
+          <tr><td>a large number of</td><td>many</td></tr>
+          </table>
+        </div>
+
+        <div class="card"><div class="card-title">Dangling Modifier (ঝুলন্ত বাক্যাংশ)</div>
+          <div class="trick bn"><b>ট্রিক:</b> বাক্য কমা দিয়ে শুরু হলে (Verb+ing/V3 phrase দিয়ে), কমার ঠিক পরের শব্দটাই সেই কাজের কর্তা হতে হবে — নাহলে অর্থ হাস্যকর হয়ে যায়।</div>
+          <div class="wr"><span class="x">Walking to the office, the rain started.</span> (বৃষ্টি কি হাঁটছিল?)</div>
+          <div class="wr"><span class="o">Walking to the office, I got caught in the rain.</span></div>
+        </div>
+
+        <div class="card"><div class="card-title">Reported Speech — সময়/স্থানের শব্দ বদল</div>
+          <div class="trick bn"><b>ট্রিক:</b> Tense বদলানোর পাশাপাশি (আগের টেবিলে দেখুন), সময়/স্থান বোঝানো শব্দও বদলাতে হয়।</div>
+          <table class="mini-table"><tr><th>Direct</th><th>Indirect</th></tr>
+          <tr><td>today</td><td>that day</td></tr>
+          <tr><td>tomorrow</td><td>the next day</td></tr>
+          <tr><td>yesterday</td><td>the day before</td></tr>
+          <tr><td>now</td><td>then</td></tr>
+          <tr><td>here</td><td>there</td></tr></table>
+        </div>
+
+        <div class="card"><div class="card-title">Double Negative (দুইবার নেতিবাচক)</div>
+          <div class="trick bn"><b>ট্রিক:</b> ইংরেজিতে একটা বাক্যে একটাই negative word থাকে — "not" আর "no/none/nothing" একসাথে বসে না।</div>
+          <div class="wr"><span class="x">I don't have no time.</span></div>
+          <div class="wr"><span class="o">I don't have any time.</span> / <span class="o">I have no time.</span></div>
+        </div>
+
+        <div class="card"><div class="card-title">প্রফেশনাল লেখায় যা এড়াবেন</div>
+          <div class="trick bn"><b>ট্রিক:</b> Contraction ও অতি-সাধারণ শব্দ ফরমাল লেখায় এড়িয়ে চলুন।</div>
+          <table class="mini-table"><tr><th>এড়িয়ে চলুন</th><th>বদলে লিখুন</th></tr>
+          <tr><td>don't, can't, won't</td><td>do not, cannot, will not</td></tr>
+          <tr><td>a lot of / lots of</td><td>numerous, considerable</td></tr>
+          <tr><td>stuff, things</td><td>নির্দিষ্ট শব্দ (materials, items, issues)</td></tr>
+          <tr><td>get</td><td>obtain, receive, acquire</td></tr>
+          </table>
+        </div>
+
+        <div class="card"><div class="card-title">Compound Adjective-এ Hyphen</div>
+          <div class="trick bn"><b>ট্রিক:</b> দুই বা তিনটা শব্দ মিলে একসাথে একটা noun-এর <b>আগে</b> বসে বিশেষায়িত করলে হাইফেন লাগবে। Noun-এর পরে বসলে হাইফেন লাগবে না।</div>
+          <div class="wr"><span class="o">a well-known author</span> — কিন্তু: The author is <span class="o">well known</span>.</div>
+          <div class="wr"><span class="o">an up-to-date report</span>, <span class="o">a three-year-old project</span></div>
+        </div>
+
+        <div class="card"><div class="card-title">সংখ্যা লেখার নিয়ম (Numbers in Formal Writing)</div>
+          <div class="trick bn"><b>ট্রিক:</b> এক থেকে নয় পর্যন্ত কথায় লিখুন (one, two...nine), ১০ বা তার বেশি হলে সংখ্যায় (10, 25) লিখুন। বাক্য সংখ্যা দিয়ে শুরু করবেন না — শুরুতেও কথায় লিখুন।</div>
+          <div class="wr"><span class="x">5 people attended. 12 reports were submitted.</span></div>
+          <div class="wr"><span class="o">Five people attended. 12 reports were submitted.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="bn">
+      মোট নিয়ম/ট্রিক: <span id="footCount"></span>টা — যখনই সন্দেহ হবে, সার্চ বক্সে টাইপ করুন।
+    </footer>
+  </main>
+</div>
+
+<div id="noResults" class="bn">কোনো ফলাফল পাওয়া যায়নি — অন্য শব্দ দিয়ে চেষ্টা করুন।</div>
+
+<script>
+function buildSidebar(){
+  const cats = document.querySelectorAll('section.cat');
+  const sb = document.getElementById('sidebar');
+  cats.forEach(cat=>{
+    const title = cat.querySelector('.cat-title').textContent;
+    const item = document.createElement('div');
+    item.className = 'toc-item';
+    item.innerHTML = `<span>${title}</span>`;
+    item.onclick = ()=> cat.scrollIntoView({behavior:'smooth', block:'start'});
+    sb.appendChild(item);
+  });
+}
+buildSidebar();
+
+const allCards = document.querySelectorAll('.card');
+document.getElementById('totalStat').textContent = allCards.length + ' টি রেফারেন্স কার্ড';
+document.getElementById('footCount').textContent = allCards.length;
+
+function filterCards(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  let visibleCount = 0;
+  allCards.forEach(card=>{
+    const text = card.textContent.toLowerCase();
+    const match = q==='' || text.includes(q);
+    card.classList.toggle('hidden', !match);
+    if(match) visibleCount++;
+  });
+  document.querySelectorAll('section.cat').forEach(cat=>{
+    const visible = Array.from(cat.querySelectorAll('.card')).some(c=>!c.classList.contains('hidden'));
+    cat.style.display = (q==='' || visible) ? '' : 'none';
+  });
+  document.getElementById('searchCount').textContent = q==='' ? '' : (visibleCount + 'টি ফলাফল পাওয়া গেছে');
+  document.getElementById('noResults').style.display = (q!=='' && visibleCount===0) ? 'block' : 'none';
+}
+</script>
+</body>
+</html>

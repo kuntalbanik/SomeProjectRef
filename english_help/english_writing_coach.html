@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Professional English Writing Coach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Source+Sans+3:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2b3a; --ink-soft:#33475c;
+    --paper:#efe9db; --paper-raised:#f8f4ea; --paper-dark:#e2dac6;
+    --accent:#a33d2e; --accent-soft:#c65e4c;
+    --gold:#a4823b; --muted:#6b6459; --line:#d8cfb8; --done:#4f6b4a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    background-image:repeating-linear-gradient(0deg, rgba(28,43,58,0.025) 0px, rgba(28,43,58,0.025) 1px, transparent 1px, transparent 32px);
+    color:var(--ink); font-family:'Source Sans 3', sans-serif; min-height:100vh;
+  }
+  .bn{ font-family:'Noto Sans Bengali','Source Sans 3',sans-serif; }
+
+  header{
+    padding:26px 32px 20px; border-bottom:2px solid var(--ink);
+    display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:14px;
+    background:linear-gradient(180deg, var(--paper-raised), var(--paper));
+  }
+  .brand{display:flex; align-items:center; gap:16px;}
+  .seal{
+    width:52px;height:52px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--accent-soft), var(--accent) 70%);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 3px 0 rgba(0,0,0,0.15), inset 0 0 0 3px rgba(255,255,255,0.25);
+    flex-shrink:0;
+  }
+  .seal svg{width:26px;height:26px;fill:#fbe9c9;}
+  h1{ font-family:'Fraunces', serif; font-weight:700; font-size:1.65rem; margin:0; }
+  .tagline{ margin:2px 0 0; color:var(--muted); font-size:0.9rem; }
+  .progress-wrap{ text-align:right; min-width:220px; }
+  .progress-label{ font-size:0.8rem; color:var(--muted); margin-bottom:6px; }
+  .progress-track{ width:220px; height:8px; background:var(--paper-dark); border-radius:6px; overflow:hidden; border:1px solid var(--line); }
+  .progress-fill{ height:100%; background:linear-gradient(90deg, var(--gold), var(--accent)); width:0%; transition:width .4s; }
+  .progress-count{ font-family:'Fraunces', serif; font-size:0.92rem; margin-top:6px; }
+
+  .layout{ display:flex; min-height:calc(100vh - 92px); }
+  nav.sidebar{ width:320px; flex-shrink:0; border-right:2px solid var(--ink); overflow-y:auto; max-height:calc(100vh - 92px); background:var(--paper-raised); }
+  .home-link{ padding:12px 18px; cursor:pointer; font-family:'Fraunces',serif; font-weight:700; border-bottom:1px solid var(--line); }
+  .home-link:hover{ background:var(--paper-dark); }
+  .level{ border-bottom:1px solid var(--line); }
+  .level-head{
+    padding:12px 18px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;
+    font-family:'Fraunces', serif; font-weight:600; font-size:0.95rem; color:var(--ink); user-select:none;
+  }
+  .level-head:hover{ background:var(--paper-dark); }
+  .level-head .count{ font-family:'Source Sans 3',sans-serif; font-size:0.72rem; color:var(--muted); background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:1px 8px; }
+  .level-arrow{ transition:transform .2s; font-size:0.75rem; color:var(--gold); }
+  .level.open .level-arrow{ transform:rotate(90deg); }
+  .level-items{ display:none; padding-bottom:6px; }
+  .level.open .level-items{ display:block; }
+  .item{ padding:8px 18px 8px 34px; cursor:pointer; font-size:0.85rem; color:var(--ink-soft); border-left:3px solid transparent; display:flex; align-items:center; gap:8px; }
+  .item:hover{ background:var(--paper-dark); }
+  .item.active{ border-left-color:var(--accent); background:var(--paper-dark); font-weight:600; color:var(--ink); }
+  .item .stamp-mini{ width:8px; height:8px; border-radius:50%; background:var(--paper-dark); border:1px solid var(--muted); flex-shrink:0; }
+  .item.learned .stamp-mini{ background:var(--done); border-color:var(--done); }
+
+  main{ flex:1; padding:34px 44px 80px; max-width:900px; overflow-y:auto; max-height:calc(100vh - 92px); }
+  .welcome h2{ font-family:'Fraunces',serif; font-size:1.55rem; }
+  .welcome p, .welcome li{ line-height:1.75; color:var(--ink-soft); }
+  .level-card{
+    border:1px solid var(--line); background:var(--paper-raised); border-left:4px solid var(--gold);
+    padding:14px 18px; margin-bottom:12px; border-radius:2px; cursor:pointer;
+  }
+  .level-card:hover{ box-shadow:2px 3px 0 rgba(28,43,58,0.08); }
+  .level-card b{ font-family:'Fraunces',serif; }
+
+  .eyebrow{ font-size:0.76rem; text-transform:uppercase; letter-spacing:1.2px; color:var(--gold); font-weight:700; }
+  .lesson-title{ font-family:'Fraunces', serif; font-size:1.9rem; margin:4px 0 22px; font-weight:700; }
+  .block{ margin-bottom:26px; }
+  .block h3{ font-family:'Fraunces', serif; font-size:1.04rem; margin:0 0 10px; display:flex; align-items:center; gap:8px; color:var(--ink); }
+  .block h3 .num{ display:inline-flex; align-items:center; justify-content:center; width:22px;height:22px;border-radius:50%; background:var(--ink); color:var(--paper-raised); font-size:0.7rem; font-family:'Source Sans 3',sans-serif; font-weight:700; }
+
+  .word-pair{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:10px; }
+  .word-box{ flex:1; min-width:180px; padding:14px 18px; border-radius:3px; }
+  .word-box.common{ background:#f1e8e0; border:1px solid #d9c3b3; }
+  .word-box.pro{ background:#e9f0ea; border:1px solid #c3d3c3; }
+  .word-box .wlabel{ font-size:0.72rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted); }
+  .word-box .wword{ font-family:'Fraunces',serif; font-size:1.3rem; margin-top:4px; }
+  .arrow-sep{ display:flex; align-items:center; font-size:1.4rem; color:var(--gold); }
+
+  .chip{ background:var(--paper-dark); border:1px solid var(--line); border-radius:20px; padding:6px 14px; font-size:0.87rem; display:inline-block; margin:3px 6px 3px 0;}
+  .chip b{ color:var(--accent); }
+
+  .sentence-upgrade{ display:flex; flex-direction:column; gap:10px; }
+  .sent-line{ padding:14px 18px; border-radius:3px; line-height:1.6; font-size:0.97rem; }
+  .sent-line.simple{ background:#f6f1e6; border:1px dashed var(--muted); }
+  .sent-line.better{ background:var(--paper-raised); border-left:4px solid var(--accent); box-shadow:2px 3px 0 rgba(28,43,58,0.06); }
+  .sent-line .tag{ font-size:0.72rem; text-transform:uppercase; color:var(--muted); letter-spacing:0.5px; display:block; margin-bottom:4px; }
+
+  .grammar-card{ background:#eef1e9; border:1px solid #c9d3bd; border-left:4px solid var(--done); padding:18px 22px; border-radius:2px; line-height:1.85; font-size:0.98rem; }
+
+  .task-card{ background:#fbf3e2; border:1px dashed var(--gold); padding:16px 20px; border-radius:2px; line-height:1.65; font-size:0.94rem; }
+  .task-card::before{ content:"✎ আজকের ইন্টারঅ্যাক্টিভ টাস্ক"; display:block; font-weight:700; color:var(--gold); margin-bottom:6px; font-size:0.82rem; letter-spacing:0.5px;}
+  textarea.answer-box{
+    width:100%; min-height:100px; margin-top:12px; padding:12px 14px; font-family:'Source Sans 3',sans-serif;
+    font-size:0.95rem; border:1px solid var(--line); border-radius:3px; background:#fffdf8; resize:vertical;
+  }
+  .task-buttons{ margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; }
+  .copy-btn, .mark-btn{ background:var(--ink); color:var(--paper-raised); border:none; padding:9px 18px; border-radius:3px; cursor:pointer; font-family:'Source Sans 3',sans-serif; font-size:0.84rem; font-weight:600; }
+  .copy-btn.copied{ background:var(--done); }
+  .mark-btn.done{ background:var(--done); }
+  .copy-hint{ font-size:0.82rem; color:var(--muted); margin-top:6px; }
+
+  .nav-buttons{ display:flex; justify-content:space-between; margin-top:34px; padding-top:18px; border-top:1px solid var(--line); }
+  .nav-buttons button{ background:none; border:1px solid var(--ink); color:var(--ink); padding:8px 16px; border-radius:3px; cursor:pointer; font-family:'Source Sans 3',sans-serif; font-size:0.85rem; }
+  .nav-buttons button:hover{ background:var(--ink); color:var(--paper-raised); }
+  .nav-buttons button:disabled{ opacity:0.35; cursor:default; }
+  .nav-buttons button:disabled:hover{ background:none; color:var(--ink); }
+
+  table.vault{ width:100%; border-collapse:collapse; font-size:0.88rem; }
+  table.vault th, table.vault td{ text-align:left; padding:7px 10px; border-bottom:1px solid var(--line); }
+  table.vault th{ color:var(--muted); font-weight:600; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; }
+
+  @media (max-width: 820px){
+    .layout{ flex-direction:column; }
+    nav.sidebar{ width:100%; max-height:280px; border-right:none; border-bottom:2px solid var(--ink); }
+    main{ max-height:none; padding:24px 20px 60px; }
+    .progress-wrap{ text-align:left; }
+    .word-pair{ flex-direction:column; }
+    .arrow-sep{ transform:rotate(90deg); justify-content:center; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="seal"><svg viewBox="0 0 24 24"><path d="M12 2l1.8 5.6H20l-4.6 3.4 1.8 5.6L12 13.2 6.8 16.6l1.8-5.6L4 7.6h6.2z"/></svg></div>
+    <div>
+      <h1>Professional English Writing Coach</h1>
+      <p class="tagline bn">বেসিক থেকে অ্যাডভান্স — নিউজপেপার, আর্টিকেল ও অফিস ইমেইল/রিপোর্ট লেখার ধাপে ধাপে কোর্স</p>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label bn">আপনার অগ্রগতি (এই সেশনে)</div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-count" id="progressCount">0 / 0 stamped</div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main id="main"></main>
+</div>
+
+<script>
+/* ============ COURSE DATA ============ */
+const LEVELS = [
+  {key:"L1", name:"Level 1 — ভিত্তি (Foundation)", desc:"দৈনন্দিন সাধারণ শব্দকে প্রফেশনাল শব্দে রূপান্তর — সবচেয়ে সহজ থেকে শুরু।"},
+  {key:"L2", name:"Level 2 — অফিস যোগাযোগ (Office Communication)", desc:"ইমেইল, মিটিং ও রিকোয়েস্টের জন্য দরকারি শব্দ ও গঠন।"},
+  {key:"L3", name:"Level 3 — রিপোর্ট ও নিউজ স্টাইল (Report & News Style)", desc:"তথ্যভিত্তিক, নিরপেক্ষ ও বিশ্লেষণাত্মক লেখার ভাষা।"},
+  {key:"L4", name:"Level 4 — অ্যাডভান্স / এডিটোরিয়াল (Advanced / Editorial)", desc:"আর্টিকেল ও এডিটোরিয়াল মানের শক্তিশালী, নিখুঁত শব্দচয়ন।"}
+];
+
+const DATA = [
+/* ================= LEVEL 1 — FOUNDATION ================= */
+{level:"L1", day:1, topic:"অনুমতি চাওয়া (Asking Permission)",
+ common:"get", professional:"obtain", phrasal:{v:"look into", m:"খতিয়ে দেখা / তদন্ত করা"},
+ collocation:{p:"obtain approval", m:"অনুমোদন লাভ করা"},
+ simple:"I got the manager's permission to leave early.",
+ better:"I obtained the manager's approval to leave early, and he said he would look into rescheduling my remaining tasks.",
+ grammar:"'get' একটা খুব সাধারণ (general) verb, যেকোনো প্রসঙ্গে চলে। কিন্তু 'obtain' শব্দটা বেশি ফরমাল কারণ এটা বোঝায় জিনিসটা প্রচেষ্টা বা প্রক্রিয়ার মাধ্যমে পাওয়া হয়েছে, শুধু হাতে চলে আসেনি। তাই অফিসিয়াল লেখায় 'get approval'-এর বদলে 'obtain approval' ব্যবহার করলে লেখাটা বেশি গুরুত্বপূর্ণ ও পরিণত শোনায়।",
+ task:"অফিস পরিস্থিতি: আপনার বস আজ আধা ঘণ্টা দেরি করে অফিসে ঢুকবেন এবং আপনাকে জানিয়েছেন। এই বিষয়ে ৩-৪ লাইনের একটি ছোট ইমেইল বা নোট লিখুন সহকর্মীদের জানানোর জন্য, 'obtain' বা 'look into' শব্দ দুটোর যেকোনো একটা ব্যবহার করার চেষ্টা করুন।"},
+
+{level:"L1", day:2, topic:"কাজ সম্পন্ন করা (Doing a Task)",
+ common:"use", professional:"utilize", phrasal:{v:"carry out", m:"সম্পাদন করা / করা"},
+ collocation:{p:"carry out an inspection", m:"পরিদর্শন করা"},
+ simple:"We used the new tool to check the network.",
+ better:"We utilized the new tool to carry out a full inspection of the network.",
+ grammar:"'utilize' আর 'use'-এর অর্থ প্রায় একই, কিন্তু 'utilize' বোঝায় জিনিসটাকে একটা নির্দিষ্ট উদ্দেশ্যে দক্ষতার সাথে কাজে লাগানো হয়েছে। লক্ষ্য করুন প্রতিটা ছোট শব্দকে সবসময় 'professional' শব্দে বদলানো ঠিক না — 'utilize' মাঝেমধ্যে বেশি ভারী শোনাতে পারে, তাই কনটেক্সট (রিপোর্ট/অফিসিয়াল লেখা) বুঝে ব্যবহার করাই ভালো অভ্যাস।",
+ task:"নিউজ টপিক: ধরুন একটি স্থানীয় কোম্পানি নতুন সফটওয়্যার এনেছে অফিসের কাজ সহজ করার জন্য। এই খবরটা ৩-৪ লাইনে লিখুন, 'utilize' এবং 'carry out' ব্যবহার করে।"},
+
+{level:"L1", day:3, topic:"সাহায্য করা (Helping / Solving)",
+ common:"help", professional:"assist", phrasal:{v:"deal with", m:"সামলানো / মোকাবিলা করা"},
+ collocation:{p:"assist with a task", m:"কোনো কাজে সহায়তা করা"},
+ simple:"She helped me with the report and dealt with the printer problem too.",
+ better:"She assisted me with the report and also dealt with the printer problem efficiently.",
+ grammar:"'help' এবং 'assist' প্রায় সমার্থক, কিন্তু preposition আলাদা — 'help someone with something' আর 'assist someone with something' দুটোই ঠিক, তবে ফরমাল লেখায় 'assist' বেশি প্রচলিত। লক্ষ্য করুন 'efficiently' শব্দটা verb-এর পরে বসেছে (adverb of manner) — কীভাবে কাজটা হলো তা বোঝাতে adverb সাধারণত verb-এর পরে বা বাক্যের শেষে বসে।",
+ task:"অফিস পরিস্থিতি: একজন নতুন সহকর্মী কম্পিউটার সেটআপে সমস্যায় পড়েছেন এবং আপনি তাকে সাহায্য করেছেন। এই ঘটনাটা ৩-৪ লাইনে লিখুন 'assist' ও 'deal with' ব্যবহার করে।"},
+
+{level:"L1", day:4, topic:"কিছু দেখানো (Showing / Pointing Out)",
+ common:"show", professional:"demonstrate", phrasal:{v:"point out", m:"উল্লেখ করা / দেখিয়ে দেওয়া"},
+ collocation:{p:"point out an error", m:"ভুল উল্লেখ করা"},
+ simple:"He showed the mistake in the file and I fixed it.",
+ better:"He pointed out an error in the file, which clearly demonstrated the need for a review process.",
+ grammar:"'which clearly demonstrated' — এখানে 'which' আগের পুরো বাক্যাংশ ('he pointed out an error')-কে নির্দেশ করছে, শুধু একটা শব্দকে নয়। এই ধরনের non-defining relative clause একটা ঘটনার ফলাফল বা তাৎপর্য যোগ করতে ব্যবহৃত হয়, ইংরেজি রিপোর্ট লেখায় খুব সাধারণ একটা কৌশল।",
+ task:"অফিস পরিস্থিতি: একটি রিপোর্টে একটি হিসাবের ভুল ধরা পড়েছে। এই বিষয়ে সহকর্মীকে জানিয়ে ৩-৪ লাইনের একটি নোট লিখুন 'point out' ও 'demonstrate' ব্যবহার করে।"},
+
+{level:"L1", day:5, topic:"শুরু করা (Starting Something)",
+ common:"start", professional:"initiate", phrasal:{v:"set up", m:"স্থাপন করা / ব্যবস্থা করা"},
+ collocation:{p:"initiate a process", m:"কোনো প্রক্রিয়া শুরু করা"},
+ simple:"We started the new project and set up a meeting to plan it.",
+ better:"We initiated the new project and set up a meeting to plan the next steps.",
+ grammar:"'initiate' শব্দটা 'start'-এর চেয়ে বেশি পরিকল্পিত ও আনুষ্ঠানিক শোনায় — এটা বোঝায় শুরুটা সচেতনভাবে, একটা সিদ্ধান্তের ফলে হয়েছে। খেয়াল করুন 'set up' একটা phrasal verb, এটা কখনো একসাথে (setup) লেখা ঠিক না verb হিসেবে — 'setup' শুধু noun (যেমন 'a good setup')।",
+ task:"নিউজ টপিক: একটি স্কুল নতুন কম্পিউটার ল্যাব চালু করেছে। এই খবরটা ৩-৪ লাইনে লিখুন 'initiate' ও 'set up' ব্যবহার করে।"},
+
+{level:"L1", day:6, topic:"শেষ করা (Concluding)",
+ common:"end", professional:"conclude", phrasal:{v:"wrap up", m:"গুটিয়ে ফেলা / শেষ করা"},
+ collocation:{p:"conclude a report", m:"রিপোর্ট শেষ করা / উপসংহার টানা"},
+ simple:"We ended the meeting and wrapped up all the pending points.",
+ better:"We concluded the meeting after wrapping up all the pending discussion points.",
+ grammar:"'after wrapping up' — এখানে 'after' এর পরে verb-এর -ing form বসেছে, কারণ 'after' এখানে preposition হিসেবে কাজ করছে (a preposition of time)। এটা 'after we wrapped up' এর একটা সংক্ষিপ্ত ও মসৃণ রূপ — দুইটা আলাদা clause না লিখে একটা -ing phrase দিয়ে বাক্য ছোট করা যায়।",
+ task:"অফিস পরিস্থিতি: একটি মিটিং শেষ হয়েছে এবং সব সিদ্ধান্ত চূড়ান্ত হয়েছে। এই বিষয়ে ৩-৪ লাইনের একটি সারাংশ লিখুন 'conclude' ও 'wrap up' ব্যবহার করে।"},
+
+{level:"L1", day:7, topic:"জানানো (Informing)",
+ common:"tell", professional:"inform / notify", phrasal:{v:"fill in", m:"পূরণ করা (ফর্ম) / জানানো (কাউকে খবর দেওয়া)"},
+ collocation:{p:"notify the client", m:"ক্লায়েন্টকে অবহিত করা"},
+ simple:"I told him about the delay and asked him to fill in the form.",
+ better:"I notified him about the delay and asked him to fill in the required form.",
+ grammar:"'tell' সাধারণত ব্যক্তিগত কথোপকথনে ব্যবহৃত হয় (tell someone something), কিন্তু ফরমাল লেখায় 'inform' বা 'notify' বেশি প্রচলিত এবং এগুলোর গঠন একটু ভিন্ন: 'notify someone of/about something'। লক্ষ্য করুন 'fill in' একটা দুই-অর্থবিশিষ্ট (double meaning) phrasal verb — প্রসঙ্গ অনুযায়ী এর অর্থ ঠিক করে নিতে হয়।",
+ task:"অফিস পরিস্থিতি: একটি চালান (invoice) দেরিতে পাঠানো হবে এই তথ্য ক্লায়েন্টকে জানাতে হবে। ৩-৪ লাইনের একটি সংক্ষিপ্ত বার্তা লিখুন 'notify' শব্দ ব্যবহার করে।"},
+
+/* ================= LEVEL 2 — OFFICE COMMUNICATION ================= */
+{level:"L2", day:8, topic:"অনুরোধ করা (Making a Request)",
+ common:"ask", professional:"request", phrasal:{v:"follow up on", m:"পরবর্তীতে খোঁজ নেওয়া"},
+ collocation:{p:"submit a request", m:"অনুরোধ জমা দেওয়া"},
+ simple:"I asked for more time and will follow up on it tomorrow.",
+ better:"I submitted a request for an extended deadline and will follow up on it tomorrow morning.",
+ grammar:"'request' verb হিসেবেও ব্যবহৃত হয় (request something) এবং noun হিসেবেও (submit a request)। খেয়াল করুন verb আকারে 'request' এর পর কোনো 'for' লাগে না (I requested help — সঠিক), কিন্তু noun আকারে 'a request for something' বলতে হয় — এই সূক্ষ্ম পার্থক্যটা প্রায়ই ভুল হয়।",
+ task:"অফিস পরিস্থিতি: আপনি একটি প্রজেক্টের ডেডলাইন বাড়ানোর অনুরোধ করেছেন বসের কাছে। ৩-৪ লাইনের একটি ছোট ইমেইল লিখুন 'submit a request' ও 'follow up on' ব্যবহার করে।"},
+
+{level:"L2", day:9, topic:"যাচাই করা (Verifying)",
+ common:"check", professional:"verify", phrasal:{v:"check in", m:"খোঁজ নেওয়া / অবস্থা জানা"},
+ collocation:{p:"verify the details", m:"বিস্তারিত তথ্য যাচাই করা"},
+ simple:"Please check the details before you send the email.",
+ better:"Please verify the details carefully before sending the email, and check in with me if anything is unclear.",
+ grammar:"'before sending' — 'before' এর পরে verb -ing হয়েছে, ঠিক 'after'-এর মতোই, কারণ দুটোই সময়সূচক preposition হিসেবে কাজ করতে পারে। এই একই প্যাটার্ন (preposition + verb-ing) বারবার দেখা যাচ্ছে — এটাই ইংরেজির সবচেয়ে গুরুত্বপূর্ণ ও প্রয়োগযোগ্য একটা নিয়ম।",
+ task:"অফিস পরিস্থিতি: একটি গুরুত্বপূর্ণ ক্লায়েন্ট ইমেইল পাঠানোর আগে তথ্য যাচাই করার প্রয়োজন। ৩-৪ লাইনের নোট লিখুন সহকর্মীর জন্য 'verify' ও 'check in' ব্যবহার করে।"},
+
+{level:"L2", day:10, topic:"তথ্য দেওয়া (Providing Information)",
+ common:"give", professional:"provide", phrasal:{v:"hand over", m:"হস্তান্তর করা"},
+ collocation:{p:"provide feedback", m:"মতামত/প্রতিক্রিয়া দেওয়া"},
+ simple:"He gave feedback and handed over the documents to the new manager.",
+ better:"He provided detailed feedback and handed over all the relevant documents to the new manager.",
+ grammar:"'provide' সাধারণত 'give'-এর চেয়ে বেশি ফরমাল এবং প্রায়ই কিছু প্রয়োজনীয় বা official জিনিস দেওয়া বোঝাতে ব্যবহৃত হয় (provide information/feedback/support)। adjective 'detailed' এবং 'relevant' এখানে noun-এর ঠিক আগে বসেছে — ইংরেজিতে সাধারণত একাধিক adjective থাকলে সেগুলো noun-এর আগে ক্রমান্বয়ে বসে।",
+ task:"অফিস পরিস্থিতি: একটি প্রজেক্ট শেষে আপনি বসকে কিছু ডকুমেন্ট হস্তান্তর করেছেন এবং তার মতামত পেয়েছেন। ৩-৪ লাইনে লিখুন 'provide' ও 'hand over' ব্যবহার করে।"},
+
+{level:"L2", day:11, topic:"আলোচনা করা (Discussing)",
+ common:"talk about", professional:"discuss", phrasal:{v:"bring up", m:"বিষয় উত্থাপন করা"},
+ collocation:{p:"discuss the matter", m:"বিষয়টি নিয়ে আলোচনা করা"},
+ simple:"We talked about the problem and someone brought up a good solution.",
+ better:"We discussed the matter at length, and one colleague brought up a practical solution.",
+ grammar:"লক্ষ্য করুন 'discuss' এর পরে সরাসরি object বসে, কোনো preposition লাগে না (discuss the matter — সঠিক, discuss about the matter — ভুল)। এটা বাংলাভাষী ইংরেজি শিক্ষার্থীদের সবচেয়ে সাধারণ একটা ভুল, কারণ বাংলায় 'নিয়ে আলোচনা করা' অনুবাদ করতে গিয়ে 'about' যোগ করে ফেলি।",
+ task:"অফিস পরিস্থিতি: একটি মিটিংয়ে নেটওয়ার্ক সমস্যা নিয়ে আলোচনা হয়েছে এবং একজন সহকর্মী একটা সমাধান প্রস্তাব করেছেন। ৩-৪ লাইনে লিখুন 'discuss' ও 'bring up' ব্যবহার করে (discuss-এর পর 'about' বসাবেন না)।"},
+
+{level:"L2", day:12, topic:"সমাধান করা (Resolving)",
+ common:"fix", professional:"resolve", phrasal:{v:"sort out", m:"সমাধান করা / গুছিয়ে ফেলা"},
+ collocation:{p:"resolve an issue", m:"সমস্যা সমাধান করা"},
+ simple:"IT fixed the problem and sorted out the login issue too.",
+ better:"The IT team resolved the network problem and also sorted out the recurring login issue.",
+ grammar:"'resolve' একটা বেশি ফরমাল ও ব্যাপক শব্দ, যেটা 'fix'-এর চেয়ে বড় বা জটিল সমস্যায় ব্যবহৃত হয় (resolve a conflict/issue/dispute)। 'recurring' শব্দটা adjective হিসেবে issue-কে বিশেষায়িত করছে, অর্থ 'যা বারবার ঘটে' — এই ধরনের precise adjective ব্যবহার করলে রিপোর্ট আরও নির্দিষ্ট তথ্য দেয়।",
+ task:"অফিস পরিস্থিতি: অফিসের সার্ভারে বারবার একটি সমস্যা হচ্ছিল যা আজ সমাধান হয়েছে। ৩-৪ লাইনে লিখুন 'resolve' ও 'sort out' ব্যবহার করে।"},
+
+{level:"L2", day:13, topic:"চিন্তা করা / প্রস্তাব দেওয়া (Considering / Proposing)",
+ common:"think", professional:"consider", phrasal:{v:"come up with", m:"ধারণা/সমাধান বের করা"},
+ collocation:{p:"consider a proposal", m:"প্রস্তাব বিবেচনা করা"},
+ simple:"We thought about the idea and came up with a better plan.",
+ better:"We carefully considered the proposal and came up with an improved plan for implementation.",
+ grammar:"'consider' এর পরে verb এলে সবসময় -ing form হয় (consider doing something), কখনো to+verb নয় — যেমন 'we considered implementing the plan', 'we considered to implement' নয়। এটা মনে রাখার সহজ উপায়: consider মানে মাথায় ঘুরানো, তাই কাজটাকে একটা চলমান ধারণা (gerund) হিসেবে দেখানো হয়।",
+ task:"অফিস পরিস্থিতি: একটি নতুন কাজের পদ্ধতি নিয়ে আপনার টিম চিন্তা করছে এবং একজন সহকর্মী একটা ভালো ধারণা দিয়েছে। ৩-৪ লাইনে লিখুন 'consider' ও 'come up with' ব্যবহার করে।"},
+
+{level:"L2", day:14, topic:"পাঠানো / হস্তান্তর করা (Forwarding)",
+ common:"send", professional:"forward", phrasal:{v:"pass on", m:"হাতবদল করা / পৌঁছে দেওয়া"},
+ collocation:{p:"forward the email", m:"ইমেইল ফরওয়ার্ড করা"},
+ simple:"I sent the email to the manager and passed on the message to the team too.",
+ better:"I forwarded the email to the manager and passed on the key message to the rest of the team.",
+ grammar:"'forward' verb ও noun হিসেবে ভিন্ন উচ্চারণ ও ব্যবহারে আসে না ইংরেজিতে (এটা spelling একই থাকে, শুধু context ভিন্ন)। 'the rest of the team' একটা common collocation যার অর্থ 'বাকি টিম' — 'other team' বলাটা ভুল প্রয়োগ, কারণ 'other' এর সাথে plural noun-এর আগে সাধারণত 'the' লাগে (the other team members)।",
+ task:"অফিস পরিস্থিতি: একটি গুরুত্বপূর্ণ ইমেইল বসের কাছ থেকে এসেছে এবং আপনাকে সেটা টিমের কাছে পাঠাতে হবে। ৩-৪ লাইনে লিখুন 'forward' ও 'pass on' ব্যবহার করে।"},
+
+/* ================= LEVEL 3 — REPORT & NEWS STYLE ================= */
+{level:"L3", day:15, topic:"গুরুত্বপূর্ণ প্রভাব বোঝানো (Significant Impact)",
+ common:"big", professional:"significant", phrasal:{v:"bring about", m:"ঘটিয়ে আনা / সৃষ্টি করা"},
+ collocation:{p:"significant impact", m:"উল্লেখযোগ্য প্রভাব"},
+ simple:"The new policy made a big change and brought a lot of results.",
+ better:"The new policy has had a significant impact on productivity and has brought about noticeable improvements across departments.",
+ grammar:"'has had a significant impact' — present perfect ব্যবহৃত হয়েছে কারণ নীতিটার প্রভাব অতীতে শুরু হয়ে এখনো অনুভূত হচ্ছে। নিউজ ও রিপোর্ট লেখায় 'has/have + past participle' ব্যাপকভাবে ব্যবহৃত হয় যখন কোনো ঘটনার বর্তমান প্রাসঙ্গিকতা দেখাতে হয়, শুধু অতীতের একটা ঘটনা নয়।",
+ task:"নিউজ টপিক: সরকার একটি নতুন ইন্টারনেট নীতি চালু করেছে যা ছোট ব্যবসাগুলোকে সাহায্য করছে। ৩-৪ লাইনে এই খবরটা লিখুন 'significant impact' ও 'bring about' ব্যবহার করে।"},
+
+{level:"L3", day:16, topic:"নেতিবাচক ফলাফল বোঝানো (Adverse Effect)",
+ common:"bad", professional:"adverse", phrasal:{v:"result in", m:"পরিণতি ঘটানো"},
+ collocation:{p:"adverse effect", m:"বিরূপ প্রভাব"},
+ simple:"The heavy rain was bad for the roads and caused a lot of problems.",
+ better:"The heavy rainfall had an adverse effect on the road infrastructure, resulting in several traffic disruptions.",
+ grammar:"'resulting in' — present participle clause ব্যবহার হয়েছে causation (কারণ-ফলাফল) দেখাতে, নতুন বাক্য 'and it resulted in' না লিখেই। নিউজ রিপোর্টিং-এ এই ধরনের compact participle clause খুব সাধারণ, কারণ এতে একই বাক্যে কারণ ও ফলাফল দুটোই বসানো যায় সংক্ষিপ্তভাবে।",
+ task:"নিউজ টপিক: একটি এলাকায় ভারী বৃষ্টির কারণে রাস্তায় জলাবদ্ধতা হয়েছে। ৩-৪ লাইনে এই খবরটা লিখুন 'adverse effect' ও 'result in' ব্যবহার করে।"},
+
+{level:"L3", day:17, topic:"অনেক কারণ বোঝানো (Numerous Factors)",
+ common:"many", professional:"numerous", phrasal:{v:"account for", m:"ব্যাখ্যা করা / কারণ হওয়া"},
+ collocation:{p:"numerous factors", m:"অসংখ্য কারণ"},
+ simple:"Many factors caused the delay, and rising costs were a big part of it.",
+ better:"Numerous factors contributed to the delay, with rising material costs accounting for the largest share.",
+ grammar:"'with rising material costs accounting for...' — এখানে 'with + noun + -ing' একটা absolute construction, যা একটা বাক্যের সাথে অতিরিক্ত ব্যাখ্যা জুড়ে দেয় নতুন clause না বানিয়ে। এটা একটু অ্যাডভান্স গঠন, কিন্তু রিপোর্ট ও আর্টিকেল লেখায় খুব প্রচলিত — এটা দুটো তথ্যকে একসাথে, প্রবাহমানভাবে উপস্থাপন করে।",
+ task:"নিউজ টপিক: একটি নির্মাণ প্রকল্প দেরি হচ্ছে কয়েকটি কারণে, তার মধ্যে শ্রমিক সংকট সবচেয়ে বড় কারণ। ৩-৪ লাইনে লিখুন 'numerous factors' ও 'account for' ব্যবহার করে।"},
+
+{level:"L3", day:18, topic:"বক্তব্য উপস্থাপন করা (Stating / Asserting)",
+ common:"say", professional:"state", phrasal:{v:"point to", m:"ইঙ্গিত করা / নির্দেশ করা"},
+ collocation:{p:"officials stated", m:"কর্মকর্তারা জানিয়েছেন"},
+ simple:"The officials said the project will finish soon, and the data shows good progress.",
+ better:"Officials stated that the project is on track for completion, with the latest data pointing to steady progress.",
+ grammar:"নিউজ রিপোর্টিং-এ 'said' এর বদলে 'stated', 'noted', 'reported' ব্যবহার করলে লেখা বেশি professional শোনায়, কারণ এগুলো একটা আনুষ্ঠানিক ঘোষণার ভাব আনে। 'is on track for completion' একটা খুব প্রচলিত নিউজ-স্টাইল collocation, যার অর্থ 'পরিকল্পনা অনুযায়ী এগোচ্ছে'।",
+ task:"নিউজ টপিক: একটি সরকারি প্রকল্প সময়মতো শেষ হচ্ছে বলে কর্মকর্তারা জানিয়েছেন। ৩-৪ লাইনে খবরটা লিখুন 'state' ও 'point to' ব্যবহার করে।"},
+
+{level:"L3", day:19, topic:"কারণ বোঝানো (Explaining Cause)",
+ common:"because of", professional:"owing to / due to", phrasal:{v:"stem from", m:"থেকে উদ্ভূত হওয়া"},
+ collocation:{p:"due to a shortage", m:"স্বল্পতার কারণে"},
+ simple:"Because of the shortage of raw materials, the factory slowed down production.",
+ better:"Owing to a shortage of raw materials, the factory reduced production — a problem that stems from ongoing supply chain disruptions.",
+ grammar:"'owing to' এবং 'due to' দুটোই 'because of'-এর ফরমাল বিকল্প, তবে ঐতিহ্যবাহী নিয়মে 'due to' সাধারণত noun-এর পরে বসানোর কথা বলা হয় (the delay was due to rain) আর 'owing to' বাক্যের শুরুতে (owing to rain, the match was delayed)। আধুনিক ইংরেজিতে দুটোই প্রায় একইভাবে ব্যবহৃত হয়, তবে জানা থাকলে লেখা আরও নিখুঁত হয়।",
+ task:"নিউজ টপিক: কাঁচামালের অভাবে একটি কারখানা উৎপাদন কমিয়ে দিয়েছে। ৩-৪ লাইনে খবরটা লিখুন 'owing to/due to' ও 'stem from' ব্যবহার করে।"},
+
+{level:"L3", day:20, topic:"পরিবর্তন বোঝানো (Change / Shift)",
+ common:"change", professional:"shift / alter", phrasal:{v:"bring forward", m:"এগিয়ে আনা (সময়/পরিকল্পনা)"},
+ collocation:{p:"policy shift", m:"নীতিগত পরিবর্তন"},
+ simple:"The company changed its plan and brought the deadline forward by a week.",
+ better:"The company announced a policy shift and brought the project deadline forward by a full week.",
+ grammar:"'shift' noun হিসেবে (a policy shift) এবং verb হিসেবে (to shift) দুটোই ব্যবহৃত হয়, প্রসঙ্গ বলে দেয় কোনটা। 'bring forward' মানে সময়ের দিক থেকে আগে নিয়ে আসা (deadline আগে করা), এটা 'bring back' থেকে সম্পূর্ণ ভিন্ন অর্থ বহন করে — phrasal verb-এ preposition বদলালে অর্থ সম্পূর্ণ পাল্টে যায়, এটা মনে রাখা জরুরি।",
+ task:"নিউজ টপিক: একটি সংস্থা তাদের প্রকল্পের সময়সূচি এক সপ্তাহ এগিয়ে এনেছে নতুন নীতির কারণে। ৩-৪ লাইনে খবরটা লিখুন 'shift' ও 'bring forward' ব্যবহার করে।"},
+
+{level:"L3", day:21, topic:"পরিকল্পনা বাস্তবায়ন (Implementing a Plan)",
+ common:"plan", professional:"strategy", phrasal:{v:"roll out", m:"পর্যায়ক্রমে চালু করা"},
+ collocation:{p:"implement a strategy", m:"কৌশল বাস্তবায়ন করা"},
+ simple:"The company made a new plan and is rolling it out next month.",
+ better:"The company has developed a new digital strategy and plans to implement it, rolling it out to all branches next month.",
+ grammar:"'plans to implement it, rolling it out...' — এখানে একটা মূল ক্রিয়া (plans to implement) এর পর একটা participle clause (rolling it out) যোগ হয়েছে বিস্তারিত ব্যাখ্যা হিসেবে। এই কৌশলটা এই কোর্সে বারবার এসেছে কারণ এটা রিপোর্ট ও আর্টিকেল লেখার সবচেয়ে গুরুত্বপূর্ণ একটা টুল — একটা বাক্যে মূল তথ্য ও তার বিস্তারিত দুটোই মসৃণভাবে বসানো।",
+ task:"নিউজ টপিক: একটি প্রতিষ্ঠান একটি নতুন ডিজিটাল কৌশল সব শাখায় ধাপে ধাপে চালু করছে। ৩-৪ লাইনে খবরটা লিখুন 'strategy' ও 'roll out' ব্যবহার করে।"},
+
+/* ================= LEVEL 4 — ADVANCED / EDITORIAL ================= */
+{level:"L4", day:22, topic:"গুরুত্বপূর্ণ ভূমিকা বোঝানো (Crucial Role)",
+ common:"important", professional:"crucial / pivotal", phrasal:{v:"hinge on", m:"এর ওপর নির্ভরশীল হওয়া"},
+ collocation:{p:"pivotal role", m:"কেন্দ্রীয়/গুরুত্বপূর্ণ ভূমিকা"},
+ simple:"Good internet is important for small businesses, and their success depends on it.",
+ better:"Reliable internet access plays a pivotal role for small businesses, whose survival often hinges on uninterrupted connectivity.",
+ grammar:"'whose survival often hinges on' — 'whose' এখানে possession (মালিকানা) দেখাচ্ছে relative clause-এ, 'small businesses'-এর সাথে যুক্ত করে। এই গঠনটা এডিটোরিয়াল লেখায় জটিল ধারণাকে একটা সুন্দর, প্রবাহমান বাক্যে বাঁধতে সাহায্য করে, দুটো ছোট বাক্যের বদলে।",
+ task:"নিউজ/আর্টিকেল টপিক: গ্রামীণ ছোট ব্যবসার জন্য নির্ভরযোগ্য ইন্টারনেট সংযোগ কতটা জরুরি — এই বিষয়ে ৩-৪ লাইনের একটা মতামতমূলক (opinion) অনুচ্ছেদ লিখুন 'pivotal role' ও 'hinge on' ব্যবহার করে।"},
+
+{level:"L4", day:23, topic:"সমস্যার সাথে লড়াই (Grappling with Challenges)",
+ common:"problem", professional:"challenge / predicament", phrasal:{v:"grapple with", m:"সমস্যার সাথে লড়াই করা"},
+ collocation:{p:"grapple with a challenge", m:"চ্যালেঞ্জ মোকাবিলা করার চেষ্টা করা"},
+ simple:"Many companies have a problem with skilled staff and are trying to solve it.",
+ better:"Many companies continue to grapple with the challenge of retaining skilled staff amid a competitive job market.",
+ grammar:"'amid a competitive job market' — 'amid' একটা ফরমাল preposition যার অর্থ 'in the middle of/during', সাধারণত জটিল বা চলমান পরিস্থিতি বোঝাতে সংবাদ ও এডিটোরিয়াল লেখায় ব্যবহৃত হয়। সাধারণ কথোপকথনে 'in' বা 'during' চলে, কিন্তু 'amid' লেখাকে বেশি ঝাঁঝালো ও পেশাদার করে তোলে।",
+ task:"আর্টিকেল টপিক: প্রতিযোগিতামূলক চাকরির বাজারে কোম্পানিগুলো দক্ষ কর্মী ধরে রাখতে হিমশিম খাচ্ছে — এই বিষয়ে ৩-৪ লাইন লিখুন 'grapple with' ও 'amid' ব্যবহার করে।"},
+
+{level:"L4", day:24, topic:"বৃদ্ধি বোঝানো (Surge / Escalation)",
+ common:"increase", professional:"surge / escalate", phrasal:{v:"drive up", m:"বাড়িয়ে দেওয়া (মূল্য/চাহিদা)"},
+ collocation:{p:"sharp surge", m:"তীব্র বৃদ্ধি"},
+ simple:"Prices went up a lot because demand increased quickly.",
+ better:"Prices have seen a sharp surge, driven up by a rapid escalation in consumer demand.",
+ grammar:"'driven up by' — এখানে past participle passive (driven) ব্যবহৃত হয়েছে prices-কে বিশেষায়িত করতে (prices that were driven up by demand)। এই কোর্স জুড়ে আমরা বারবার দেখেছি past participle clause কীভাবে কারণ-ফলাফল সংক্ষিপ্তভাবে দেখায় — এখন লক্ষ্য করুন এটা আরও জটিল, একাধিক স্তরের বাক্যে (surge...driven up...escalation) কীভাবে ব্যবহৃত হয়।",
+ task:"নিউজ টপিক: ভোক্তাদের চাহিদা বৃদ্ধির কারণে বাজারে দ্রব্যমূল্য হঠাৎ বেড়ে গেছে। ৩-৪ লাইনে খবরটা লিখুন 'surge' ও 'drive up' ব্যবহার করে।"},
+
+{level:"L4", day:25, topic:"হ্রাস বোঝানো (Decline / Plummet)",
+ common:"decrease", professional:"decline / plummet", phrasal:{v:"taper off", m:"ধীরে ধীরে কমে যাওয়া"},
+ collocation:{p:"steady decline", m:"স্থিতিশীল/ধারাবাহিক হ্রাস"},
+ simple:"Sales decreased a lot last quarter and are slowly decreasing now too.",
+ better:"Sales plummeted sharply last quarter, though the decline appears to be tapering off in recent weeks.",
+ grammar:"'though the decline appears to be tapering off' — 'though' এখানে একটা বৈপরীত্য (contrast) যোগ করছে আগের নেতিবাচক তথ্যের সাথে (plummeted, কিন্তু এখন কমছে না তেমন)। 'appears to be' একটা hedge phrase — সরাসরি নিশ্চিত না করে সম্ভাবনা প্রকাশ করছে, যা সাংবাদিকতায় সতর্ক ভাষার একটা গুরুত্বপূর্ণ বৈশিষ্ট্য।",
+ task:"নিউজ টপিক: গত প্রান্তিকে বিক্রি হঠাৎ কমে গিয়েছিল কিন্তু সাম্প্রতিক সপ্তাহে তা স্থিতিশীল হতে শুরু করেছে। ৩-৪ লাইনে খবরটা লিখুন 'plummet' ও 'taper off' ব্যবহার করে।"},
+
+{level:"L4", day:26, topic:"সহমত হওয়া (Agreeing / Concurring)",
+ common:"agree", professional:"concur", phrasal:{v:"align with", m:"সামঞ্জস্যপূর্ণ হওয়া"},
+ collocation:{p:"broadly concur", m:"মোটামুটি সহমত হওয়া"},
+ simple:"Most experts agree with this idea and it matches government plans too.",
+ better:"Most experts broadly concur with this assessment, which aligns closely with the government's long-term development plans.",
+ grammar:"'broadly concur' — এখানে 'broadly' adverb-টা concur-কে একটু নরম করছে, অর্থ 'সম্পূর্ণ না হলেও মোটামুটি একমত'। এই ধরনের 'hedging adverb' (broadly, largely, generally) সাংবাদিকতা ও একাডেমিক লেখায় খুব গুরুত্বপূর্ণ, কারণ এটা একটা মতকে অতিরিক্ত নিশ্চিতভাবে না বলে বাস্তবসম্মতভাবে উপস্থাপন করে।",
+ task:"আর্টিকেল টপিক: বেশিরভাগ বিশেষজ্ঞ সরকারের একটি নতুন উন্নয়ন পরিকল্পনার সাথে একমত। ৩-৪ লাইনে লিখুন 'concur' ও 'align with' ব্যবহার করে।"},
+
+{level:"L4", day:27, topic:"দ্বিমত পোষণ করা (Disagreeing / Disputing)",
+ common:"disagree", professional:"dispute", phrasal:{v:"push back on", m:"বিরুদ্ধে প্রতিক্রিয়া জানানো"},
+ collocation:{p:"dispute the claim", m:"দাবির বিরুদ্ধে আপত্তি জানানো"},
+ simple:"Some critics disagree with the report and are pushing back on its findings.",
+ better:"Some critics have disputed the report's central claim, pushing back on what they describe as flawed methodology.",
+ grammar:"'what they describe as flawed methodology' — এখানে 'what' একটা নতুন noun clause শুরু করছে যা এক ধরনের সতর্ক দূরত্ব বজায় রাখে (লেখক সরাসরি বলছে না methodology ত্রুটিপূর্ণ, বরং সমালোচকরা সেটা বলছেন)। সাংবাদিকতায় নিরপেক্ষতা বজায় রাখতে এই ধরনের 'reported speech' কৌশল অত্যন্ত গুরুত্বপূর্ণ।",
+ task:"আর্টিকেল টপিক: কিছু সমালোচক একটি সরকারি রিপোর্টের পদ্ধতি নিয়ে প্রশ্ন তুলেছেন। ৩-৪ লাইনে লিখুন 'dispute' ও 'push back on' ব্যবহার করে, নিরপেক্ষ টোন বজায় রেখে।"},
+
+{level:"L4", day:28, topic:"সমাপ্তি ও অর্জন (Culmination — কোর্স সমাপনী)",
+ common:"finish", professional:"conclude / culminate", phrasal:{v:"build on", m:"এর ওপর ভিত্তি করে এগিয়ে যাওয়া"},
+ collocation:{p:"culminate in success", m:"সাফল্যে পরিণত হওয়া"},
+ simple:"The project finished well and the team will use this to do more good work.",
+ better:"The project culminated in a resounding success, and the team is now well positioned to build on this momentum for future initiatives.",
+ grammar:"'well positioned to build on this momentum' — 'be positioned to do something' একটা সুন্দর ফরমাল collocation যার অর্থ 'ভালো অবস্থানে থাকা যাতে ভবিষ্যতে কিছু করা যায়'। এই কোর্সের শেষ পাঠে লক্ষ্য করুন কীভাবে অনেকগুলো টেকনিক — participle clause, hedging, precise adjective, passive voice — একসাথে মিলে একটা সমৃদ্ধ, প্রাঞ্জল বাক্য তৈরি করে। এটাই লক্ষ্য: আলাদা আলাদা নিয়ম মুখস্থ না করে, সবগুলো একসাথে স্বাভাবিকভাবে ব্যবহার করতে পারা।",
+ task:"অফিস/আর্টিকেল টপিক: একটি বড় প্রজেক্ট সফলভাবে শেষ হয়েছে এবং টিম এখন এই অভিজ্ঞতা কাজে লাগিয়ে নতুন প্রকল্পে এগোতে প্রস্তুত। ৩-৪ লাইনে লিখুন 'culminate in' ও 'build on' ব্যবহার করে — এটা এই কোর্সের শেষ পাঠ, তাই যত বেশি সম্ভব আগের শেখা শব্দ/গঠন ব্যবহার করার চেষ্টা করুন।"}
+];
+
+DATA.forEach((d,i)=>{ d.id=i; });
+let currentIndex = null;
+const learned = new Set();
+
+/* ============ RENDER ============ */
+function renderSidebar(){
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '';
+  const home = document.createElement('div');
+  home.className='home-link bn';
+  home.textContent = '🏠 হোম / কোর্স পরিচিতি';
+  home.onclick = renderWelcome;
+  sb.appendChild(home);
+
+  LEVELS.forEach((lv, li)=>{
+    const items = DATA.filter(d=>d.level===lv.key);
+    const div = document.createElement('div');
+    div.className = 'level' + (li===0?' open':'');
+    const head = document.createElement('div');
+    head.className='level-head';
+    head.innerHTML = `<span>${lv.name}</span><span class="count">${items.length}</span><span class="level-arrow">▶</span>`;
+    head.onclick = ()=>div.classList.toggle('open');
+    const wrap = document.createElement('div');
+    wrap.className='level-items';
+    items.forEach(d=>{
+      const it = document.createElement('div');
+      it.className='item'+(d.id===currentIndex?' active':'')+(learned.has(d.id)?' learned':'');
+      it.innerHTML = `<span class="stamp-mini"></span><span>Day ${d.day} — ${d.topic}</span>`;
+      it.onclick = ()=>openLesson(d.id);
+      wrap.appendChild(it);
+    });
+    div.appendChild(head); div.appendChild(wrap);
+    sb.appendChild(div);
+  });
+
+  const vaultLink = document.createElement('div');
+  vaultLink.className='home-link bn';
+  vaultLink.style.borderTop = '2px solid var(--ink)';
+  vaultLink.textContent = '📚 রিভিশন ভল্ট (সব শব্দ একসাথে)';
+  vaultLink.onclick = renderVault;
+  sb.appendChild(vaultLink);
+
+  updateProgress();
+}
+
+function updateProgress(){
+  const total = DATA.length, done = learned.size;
+  document.getElementById('progressFill').style.width = (done/total*100)+'%';
+  document.getElementById('progressCount').textContent = done+' / '+total+' stamped';
+}
+
+function renderWelcome(){
+  currentIndex = null;
+  const main = document.getElementById('main');
+  main.innerHTML = `
+    <div class="welcome">
+      <span class="eyebrow">START HERE</span>
+      <h2 class="bn">স্বাগতম — আপনার প্রফেশনাল ইংলিশ রাইটিং কোচ</h2>
+      <p class="bn">এই কোর্সটি ৪টি লেভেল আর মোট ২৮ দিনের পাঠে সাজানো, একদম বেসিক থেকে শুরু করে ধীরে ধীরে অ্যাডভান্স/এডিটোরিয়াল লেভেলে যাবে। প্রতিদিন একটা করে পাঠ করুন, তাড়াহুড়ো না করে।</p>
+      ${LEVELS.map(lv=>`<div class="level-card" onclick="openFirstOfLevel('${lv.key}')"><b>${lv.name}</b><p class="bn" style="margin:6px 0 0;">${lv.desc}</p></div>`).join('')}
+      <p class="bn"><b>প্রতিটি পাঠে যা পাবেন:</b></p>
+      <ul class="bn">
+        <li>১টি Common Word → ১টি Professional Word + ১টি দরকারি Phrasal Verb</li>
+        <li>ওই শব্দগুলোর সাথে মানানসই একটি Collocation</li>
+        <li>Simple বাক্য থেকে Better (প্রফেশনাল) বাক্যে রূপান্তর</li>
+        <li>বাংলায় সহজ গ্রামার ব্যাখ্যা — কেন এভাবে লেখা হলো, মুখস্থ নিয়ম ছাড়াই</li>
+        <li>একটি ছোট ইন্টারঅ্যাক্টিভ টাস্ক — ৩-৪ লাইন লিখে অনুশীলন করার জন্য</li>
+      </ul>
+      <p class="bn"><b>টাস্ক সংশোধনের নিয়ম:</b> এই HTML ফাইলটি একটি স্ট্যাটিক পেজ, তাই এটি নিজে থেকে আপনার লেখা সংশোধন করতে পারবে না। প্রতিটি পাঠের নিচে একটি বক্সে আপনার উত্তর লিখুন, তারপর "কপি করুন" বাটনে চাপ দিয়ে সেটা Claude চ্যাটে পেস্ট করে পাঠান — আমি (Claude) সেখানে সংশোধন করে দেব এবং আরও উন্নত করার পরামর্শ দেব।</p>
+      <p class="bn"><b>বাড়তি কিছু টিপস (যোগ করা হলো):</b></p>
+      <ul class="bn">
+        <li>প্রতিদিন যেকোনো একটি ইংরেজি নিউজ হেডলাইন পড়ুন (BBC/The Daily Star) এবং বুঝে দেখুন এখানে শেখা কোনো শব্দ বা গঠন সেখানে আছে কিনা।</li>
+        <li>একটি শব্দ শুধু মুখস্থ না করে, সেটা দিয়ে নিজের জীবনের একটা বাস্তব বাক্য বানানোর চেষ্টা করুন — এতে শব্দটা স্মৃতিতে বেশি দিন থাকবে।</li>
+        <li>বাংলা বাক্য গঠন ভাবতে ভাবতে ইংরেজি না লিখে, সরাসরি ইংরেজিতেই ভাবার অভ্যাস করুন — শুরুতে কঠিন লাগলেও এটাই "অনুবাদ ছাড়া লেখার" আসল রাস্তা।</li>
+        <li>রিভিশন ভল্ট পেজে গিয়ে সপ্তাহে একবার সব শব্দ চোখ বুলিয়ে নিন — নতুন শব্দের চেয়ে পুরনো শব্দ পাকা করা বেশি জরুরি।</li>
+      </ul>
+    </div>
+  `;
+  renderSidebar();
+}
+
+function openFirstOfLevel(key){
+  const first = DATA.find(d=>d.level===key);
+  if(first) openLesson(first.id);
+}
+
+function renderVault(){
+  currentIndex = null;
+  const main = document.getElementById('main');
+  const rows = DATA.map(d=>`
+    <tr>
+      <td>Day ${d.day}</td>
+      <td>${d.common} → <b>${d.professional}</b></td>
+      <td><b>${d.phrasal.v}</b><br><span class="bn" style="color:var(--muted);font-size:0.82rem;">${d.phrasal.m}</span></td>
+      <td><b>${d.collocation.p}</b><br><span class="bn" style="color:var(--muted);font-size:0.82rem;">${d.collocation.m}</span></td>
+    </tr>`).join('');
+  main.innerHTML = `
+    <span class="eyebrow">REVISION</span>
+    <h2 class="lesson-title bn">রিভিশন ভল্ট</h2>
+    <p class="bn" style="color:var(--ink-soft);">এখানে কোর্সের সব শব্দ, ফ্রেজাল ভার্ব ও কোলোকেশন একসাথে দেওয়া আছে — সপ্তাহে একবার চোখ বুলিয়ে নিন।</p>
+    <table class="vault">
+      <tr><th>Day</th><th>Word Upgrade</th><th>Phrasal Verb</th><th>Collocation</th></tr>
+      ${rows}
+    </table>
+  `;
+  renderSidebar();
+}
+
+function openLesson(id){
+  currentIndex = id;
+  const d = DATA[id];
+  const main = document.getElementById('main');
+  const levelName = LEVELS.find(l=>l.key===d.level).name;
+
+  main.innerHTML = `
+    <span class="eyebrow">${levelName} · Day ${d.day}</span>
+    <h2 class="lesson-title">${d.topic}</h2>
+
+    <div class="block">
+      <h3><span class="num">1</span> Vocabulary &amp; Phrasal Verb</h3>
+      <div class="word-pair">
+        <div class="word-box common"><div class="wlabel">Common Word</div><div class="wword">${d.common}</div></div>
+        <div class="arrow-sep">→</div>
+        <div class="word-box pro"><div class="wlabel">Professional Word</div><div class="wword">${d.professional}</div></div>
+      </div>
+      <div class="chip"><b>Phrasal Verb:</b> ${d.phrasal.v} — <span class="bn">${d.phrasal.m}</span></div>
+    </div>
+
+    <div class="block">
+      <h3><span class="num">2</span> Collocation</h3>
+      <div class="chip"><b>${d.collocation.p}</b> — <span class="bn">${d.collocation.m}</span></div>
+    </div>
+
+    <div class="block">
+      <h3><span class="num">3</span> Sentence Upgrade</h3>
+      <div class="sentence-upgrade">
+        <div class="sent-line simple"><span class="tag">Simple English</span>${d.simple}</div>
+        <div class="sent-line better"><span class="tag">Better (Professional) English</span>${d.better}</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <h3><span class="num">4</span> ব্যাকরণ ও ধারণা</h3>
+      <div class="grammar-card bn">${d.grammar}</div>
+    </div>
+
+    <div class="block">
+      <h3><span class="num">5</span> Interactive Task</h3>
+      <div class="task-card bn">${d.task}</div>
+      <textarea class="answer-box" id="answerBox" placeholder="এখানে আপনার ৩-৪ লাইনের প্যারাগ্রাফ লিখুন..."></textarea>
+      <div class="task-buttons">
+        <button class="copy-btn" id="copyBtn" onclick="copyAnswer(${id})">📋 কপি করুন (Claude চ্যাটে পাঠানোর জন্য)</button>
+      </div>
+      <p class="copy-hint bn">কপি করার পর Claude চ্যাটে পেস্ট করে লিখুন: "এটা সংশোধন করে দাও" — আমি ব্যাখ্যাসহ সংশোধন করে দেব।</p>
+    </div>
+
+    <button class="mark-btn ${learned.has(id)?'done':''}" onclick="toggleLearned(${id})">
+      ${learned.has(id) ? '✓ শেখা হয়ে গেছে — সিল পাওয়া গেছে' : 'শেখা হয়ে গেছে — মার্ক করুন'}
+    </button>
+
+    <div class="nav-buttons">
+      <button onclick="navLesson(-1)" ${id===0?'disabled':''}>← আগের দিন</button>
+      <button onclick="navLesson(1)" ${id===DATA.length-1?'disabled':''}>পরের দিন →</button>
+    </div>
+  `;
+  renderSidebar();
+  main.scrollTop = 0;
+}
+
+function copyAnswer(id){
+  const d = DATA[id];
+  const text = document.getElementById('answerBox').value;
+  const fullText = `Day ${d.day} — ${d.topic}\n\nTask: ${d.task}\n\nMy paragraph:\n${text}\n\nদয়া করে এটা সংশোধন করে দাও এবং আরও উন্নত করার পরামর্শ দাও।`;
+  navigator.clipboard.writeText(fullText).then(()=>{
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ কপি হয়ে গেছে!';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='📋 কপি করুন (Claude চ্যাটে পাঠানোর জন্য)'; btn.classList.remove('copied'); }, 2000);
+  }).catch(()=>{
+    alert('কপি করা যায়নি — দয়া করে ম্যানুয়ালি সিলেক্ট করে কপি করুন।');
+  });
+}
+
+function toggleLearned(id){
+  if(learned.has(id)) learned.delete(id); else learned.add(id);
+  openLesson(id);
+}
+
+function navLesson(dir){
+  const next = currentIndex + dir;
+  if(next>=0 && next<DATA.length) openLesson(next);
+}
+
+renderWelcome();
+</script>
+</body>
+</html>

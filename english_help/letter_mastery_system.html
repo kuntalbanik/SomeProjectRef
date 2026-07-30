@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Letter Mastery — সব ধরনের চিঠি লেখা শেখার সিস্টেম</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Source+Sans+3:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2b3a;
+    --ink-soft:#33475c;
+    --paper:#efe9db;
+    --paper-raised:#f8f4ea;
+    --paper-dark:#e2dac6;
+    --accent:#a33d2e;
+    --accent-soft:#c65e4c;
+    --gold:#a4823b;
+    --muted:#6b6459;
+    --line:#d8cfb8;
+    --done:#4f6b4a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(28,43,58,0.025) 0px, rgba(28,43,58,0.025) 1px, transparent 1px, transparent 32px);
+    color:var(--ink);
+    font-family:'Source Sans 3', sans-serif;
+    min-height:100vh;
+  }
+  .bn{ font-family:'Noto Sans Bengali','Source Sans 3',sans-serif; }
+
+  /* ===== Header ===== */
+  header{
+    padding:28px 32px 22px;
+    border-bottom:2px solid var(--ink);
+    display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:14px;
+    background:linear-gradient(180deg, var(--paper-raised), var(--paper));
+  }
+  .brand{display:flex; align-items:center; gap:16px;}
+  .seal{
+    width:52px;height:52px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--accent-soft), var(--accent) 70%);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 3px 0 rgba(0,0,0,0.15), inset 0 0 0 3px rgba(255,255,255,0.25);
+    flex-shrink:0;
+  }
+  .seal svg{width:26px;height:26px;fill:#fbe9c9;}
+  h1{
+    font-family:'Fraunces', serif; font-weight:700; font-size:1.7rem; margin:0;
+    letter-spacing:0.2px;
+  }
+  .tagline{ margin:2px 0 0; color:var(--muted); font-size:0.92rem; }
+  .progress-wrap{ text-align:right; min-width:220px; }
+  .progress-label{ font-size:0.8rem; color:var(--muted); margin-bottom:6px; }
+  .progress-track{ width:220px; height:8px; background:var(--paper-dark); border-radius:6px; overflow:hidden; border:1px solid var(--line); }
+  .progress-fill{ height:100%; background:linear-gradient(90deg, var(--gold), var(--accent)); width:0%; transition:width .4s; }
+  .progress-count{ font-family:'Fraunces', serif; font-size:0.95rem; margin-top:6px; }
+
+  /* ===== Layout ===== */
+  .layout{ display:flex; min-height:calc(100vh - 96px); }
+  nav.sidebar{
+    width:340px; flex-shrink:0; border-right:2px solid var(--ink);
+    overflow-y:auto; max-height:calc(100vh - 96px);
+    background:var(--paper-raised);
+  }
+  .cat{ border-bottom:1px solid var(--line); }
+  .cat-head{
+    padding:12px 18px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;
+    font-family:'Fraunces', serif; font-weight:600; font-size:0.98rem; color:var(--ink);
+    user-select:none;
+  }
+  .cat-head:hover{ background:var(--paper-dark); }
+  .cat-head .count{
+    font-family:'Source Sans 3',sans-serif; font-size:0.72rem; color:var(--muted);
+    background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:1px 8px;
+  }
+  .cat-arrow{ transition:transform .2s; font-size:0.75rem; color:var(--gold); }
+  .cat.open .cat-arrow{ transform:rotate(90deg); }
+  .cat-items{ display:none; padding-bottom:6px; }
+  .cat.open .cat-items{ display:block; }
+  .item{
+    padding:8px 18px 8px 34px; cursor:pointer; font-size:0.87rem; color:var(--ink-soft);
+    border-left:3px solid transparent; display:flex; align-items:center; gap:8px;
+  }
+  .item:hover{ background:var(--paper-dark); }
+  .item.active{ border-left-color:var(--accent); background:var(--paper-dark); font-weight:600; color:var(--ink); }
+  .item .stamp-mini{ width:8px; height:8px; border-radius:50%; background:var(--paper-dark); border:1px solid var(--muted); flex-shrink:0; }
+  .item.learned .stamp-mini{ background:var(--done); border-color:var(--done); }
+
+  main{ flex:1; padding:34px 44px 80px; max-width:920px; overflow-y:auto; max-height:calc(100vh - 96px); }
+  .welcome{ max-width:640px; }
+  .welcome h2{ font-family:'Fraunces',serif; font-size:1.6rem; }
+  .welcome p{ line-height:1.7; color:var(--ink-soft); }
+  .welcome ul{ line-height:1.9; color:var(--ink-soft); }
+
+  .eyebrow{ font-size:0.78rem; text-transform:uppercase; letter-spacing:1.2px; color:var(--gold); font-weight:700; }
+  .lesson-title{ font-family:'Fraunces', serif; font-size:2rem; margin:4px 0 22px; font-weight:700; }
+
+  .block{ margin-bottom:30px; }
+  .block h3{
+    font-family:'Fraunces', serif; font-size:1.08rem; margin:0 0 10px;
+    display:flex; align-items:center; gap:8px; color:var(--ink);
+  }
+  .block h3 .num{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:22px;height:22px;border-radius:50%; background:var(--ink); color:var(--paper-raised);
+    font-size:0.7rem; font-family:'Source Sans 3',sans-serif; font-weight:700;
+  }
+
+  .letter-card{
+    background:var(--paper-raised); border:1px solid var(--line); border-left:4px solid var(--accent);
+    padding:20px 24px; border-radius:2px; box-shadow:2px 3px 0 rgba(28,43,58,0.06);
+    white-space:pre-line; line-height:1.75; font-size:0.95rem;
+  }
+  .task-card{
+    background:#fbf3e2; border:1px dashed var(--gold); padding:16px 20px; border-radius:2px;
+    line-height:1.6; font-size:0.94rem;
+  }
+  .task-card::before{ content:"✎ অনুশীলন / Practice Task"; display:block; font-weight:700; color:var(--gold); margin-bottom:6px; font-size:0.82rem; letter-spacing:0.5px;}
+
+  table.vocab{ width:100%; border-collapse:collapse; font-size:0.9rem; }
+  table.vocab th, table.vocab td{ text-align:left; padding:7px 10px; border-bottom:1px solid var(--line); }
+  table.vocab th{ color:var(--muted); font-weight:600; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.5px; }
+  table.vocab tr:last-child td{ border-bottom:none; }
+
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{
+    background:var(--paper-dark); border:1px solid var(--line); border-radius:20px;
+    padding:6px 14px; font-size:0.87rem;
+  }
+  .chip b{ color:var(--accent); }
+
+  .grammar-card{
+    background:#eef1e9; border:1px solid #c9d3bd; border-left:4px solid var(--done);
+    padding:18px 22px; border-radius:2px; line-height:1.85; font-size:0.98rem;
+  }
+
+  .mark-btn{
+    margin-top:8px; background:var(--ink); color:var(--paper-raised); border:none; padding:9px 20px;
+    border-radius:3px; cursor:pointer; font-family:'Source Sans 3',sans-serif; font-size:0.85rem; font-weight:600;
+  }
+  .mark-btn.done{ background:var(--done); }
+  .nav-buttons{ display:flex; justify-content:space-between; margin-top:36px; padding-top:18px; border-top:1px solid var(--line); }
+  .nav-buttons button{
+    background:none; border:1px solid var(--ink); color:var(--ink); padding:8px 16px; border-radius:3px; cursor:pointer;
+    font-family:'Source Sans 3',sans-serif; font-size:0.85rem;
+  }
+  .nav-buttons button:hover{ background:var(--ink); color:var(--paper-raised); }
+  .nav-buttons button:disabled{ opacity:0.35; cursor:default; }
+  .nav-buttons button:disabled:hover{ background:none; color:var(--ink); }
+
+  @media (max-width: 820px){
+    .layout{ flex-direction:column; }
+    nav.sidebar{ width:100%; max-height:280px; border-right:none; border-bottom:2px solid var(--ink); }
+    main{ max-height:none; padding:24px 20px 60px; }
+    .progress-wrap{ text-align:left; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="seal"><svg viewBox="0 0 24 24"><path d="M3 5h18v14H3V5zm2 2v.01L12 12l7-4.99V7l-7 5-7-5zm0 3.24V17h14V10.24l-6.5 4.64a1 1 0 01-1 0L5 10.24z"/></svg></div>
+    <div>
+      <h1>Letter Mastery</h1>
+      <p class="tagline bn">৮৭ রকমের চিঠি — একটা একটা করে আয়ত্ত করুন, উদাহরণ + অনুশীলন + শব্দভাণ্ডার + ব্যাকরণ সহ</p>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label bn">আপনার অগ্রগতি (এই সেশনে)</div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-count" id="progressCount">0 / 0 stamped</div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main id="main">
+    <div class="welcome">
+      <span class="eyebrow">START HERE</span>
+      <h2 class="bn">স্বাগতম — আপনার চিঠি লেখার শিক্ষালয়ে</h2>
+      <p class="bn">বাঁ পাশে ৮৭টি চিঠির ধরন ১০টি ক্যাটাগরিতে সাজানো আছে। যেকোনো একটির নামে ক্লিক করুন — সেখানে পাবেন:</p>
+      <ul class="bn">
+        <li>একটি বাস্তব উদাহরণ চিঠি</li>
+        <li>একটি অনুশীলনের কাজ (practice task)</li>
+        <li>গুরুত্বপূর্ণ শব্দভাণ্ডার (Vocabulary)</li>
+        <li>Phrasal Verb ও Collocation ব্যাখ্যাসহ</li>
+        <li>বাংলায় সহজ ব্যাকরণ ও ধারণা ব্যাখ্যা — মুখস্থ নিয়ম ছাড়াই, কেন এভাবে লেখা হলো তার যুক্তি সহ</li>
+      </ul>
+      <p class="bn">প্রতিটি পাঠ শেষে "শেখা হয়ে গেছে" বাটনে ক্লিক করে সিল (stamp) সংগ্রহ করুন। একবারে একটি করে চিঠির ধরন নিয়ে এগোন — তাড়াহুড়ো না করাই ভালো।</p>
+    </div>
+  </main>
+</div>
+
+<script>
+const DATA = [
+/* ===================== 1. BUSINESS & WORKPLACE ===================== */
+{cat:"Business & Workplace Letters", title:"Job Application Letter",
+example:"Dear Hiring Manager,\n\nI am writing to apply for the position of Network Support Engineer advertised on your company website. With three years of hands-on experience in hardware troubleshooting and RHCE certification, I am confident I can contribute to your IT team from day one.\n\nI have attached my resume for your consideration and would welcome the opportunity to discuss my application further.\n\nSincerely,\nRahim Sheikh",
+task:"আপনার নিজের কাজের অভিজ্ঞতা (hardware & networking) দিয়ে একটি Job Application Letter লিখুন একটি ছোট IT ফার্মের জন্য।",
+vocab:["advertised – বিজ্ঞাপিত","hands-on experience – সরাসরি হাতে-কলমে অভিজ্ঞতা","confident – আত্মবিশ্বাসী","contribute – অবদান রাখা","consideration – বিবেচনা"],
+phrasal:["apply for – আবেদন করা (কোনো পদের জন্য)","attach to – সংযুক্ত করা"],
+colloc:["apply for a position – পদের জন্য আবেদন করা","attached my resume – আমার জীবনবৃত্তান্ত সংযুক্ত করেছি"],
+grammar:"লক্ষ্য করুন 'I am writing to apply' — এখানে present continuous (am writing) ব্যবহার হয়েছে কারণ এটা একটা চলমান, নির্দিষ্ট উদ্দেশ্যে করা কাজ, শুধু সাধারণ অভ্যাস (I write) নয়। ফরমাল চিঠিতে 'I am writing to...' একটা প্রচলিত opening formula — এটা সরাসরি উদ্দেশ্য বলে দেয়, তাই পাঠক প্রথম লাইনেই বোঝে কেন চিঠিটা লেখা হয়েছে।"},
+
+{cat:"Business & Workplace Letters", title:"Cover Letter",
+example:"Dear Ms. Rahman,\n\nPlease find enclosed my resume for the position of IT Support Specialist. Over the past five years, I have maintained networking infrastructure for a mid-sized office, and I am now looking to bring that experience to a larger, growth-focused team like yours.\n\nThank you for your time and consideration.\n\nWarm regards,\nRahim Sheikh",
+task:"আপনার RHCE সার্টিফিকেট এবং networking অভিজ্ঞতাকে হাইলাইট করে একটি Cover Letter লিখুন যা resume-এর সাথে পাঠানো হবে।",
+vocab:["enclosed – সংযুক্ত","infrastructure – অবকাঠামো","growth-focused – উন্নতিমুখী","maintain – রক্ষণাবেক্ষণ করা"],
+phrasal:["bring to – নিয়ে আসা (কোনো দক্ষতা/অভিজ্ঞতা)","look to – পরিকল্পনা করা"],
+colloc:["please find enclosed – দয়া করে সংযুক্ত দেখুন","thank you for your consideration – আপনার বিবেচনার জন্য ধন্যবাদ"],
+grammar:"Cover Letter আর Job Application Letter প্রায় একই রকম মনে হলেও পার্থক্য হলো — Cover Letter সবসময় resume-এর সাথে যায়, তাই ভাষা resume-কে 'introduce' করার মতো হয় ('Please find enclosed my resume')। এই বাক্যে passive-এর মতো structure ব্যবহার করা হয়েছে ভদ্রতা বোঝাতে, direct order না দিয়ে।"},
+
+{cat:"Business & Workplace Letters", title:"Offer Letter",
+example:"Dear Mr. Karim,\n\nWe are pleased to offer you the position of Network Administrator at TechNet Solutions, starting August 15, 2026. Your monthly salary will be as discussed, along with standard benefits.\n\nPlease sign and return this letter by August 5 to confirm your acceptance.\n\nBest regards,\nHR Department",
+task:"একজন IT Technician-কে একটি Offer Letter লিখুন যেখানে join করার তারিখ ও শর্তাবলী উল্লেখ থাকবে।",
+vocab:["pleased – আনন্দিত","starting – শুরু হওয়া","benefits – সুযোগ-সুবিধা","confirm – নিশ্চিত করা"],
+phrasal:["sign and return – স্বাক্ষর করে ফেরত পাঠানো"],
+colloc:["we are pleased to offer – আমরা আনন্দিত যে অফার করছি","standard benefits – প্রচলিত সুযোগ-সুবিধা"],
+grammar:"'We are pleased to offer you' — এটা কোম্পানির পক্ষ থেকে লেখা বলে 'We' ব্যবহার হয়েছে, 'I' নয়। ফরমাল অফিসিয়াল চিঠিতে প্রতিষ্ঠান কথা বললে সবসময় 'We' ব্যবহার করা হয়, এতে বোঝানো হয় এটা প্রতিষ্ঠানের সিদ্ধান্ত, একজন ব্যক্তির নয়।"},
+
+{cat:"Business & Workplace Letters", title:"Appointment Letter",
+example:"Dear Ms. Akter,\n\nFurther to our discussion, we are writing to confirm your appointment as Junior Network Engineer, effective from September 1, 2026. Your reporting manager will be Mr. Islam.\n\nKindly report to the HR office on your first day with the required documents.\n\nSincerely,\nHR Department",
+task:"একজন নতুন কর্মচারীর জন্য একটি Appointment Letter তৈরি করুন যাতে join date, designation ও reporting manager উল্লেখ থাকে।",
+vocab:["effective from – কার্যকর হবে (এই তারিখ থেকে)","reporting manager – যার কাছে রিপোর্ট করতে হয়","kindly – দয়া করে","required – প্রয়োজনীয়"],
+phrasal:["report to – রিপোর্ট করা / দায়িত্বে থাকা"],
+colloc:["further to our discussion – আমাদের আলোচনার পরিপ্রেক্ষিতে","effective from [date] – [তারিখ] থেকে কার্যকর"],
+grammar:"'Further to our discussion' একটা formal linking phrase — এটা আগের কোনো কথোপকথনের সাথে চিঠিটার সম্পর্ক দেখায়, যাতে পাঠক বোঝে এই চিঠি হঠাৎ আসেনি বরং আগের আলোচনার ধারাবাহিকতা।"},
+
+{cat:"Business & Workplace Letters", title:"Resignation Letter",
+example:"Dear Mr. Hasan,\n\nI am writing to formally resign from my position as Network Technician, effective two weeks from today, September 30, 2026. I am grateful for the opportunities I have had here and will ensure a smooth handover of my responsibilities.\n\nThank you for your support.\n\nSincerely,\nRahim Sheikh",
+task:"আপনার বর্তমান চাকরি থেকে দুই সপ্তাহের নোটিশ দিয়ে একটি Resignation Letter লিখুন।",
+vocab:["formally – আনুষ্ঠানিকভাবে","grateful – কৃতজ্ঞ","handover – দায়িত্ব হস্তান্তর","smooth – মসৃণ"],
+phrasal:["resign from – পদত্যাগ করা","ensure a handover – হস্তান্তর নিশ্চিত করা"],
+colloc:["effective two weeks from today – আজ থেকে দুই সপ্তাহ কার্যকর","grateful for the opportunities – সুযোগগুলোর জন্য কৃতজ্ঞ"],
+grammar:"লক্ষ্য করুন এখানে কোনো নেতিবাচক কারণ লেখা হয়নি — শুধু 'I am grateful' ও 'smooth handover' এর মতো ইতিবাচক শব্দ ব্যবহার হয়েছে। এটা একটা conscious ভাষার কৌশল: Resignation Letter সবসময় পেশাদার সম্পর্ক ভালো রেখে শেষ করার জন্য লেখা হয়, তাই ভাষা কখনো অভিযোগমূলক হয় না।"},
+
+{cat:"Business & Workplace Letters", title:"Acceptance Letter",
+example:"Dear Ms. Rahman,\n\nI am delighted to accept the position of Network Support Engineer at TechNet Solutions, effective September 1, 2026. Thank you for this opportunity — I look forward to contributing to the team.\n\nSincerely,\nRahim Sheikh",
+task:"একটি চাকরির অফার গ্রহণ করে সংক্ষিপ্ত একটি Acceptance Letter লিখুন।",
+vocab:["delighted – অত্যন্ত আনন্দিত","opportunity – সুযোগ","look forward to – উন্মুখ হয়ে থাকা"],
+phrasal:["accept the position – পদ গ্রহণ করা","look forward to – অপেক্ষায় থাকা (ভবিষ্যৎ কিছুর জন্য)"],
+colloc:["delighted to accept – গ্রহণ করতে পেরে আনন্দিত","look forward to contributing – অবদান রাখার অপেক্ষায়"],
+grammar:"'look forward to' এর পর সবসময় verb+ing বসে (contributing, working, hearing), কখনো plain verb (contribute) নয় — কারণ 'to' এখানে infinitive marker নয়, এটা preposition। এই নিয়ম মুখস্থ না করে মনে রাখুন: preposition-এর পরে verb এলে সেটা সবসময় -ing form হয়।"},
+
+{cat:"Business & Workplace Letters", title:"Rejection Letter",
+example:"Dear Mr. Chowdhury,\n\nThank you for applying for the position of IT Assistant. After careful consideration, we have decided to move forward with another candidate whose experience more closely matches our current needs.\n\nWe wish you success in your job search.\n\nSincerely,\nHR Department",
+task:"একজন যোগ্য কিন্তু নির্বাচিত না হওয়া প্রার্থীর জন্য একটি ভদ্র Rejection Letter লিখুন।",
+vocab:["careful consideration – সতর্ক বিবেচনা","candidate – প্রার্থী","closely matches – ঘনিষ্ঠভাবে মেলে","wish you success – সাফল্য কামনা করছি"],
+phrasal:["move forward with – এগিয়ে যাওয়া (কারো সাথে)","apply for – আবেদন করা"],
+colloc:["after careful consideration – সতর্ক বিবেচনার পর","move forward with another candidate – অন্য প্রার্থীর সাথে এগিয়ে যাওয়া"],
+grammar:"'After careful consideration' একটা cushioning phrase — খারাপ খবর দেওয়ার আগে এটা বসানো হয় যাতে সিদ্ধান্তটা তাড়াহুড়ো বা অবহেলাজনিত মনে না হয়। ইংরেজি ফরমাল ভাষায় খারাপ খবরের আগে সবসময় একটা 'softening' বাক্যাংশ থাকে।"},
+
+{cat:"Business & Workplace Letters", title:"Promotion Letter",
+example:"Dear Mr. Sheikh,\n\nWe are pleased to inform you that, in recognition of your consistent performance, you have been promoted to Senior Network Engineer, effective October 1, 2026, with a revised salary package.\n\nCongratulations, and we look forward to your continued contribution.\n\nHR Department",
+task:"একজন কর্মচারীর পদোন্নতির জন্য একটি Promotion Letter লিখুন যাতে নতুন designation ও effective date থাকে।",
+vocab:["recognition – স্বীকৃতি","consistent – ধারাবাহিক","revised – সংশোধিত","promoted – পদোন্নতিপ্রাপ্ত"],
+phrasal:["promoted to – পদোন্নতি পাওয়া","inform of – অবহিত করা"],
+colloc:["in recognition of – এর স্বীকৃতিস্বরূপ","revised salary package – সংশোধিত বেতন কাঠামো"],
+grammar:"'in recognition of your consistent performance' — এখানে 'in recognition of' একটি formal preposition phrase, যা কারণ বোঝাতে ব্যবহৃত হয় (কারণ দেখানোর সহজ শব্দ 'because of' এর বদলে অফিসিয়াল টোনে এই phrase ব্যবহার করা হয়)।"},
+
+{cat:"Business & Workplace Letters", title:"Transfer Letter",
+example:"Dear Ms. Begum,\n\nThis is to inform you that you are being transferred to our Chattogram branch as Network Support Lead, effective November 1, 2026, due to operational requirements.\n\nPlease coordinate with HR regarding relocation support.\n\nSincerely,\nHR Department",
+task:"একজন কর্মচারীর অন্য শাখায় বদলির জন্য একটি Transfer Letter লিখুন।",
+vocab:["transferred – স্থানান্তরিত","operational requirements – কার্যক্রমগত প্রয়োজন","coordinate – সমন্বয় করা","relocation – স্থানান্তর/বাসস্থান পরিবর্তন"],
+phrasal:["transfer to – স্থানান্তরিত হওয়া","coordinate with – সমন্বয় করা"],
+colloc:["due to operational requirements – কার্যক্রমগত প্রয়োজনে","relocation support – স্থানান্তরে সহায়তা"],
+grammar:"'you are being transferred' — এটা passive voice, present continuous-এ। Passive এখানে ইচ্ছাকৃত: এটা বোঝায় সিদ্ধান্তটা প্রতিষ্ঠান নিয়েছে, ব্যক্তি নিজে থেকে যাচ্ছে না — তাই কর্মীকে দোষারোপ বা সিদ্ধান্তে দায়ী না করে ভাষাটা নিরপেক্ষ রাখা হয়েছে।"},
+
+{cat:"Business & Workplace Letters", title:"Recommendation Letter",
+example:"To Whom It May Concern,\n\nI am pleased to recommend Mr. Karim Uddin, who worked under my supervision as a Network Technician for two years. He is diligent, technically sound, and reliable under pressure.\n\nI recommend him without reservation for any technical role.\n\nSincerely,\nManager",
+task:"একজন সহকর্মীর জন্য একটি Recommendation Letter লিখুন যিনি নতুন চাকরির জন্য আবেদন করছেন।",
+vocab:["diligent – পরিশ্রমী","technically sound – প্রযুক্তিগতভাবে দক্ষ","reliable – নির্ভরযোগ্য","without reservation – নিঃসংকোচে"],
+phrasal:["worked under – অধীনে কাজ করা","recommend for – সুপারিশ করা"],
+colloc:["to whom it may concern – যার কাছে এটি প্রযোজ্য (নির্দিষ্ট প্রাপক না জানা থাকলে)","without reservation – কোনো দ্বিধা ছাড়াই"],
+grammar:"'To Whom It May Concern' ব্যবহার হয় যখন নির্দিষ্ট প্রাপকের নাম জানা থাকে না — এটা একটা fixed formal opening, এখানে ব্যাকরণ পরিবর্তন করা যায় না, এটা একটা প্রথাগত (conventional) বাক্যাংশ হিসেবেই মুখস্থ রাখতে হয়।"},
+
+{cat:"Business & Workplace Letters", title:"Reference Letter",
+example:"Dear Sir/Madam,\n\nI am writing as a professional reference for Ms. Nasrin Akter, who has been a colleague of mine for three years. She consistently demonstrated strong troubleshooting skills and a cooperative attitude.\n\nPlease feel free to contact me for further information.\n\nRegards,\nColleague",
+task:"একজন প্রাক্তন সহকর্মীর জন্য একটি Reference Letter লিখুন, নির্দিষ্ট গুণাবলী উল্লেখ করে।",
+vocab:["colleague – সহকর্মী","demonstrated – প্রদর্শন করেছেন","cooperative – সহযোগিতামূলক","feel free to – নির্দ্বিধায়"],
+phrasal:["feel free to – নির্দ্বিধায় করা","contact for – যোগাযোগ করা"],
+colloc:["professional reference – পেশাগত সুপারিশপত্র","feel free to contact – নির্দ্বিধায় যোগাযোগ করুন"],
+grammar:"Reference Letter আর Recommendation Letter প্রায় একই কিন্তু পার্থক্য সূক্ষ্ম: Reference সাধারণত factual (সে কে, কতদিন কাজ করেছে) আর Recommendation বেশি opinion-based (কেন তাকে নেওয়া উচিত)। তাই Reference Letter-এ verb গুলো বেশি observational (demonstrated, showed) আর Recommendation-এ বেশি evaluative (I recommend, without reservation)।"},
+
+{cat:"Business & Workplace Letters", title:"Warning Letter",
+example:"Dear Mr. Alam,\n\nThis letter serves as a formal warning regarding repeated late arrivals over the past month. This behaviour must improve immediately; failure to do so may result in further disciplinary action.\n\nPlease treat this matter seriously.\n\nHR Department",
+task:"বারবার দেরিতে আসার জন্য একজন কর্মচারীকে একটি Warning Letter লিখুন।",
+vocab:["serves as – হিসেবে কাজ করে","repeated – পুনরাবৃত্ত","disciplinary action – শৃঙ্খলামূলক ব্যবস্থা","immediately – অবিলম্বে"],
+phrasal:["result in – পরিণতি ঘটানো","treat seriously – গুরুত্ব সহকারে নেওয়া"],
+colloc:["serves as a formal warning – একটি আনুষ্ঠানিক সতর্কতা হিসেবে কাজ করে","disciplinary action – শৃঙ্খলামূলক পদক্ষেপ"],
+grammar:"'failure to do so may result in...' — এটা একটা conditional-এর মতো গঠন, কিন্তু if ছাড়া। 'failure to do so' মানে 'if you don't do this'। ফরমাল ইংরেজিতে if-clause এড়িয়ে noun phrase (failure to do so) ব্যবহার করলে ভাষা আরও কঠোর ও আনুষ্ঠানিক শোনায়।"},
+
+{cat:"Business & Workplace Letters", title:"Termination Letter",
+example:"Dear Mr. Islam,\n\nThis letter is to inform you that your employment with TechNet Solutions will be terminated effective October 15, 2026, due to continued policy violations despite prior warnings.\n\nYour final settlement will be processed within 30 days.\n\nHR Department",
+task:"পূর্ববর্তী সতর্কতা সত্ত্বেও নিয়ম লঙ্ঘনের কারণে একটি Termination Letter লিখুন।",
+vocab:["employment – চাকরি/নিয়োগ","terminated – বরখাস্ত","violation – লঙ্ঘন","settlement – নিষ্পত্তি (আর্থিক)"],
+phrasal:["terminate effective [date] – নির্দিষ্ট তারিখ থেকে বাতিল হওয়া","process within – নির্দিষ্ট সময়ের মধ্যে সম্পন্ন করা"],
+colloc:["despite prior warnings – পূর্ববর্তী সতর্কতা সত্ত্বেও","final settlement – চূড়ান্ত নিষ্পত্তি"],
+grammar:"'despite prior warnings' — 'despite' এর পর সবসময় noun বা noun phrase বসে, কখনো পুরো clause নয় (despite he was warned — ভুল)। সঠিক হবে 'despite being warned' বা 'despite prior warnings'। এই পার্থক্যটা মনে রাখলে despite/although-এর গোলমাল এড়ানো যায়।"},
+
+{cat:"Business & Workplace Letters", title:"Appreciation Letter",
+example:"Dear Ms. Tania,\n\nI want to personally thank you for your outstanding work on the server migration project. Your dedication and technical expertise made a real difference to our team's success.\n\nKeep up the excellent work.\n\nWarm regards,\nManager",
+task:"একজন দলের সদস্যকে একটি প্রজেক্ট সফলভাবে শেষ করার জন্য Appreciation Letter লিখুন।",
+vocab:["outstanding – অসাধারণ","dedication – নিবেদন/একাগ্রতা","expertise – দক্ষতা","made a difference – পার্থক্য তৈরি করেছে"],
+phrasal:["keep up – বজায় রাখা","thank for – ধন্যবাদ দেওয়া"],
+colloc:["outstanding work – অসাধারণ কাজ","made a real difference – প্রকৃত পার্থক্য তৈরি করেছে"],
+grammar:"'Keep up the excellent work' একটা imperative sentence (আদেশসূচক), কিন্তু এখানে এটা আদেশ নয় বরং উৎসাহ। ইংরেজিতে imperative form শুধু আদেশ দিতেই নয়, উৎসাহ, শুভকামনা বা অনুরোধ প্রকাশ করতেও ব্যবহৃত হয় — প্রসঙ্গ (context) বলে দেয় কোনটা কী।"},
+
+{cat:"Business & Workplace Letters", title:"Complaint Letter (Employee to Employer)",
+example:"Dear HR Manager,\n\nI am writing to raise a concern about the ongoing noise disruption in the office, which has been affecting my concentration and productivity. I request that this issue be addressed at the earliest.\n\nThank you for your attention to this matter.\n\nSincerely,\nEmployee",
+task:"অফিসের একটি সমস্যা (যেমন নেটওয়ার্ক সমস্যা বা কাজের পরিবেশ) নিয়ে একটি Complaint Letter লিখুন আপনার নিয়োগকর্তাকে।",
+vocab:["raise a concern – উদ্বেগ প্রকাশ করা","disruption – ব্যাঘাত","productivity – উৎপাদনশীলতা","at the earliest – যত দ্রুত সম্ভব"],
+phrasal:["raise a concern – প্রশ্ন/উদ্বেগ তোলা","address an issue – সমস্যার সমাধান করা"],
+colloc:["raise a concern about – নিয়ে উদ্বেগ প্রকাশ করা","at the earliest – যত শীঘ্র সম্ভব"],
+grammar:"'I request that this issue be addressed' — লক্ষ্য করুন 'be addressed' (base form), 'is addressed' নয়। এটা subjunctive mood — request/demand/suggest-এর পরের clause-এ verb-এর base form ব্যবহার হয় ফরমাল ইংরেজিতে, এটাকে বলে 'mandative subjunctive'।"},
+
+/* ===================== 2. OFFICIAL / GOVERNMENT ===================== */
+{cat:"Official / Government Letters", title:"Request Letter",
+example:"Dear Sir,\n\nI am writing to request a duplicate copy of my educational certificate, as the original was misplaced during relocation. Kindly guide me through the required process and fees.\n\nThank you for your assistance.\n\nSincerely,\nApplicant",
+task:"স্থানীয় অফিস থেকে কোনো ডকুমেন্টের কপি পাওয়ার জন্য একটি Request Letter লিখুন।",
+vocab:["duplicate – প্রতিলিপি","misplaced – হারিয়ে গেছে/স্থানচ্যুত","relocation – স্থানান্তর","assistance – সহায়তা"],
+phrasal:["guide through – ধাপে ধাপে সাহায্য করা"],
+colloc:["request a duplicate copy – একটি প্রতিলিপির অনুরোধ করা","kindly guide me – দয়া করে আমাকে গাইড করুন"],
+grammar:"'as the original was misplaced' — এখানে 'as' মানে 'because' (কারণ), 'while' বা 'time' নয়। ইংরেজিতে 'as' অনেক অর্থে ব্যবহৃত হয়, কিন্তু বাক্যের শুরুতে কারণ দেখাতে গেলে সাধারণত as/since ব্যবহৃত হয়, because মাঝে।"},
+
+{cat:"Official / Government Letters", title:"Complaint Letter (to Authority)",
+example:"To the Ward Commissioner,\n\nI wish to bring to your attention the poor street lighting in our area, which has caused safety concerns at night. I request immediate action to resolve this issue.\n\nRespectfully,\nResident",
+task:"এলাকার একটি সমস্যা (যেমন রাস্তার আলো বা জলাবদ্ধতা) নিয়ে স্থানীয় কর্তৃপক্ষকে একটি Complaint Letter লিখুন।",
+vocab:["bring to attention – নজরে আনা","safety concerns – নিরাপত্তা উদ্বেগ","immediate action – তাৎক্ষণিক ব্যবস্থা","resolve – সমাধান করা"],
+phrasal:["bring to attention – দৃষ্টি আকর্ষণ করা"],
+colloc:["bring to your attention – আপনার নজরে আনা","immediate action – তাৎক্ষণিক পদক্ষেপ"],
+grammar:"'I wish to bring to your attention' — 'wish to' এখানে 'want to'-এর চেয়ে বেশি ভদ্র ও ফরমাল। কর্তৃপক্ষকে কিছু বলার সময় সরাসরি 'I want' না বলে 'I wish to' ব্যবহার করলে ভাষায় বিনয় প্রকাশ পায়।"},
+
+{cat:"Official / Government Letters", title:"Inquiry Letter",
+example:"Dear Sir/Madam,\n\nI would like to inquire about the documents required for renewing a trade license. Could you kindly send me the checklist and applicable fees at your earliest convenience?\n\nThank you.\n\nSincerely,\nApplicant",
+task:"কোনো সরকারি লাইসেন্স নবায়নের জন্য প্রয়োজনীয় কাগজপত্র জানতে একটি Inquiry Letter লিখুন।",
+vocab:["inquire about – জিজ্ঞাসা করা","renewing – নবায়ন করা","checklist – তালিকা","applicable – প্রযোজ্য"],
+phrasal:["inquire about – সম্পর্কে জানতে চাওয়া"],
+colloc:["at your earliest convenience – আপনার সুবিধামতো যত দ্রুত সম্ভব","applicable fees – প্রযোজ্য ফি"],
+grammar:"'Could you kindly send me...' — এখানে modal verb 'could' সরাসরি অনুরোধকে নরম করে দেয়। 'Send me' এর তুলনায় 'Could you kindly send me' বেশি ভদ্র, কারণ modal verb প্রশ্নটাকে একটা সম্ভাবনা (possibility) হিসেবে উপস্থাপন করে, আদেশ হিসেবে নয়।"},
+
+{cat:"Official / Government Letters", title:"Explanation Letter",
+example:"Dear Manager,\n\nI am writing to explain my absence on July 25, which was due to a sudden family emergency. I regret any inconvenience caused and have attached supporting documents for your reference.\n\nSincerely,\nEmployee",
+task:"একদিন অফিসে অনুপস্থিত থাকার কারণ ব্যাখ্যা করে একটি Explanation Letter লিখুন।",
+vocab:["absence – অনুপস্থিতি","emergency – জরুরি অবস্থা","regret – দুঃখ প্রকাশ করা","inconvenience – অসুবিধা"],
+phrasal:["due to – কারণে","attach for reference – রেফারেন্সের জন্য সংযুক্ত করা"],
+colloc:["due to a sudden emergency – হঠাৎ জরুরি অবস্থার কারণে","regret any inconvenience caused – সৃষ্ট অসুবিধার জন্য দুঃখিত"],
+grammar:"'I regret any inconvenience caused' — এখানে 'caused' একটি past participle যা 'inconvenience'-কে বিশেষায়িত করছে (inconvenience that was caused)। এভাবে relative clause সংক্ষিপ্ত করে past participle দিয়ে বাক্য ছোট ও ফরমাল করা যায়।"},
+
+{cat:"Official / Government Letters", title:"Appeal Letter",
+example:"Dear Committee,\n\nI am writing to appeal the decision to reject my scholarship application. My family's financial circumstances have changed significantly since my initial submission, as detailed in the attached documents.\n\nI kindly request a review of my case.\n\nSincerely,\nApplicant",
+task:"কোনো প্রত্যাখ্যাত সিদ্ধান্তের বিরুদ্ধে একটি Appeal Letter লিখুন, নতুন তথ্য উল্লেখ করে।",
+vocab:["appeal – আপিল করা","circumstances – পরিস্থিতি","significantly – উল্লেখযোগ্যভাবে","submission – জমা দেওয়া"],
+phrasal:["appeal against – বিরুদ্ধে আপিল করা","change since – পরিবর্তিত হওয়া (কোনো সময় থেকে)"],
+colloc:["appeal the decision – সিদ্ধান্তের বিরুদ্ধে আপিল","request a review – পুনর্বিবেচনার অনুরোধ"],
+grammar:"'have changed significantly since my initial submission' — এখানে present perfect (have changed) ব্যবহার হয়েছে কারণ পরিবর্তনটা অতীতে শুরু হয়ে বর্তমান পর্যন্ত প্রভাব ফেলছে। 'since' শব্দটা সবসময় present perfect-কে টেনে আনে, কারণ এটা একটা শুরুর বিন্দু থেকে এখন পর্যন্ত সময়ের ব্যাপ্তি বোঝায়।"},
+
+{cat:"Official / Government Letters", title:"Authorization Letter",
+example:"To Whom It May Concern,\n\nI, Rahim Sheikh, hereby authorize Mr. Karim Uddin to collect my passport from the visa office on my behalf, as I am unable to attend in person.\n\nSincerely,\nRahim Sheikh",
+task:"কাউকে আপনার পক্ষে একটি ডকুমেন্ট সংগ্রহ করার জন্য একটি Authorization Letter লিখুন।",
+vocab:["hereby – এতদ্বারা","authorize – ক্ষমতা প্রদান করা","on my behalf – আমার পক্ষে","in person – স্বয়ং উপস্থিত হয়ে"],
+phrasal:["authorize to – ক্ষমতা দেওয়া","attend in person – স্বয়ং উপস্থিত হওয়া"],
+colloc:["hereby authorize – এতদ্বারা ক্ষমতা প্রদান করছি","on my behalf – আমার পক্ষ থেকে"],
+grammar:"'hereby' একটি পুরনো আইনি/ফরমাল শব্দ যার অর্থ 'by this letter/document'। এটা বাক্যে যোগ করলে চিঠির আনুষ্ঠানিক ও আইনি গুরুত্ব বাড়ে — সাধারণ কথোপকথনে এটা ব্যবহার হয় না, শুধু আনুষ্ঠানিক দলিলে।"},
+
+{cat:"Official / Government Letters", title:"No Objection Certificate (NOC) Letter",
+example:"To Whom It May Concern,\n\nThis is to certify that we have no objection to Mr. Alamin Hossain applying for a visa to travel to Malaysia for a professional conference from October 5–10, 2026.\n\nSincerely,\nCompany Director",
+task:"একজন কর্মচারীর বিদেশ ভ্রমণের জন্য একটি NOC Letter লিখুন কোম্পানির পক্ষ থেকে।",
+vocab:["certify – প্রত্যয়ন করা","no objection – কোনো আপত্তি নেই","conference – সম্মেলন","travel – ভ্রমণ করা"],
+phrasal:["object to – আপত্তি করা"],
+colloc:["no objection to – এর প্রতি কোনো আপত্তি নেই","this is to certify – এতদ্বারা প্রত্যয়ন করা হচ্ছে"],
+grammar:"'we have no objection to Mr. Alamin applying' — 'objection to' এর পর verb এলে সেটা -ing form হয় (applying), কারণ 'to' এখানে preposition, infinitive marker নয়। আগে যেমন 'look forward to' নিয়ে বলা হয়েছিল, একই নিয়ম এখানেও প্রযোজ্য।"},
+
+{cat:"Official / Government Letters", title:"Verification Letter",
+example:"To Whom It May Concern,\n\nThis is to verify that Mr. Sabbir Ahmed has been employed with TechNet Solutions as a Network Technician since January 2023 and currently holds this position in good standing.\n\nSincerely,\nHR Department",
+task:"একজন কর্মচারীর চাকরি নিশ্চিত করে একটি Verification Letter লিখুন।",
+vocab:["verify – যাচাই করা","employed – নিযুক্ত","currently – বর্তমানে","in good standing – ভালো অবস্থানে"],
+phrasal:["hold a position – পদে থাকা"],
+colloc:["this is to verify – এতদ্বারা যাচাই করা হচ্ছে","in good standing – ভালো অবস্থায়/সুনামের সাথে"],
+grammar:"'has been employed...since January 2023' — present perfect continuous-এর ধারণা এখানে present perfect দিয়ে দেখানো হয়েছে কারণ চাকরিটা এখনো চলছে। 'since + specific point in time' সবসময় present perfect টেনে আনে, যেমনটা আগেও দেখেছেন।"},
+
+{cat:"Official / Government Letters", title:"Declaration Letter",
+example:"To Whom It May Concern,\n\nI, Nasima Khatun, hereby declare that the information provided in my application form is true and accurate to the best of my knowledge.\n\nSincerely,\nNasima Khatun",
+task:"একটি ফর্মে দেওয়া তথ্য সঠিক বলে একটি Declaration Letter লিখুন।",
+vocab:["declare – ঘোষণা করা","accurate – সঠিক","to the best of my knowledge – আমার জ্ঞান অনুযায়ী"],
+phrasal:["declare that – ঘোষণা করা যে"],
+colloc:["hereby declare – এতদ্বারা ঘোষণা করছি","to the best of my knowledge – আমার সর্বোত্তম জ্ঞান অনুযায়ী"],
+grammar:"'to the best of my knowledge' একটা hedge phrase — এটা বলা মানে 'আমি জানি এটা সত্য, কিন্তু যদি আমার অজানায় কোনো ভুল থাকে তার সম্পূর্ণ দায় আমি নিচ্ছি না'। আইনি ও অফিসিয়াল চিঠিতে এই ধরনের সতর্ক ভাষা খুবই সাধারণ।"},
+
+{cat:"Official / Government Letters", title:"Notice Letter",
+example:"Notice\n\nAll residents are informed that the water supply will remain suspended on August 3, 2026, from 9 AM to 3 PM due to maintenance work.\n\nWe regret any inconvenience.\n\nBuilding Management",
+task:"একটি বিল্ডিং বা অফিসে কোনো সাময়িক পরিবর্তন সম্পর্কে একটি Notice Letter লিখুন।",
+vocab:["suspended – স্থগিত","maintenance – রক্ষণাবেক্ষণ","residents – বাসিন্দা","regret – দুঃখ প্রকাশ"],
+phrasal:["remain suspended – স্থগিত থাকা"],
+colloc:["due to maintenance work – রক্ষণাবেক্ষণ কাজের কারণে","we regret any inconvenience – আমরা যেকোনো অসুবিধার জন্য দুঃখিত"],
+grammar:"Notice-এ ব্যক্তিগত 'I' বা 'we' প্রায় থাকেই না প্রথম বাক্যে — শুরু হয় 'All residents are informed' এর মতো passive voice দিয়ে, কারণ Notice একটা সাধারণ ঘোষণা, নির্দিষ্ট কারো কাছ থেকে ব্যক্তিগত চিঠি নয়। Passive voice এখানে objective ও universal tone তৈরি করে।"},
+
+/* ===================== 3. BUSINESS COMMUNICATION ===================== */
+{cat:"Business Communication Letters", title:"Sales Letter",
+example:"Dear Valued Customer,\n\nWe are excited to introduce our new range of networking equipment, designed to boost your office connectivity by up to 40%. For a limited time, enjoy a 15% discount on your first order.\n\nContact us today to place your order.\n\nRegards,\nSales Team",
+task:"একটি নতুন প্রোডাক্ট বা সার্ভিসের জন্য একটি Sales Letter লিখুন।",
+vocab:["introduce – পরিচয় করানো","boost – বৃদ্ধি করা","connectivity – সংযোগ","limited time – সীমিত সময়"],
+phrasal:["boost up – বাড়ানো","place an order – অর্ডার দেওয়া"],
+colloc:["for a limited time – সীমিত সময়ের জন্য","enjoy a discount – ছাড় উপভোগ করুন"],
+grammar:"'designed to boost your connectivity' — এখানে past participle 'designed' দিয়ে product-টিকে বর্ণনা করা হচ্ছে (the equipment which is designed to...)। Sales Letter-এ এই ধরনের compact adjective phrase বেশি ব্যবহৃত হয় কারণ এতে বাক্য ছোট থাকে অথচ তথ্য পুরোটাই থাকে।"},
+
+{cat:"Business Communication Letters", title:"Order Letter",
+example:"Dear Supplier,\n\nPlease arrange for the delivery of 20 units of Cat6 networking cable (Model NC-200) to our office address by August 10, 2026. Payment will be made upon delivery.\n\nRegards,\nProcurement Team",
+task:"অফিসের জন্য প্রয়োজনীয় হার্ডওয়্যার সরঞ্জাম অর্ডার করে একটি Order Letter লিখুন।",
+vocab:["arrange – ব্যবস্থা করা","delivery – সরবরাহ","units – একক/সংখ্যা","upon delivery – ডেলিভারির সময়"],
+phrasal:["arrange for – ব্যবস্থা করা","deliver to – সরবরাহ করা"],
+colloc:["arrange for delivery – ডেলিভারির ব্যবস্থা করা","payment upon delivery – ডেলিভারির সময় পেমেন্ট"],
+grammar:"'Payment will be made upon delivery' — future passive (will be made) ব্যবহার হয়েছে কারণ কে টাকা দেবে সেটা গুরুত্বপূর্ণ নয়, গুরুত্বপূর্ণ হলো পেমেন্ট কখন হবে। Business চিঠিতে process-কেন্দ্রিক তথ্যে প্রায়ই passive voice প্রাধান্য পায়।"},
+
+{cat:"Business Communication Letters", title:"Complaint Letter (Customer to Company)",
+example:"Dear Customer Service,\n\nI purchased a router (Model X200) from your store on July 10, which stopped working within a week. I request a replacement or full refund at the earliest.\n\nAwaiting your prompt response.\n\nRegards,\nCustomer",
+task:"একটি ত্রুটিপূর্ণ পণ্যের জন্য কোম্পানির কাছে একটি Complaint Letter লিখুন।",
+vocab:["purchased – ক্রয় করা","stopped working – কাজ করা বন্ধ করে দিয়েছে","replacement – প্রতিস্থাপন","refund – ফেরত (টাকা)"],
+phrasal:["stop working – কাজ বন্ধ হওয়া","await a response – উত্তরের অপেক্ষা করা"],
+colloc:["full refund – সম্পূর্ণ টাকা ফেরত","prompt response – দ্রুত উত্তর"],
+grammar:"'which stopped working within a week' — এখানে 'which' একটা non-defining relative clause শুরু করছে যা router সম্পর্কে অতিরিক্ত তথ্য দেয়। কমা দিয়ে আলাদা করা এই clause-টা মূল বাক্যের অর্থ পরিবর্তন না করেই অতিরিক্ত বিস্তারিত তথ্য যোগ করে।"},
+
+{cat:"Business Communication Letters", title:"Adjustment Letter",
+example:"Dear Valued Customer,\n\nWe sincerely apologize for the inconvenience caused by the faulty router you received. A replacement unit has been dispatched today and should arrive within 3 business days.\n\nThank you for your patience.\n\nCustomer Service Team",
+task:"একজন গ্রাহকের অভিযোগের উত্তরে একটি Adjustment Letter লিখুন, সমাধান জানিয়ে।",
+vocab:["sincerely apologize – আন্তরিকভাবে ক্ষমাপ্রার্থী","faulty – ত্রুটিপূর্ণ","dispatched – পাঠানো হয়েছে","patience – ধৈর্য"],
+phrasal:["apologize for – জন্য দুঃখ প্রকাশ করা","arrive within – নির্দিষ্ট সময়ের মধ্যে পৌঁছানো"],
+colloc:["sincerely apologize for – আন্তরিকভাবে দুঃখ প্রকাশ করছি","within 3 business days – ৩ কার্যদিবসের মধ্যে"],
+grammar:"'A replacement unit has been dispatched today' — present perfect passive (has been dispatched) ব্যবহার হয়েছে কারণ কাজটা সম্প্রতি শেষ হয়েছে এবং তার প্রভাব এখনো আছে (পণ্যটা পথে আছে)। এটা Complaint Letter-এর জবাবে আশ্বাস দেয় যে ব্যবস্থা ইতিমধ্যে নেওয়া হয়ে গেছে, শুধু প্রতিশ্রুতি নয়।"},
+
+{cat:"Business Communication Letters", title:"Inquiry Letter (Business Deals)",
+example:"Dear Sir,\n\nWe are interested in establishing a supply partnership for networking hardware. Could you please share your product catalogue, pricing structure, and bulk order discounts?\n\nWe look forward to your response.\n\nRegards,\nProcurement Manager",
+task:"একটি সম্ভাব্য সাপ্লায়ারের কাছে ব্যবসায়িক অংশীদারিত্বের জন্য একটি Inquiry Letter লিখুন।",
+vocab:["establishing – স্থাপন করা","catalogue – পণ্যতালিকা","pricing structure – মূল্য কাঠামো","bulk order – পাইকারি অর্ডার"],
+phrasal:["interested in – আগ্রহী হওয়া","share with – শেয়ার করা"],
+colloc:["establish a partnership – অংশীদারিত্ব স্থাপন করা","bulk order discounts – পাইকারি অর্ডারে ছাড়"],
+grammar:"'We are interested in establishing' — 'interested in' এর পরে verb এলে -ing form হয় (establishing), কারণ 'in' একটা preposition। এই একই প্যাটার্ন আগেও দেখেছেন (look forward to, objection to) — preposition-এর পর verb সবসময় -ing।"},
+
+{cat:"Business Communication Letters", title:"Follow-up Letter",
+example:"Dear Mr. Rahman,\n\nI am following up on my previous email regarding the proposed IT support contract. I would appreciate an update on your decision at your earliest convenience.\n\nThank you for your time.\n\nRegards,\nSales Executive",
+task:"একটি আগের ইমেইল বা মিটিং নিয়ে একটি Follow-up Letter লিখুন।",
+vocab:["following up – অনুসরণ করা/খোঁজ নেওয়া","proposed – প্রস্তাবিত","appreciate – কৃতজ্ঞ থাকা","update – হালনাগাদ তথ্য"],
+phrasal:["follow up on – খোঁজ নেওয়া/অনুসরণ করা"],
+colloc:["following up on – নিয়ে ফলোআপ করছি","appreciate an update – আপডেটের জন্য কৃতজ্ঞ থাকব"],
+grammar:"'I am following up on' — present continuous এখানে বোঝায় এটা একটা সচেতন, উদ্দেশ্যমূলক কাজ যেটা এখনই ঘটছে (এই চিঠি লেখাটাই ফলোআপ করার কাজ)। এটা 'I follow up' এর চেয়ে বেশি direct এবং immediate মনে হয়।"},
+
+{cat:"Business Communication Letters", title:"Proposal Letter",
+example:"Dear Mr. Islam,\n\nWe propose to upgrade your office network infrastructure over a 4-week period, including new switches, cabling, and Wi-Fi access points, at a total cost of BDT 150,000.\n\nWe would welcome the opportunity to discuss this further.\n\nRegards,\nTechNet Solutions",
+task:"একটি নেটওয়ার্ক আপগ্রেড প্রজেক্টের জন্য একটি Proposal Letter লিখুন, খরচ ও সময়সীমা উল্লেখ করে।",
+vocab:["propose – প্রস্তাব করা","upgrade – উন্নত করা","infrastructure – অবকাঠামো","total cost – মোট খরচ"],
+phrasal:["propose to – প্রস্তাব করা","welcome the opportunity – সুযোগকে স্বাগত জানানো"],
+colloc:["propose to upgrade – আপগ্রেড করার প্রস্তাব করছি","discuss this further – এই বিষয়ে আরও আলোচনা করা"],
+grammar:"'We propose to upgrade' — এখানে 'propose' এর পর 'to + base verb' (to upgrade) ব্যবহৃত হয়েছে, -ing নয়। কারণ 'propose to do something' মানে 'plan/intend to do'। কিন্তু 'propose doing' এর অর্থ ভিন্ন — একটা suggestion (যেমন 'I propose postponing the meeting')। তাই একই শব্দ propose দুই রকম structure নিতে পারে, অর্থভেদে।"},
+
+{cat:"Business Communication Letters", title:"Contract Letter",
+example:"Dear Mr. Karim,\n\nThis letter confirms the terms of our agreement for IT maintenance services, effective from August 1, 2026, for a period of 12 months, at a monthly fee of BDT 25,000.\n\nPlease sign below to confirm your agreement.\n\nRegards,\nTechNet Solutions",
+task:"একটি সার্ভিস চুক্তির শর্তাবলী উল্লেখ করে একটি Contract Letter লিখুন।",
+vocab:["confirms – নিশ্চিত করে","terms – শর্তাবলী","agreement – চুক্তি","monthly fee – মাসিক ফি"],
+phrasal:["sign below – নিচে স্বাক্ষর করা","confirm terms – শর্ত নিশ্চিত করা"],
+colloc:["confirms the terms of – এর শর্তাবলী নিশ্চিত করে","effective from [date] – নির্দিষ্ট তারিখ থেকে কার্যকর"],
+grammar:"'for a period of 12 months' — এখানে 'for' সময়ের দৈর্ঘ্য বোঝাচ্ছে (কত সময় ধরে), 'since' বা 'from' নয় যেগুলো শুরুর বিন্দু বোঝায়। Contract-এ সময়সীমা লেখার সময় 'for + duration' প্যাটার্নটা সবচেয়ে নির্ভুল ও প্রচলিত।"},
+
+{cat:"Business Communication Letters", title:"Partnership Letter",
+example:"Dear Mr. Hossain,\n\nWe would like to propose a formal business partnership between our two companies to jointly offer IT infrastructure solutions to corporate clients in Dhaka.\n\nWe look forward to discussing the terms in detail.\n\nRegards,\nDirector",
+task:"দুটি ব্যবসার মধ্যে অংশীদারিত্ব প্রস্তাব করে একটি Partnership Letter লিখুন।",
+vocab:["formal – আনুষ্ঠানিক","jointly – যৌথভাবে","corporate clients – কর্পোরেট ক্লায়েন্ট","in detail – বিস্তারিতভাবে"],
+phrasal:["propose between – দুই পক্ষের মধ্যে প্রস্তাব করা"],
+colloc:["propose a partnership – অংশীদারিত্বের প্রস্তাব করা","discuss in detail – বিস্তারিতভাবে আলোচনা করা"],
+grammar:"'to jointly offer' — এখানে adverb 'jointly' infinitive-এর মাঝখানে বসেছে (split infinitive: to + adverb + verb)। যদিও পুরনো নিয়মে split infinitive এড়ানোর কথা বলা হতো, আধুনিক ইংরেজিতে এটা সম্পূর্ণ স্বাভাবিক ও গ্রহণযোগ্য, বিশেষত জোর দেওয়ার জন্য।"},
+
+{cat:"Business Communication Letters", title:"Recommendation / Endorsement Letter (Business)",
+example:"To Whom It May Concern,\n\nWe have worked with TechNet Solutions for over two years and can confidently endorse their networking services for reliability and prompt support.\n\nWe recommend them for any organization seeking dependable IT partners.\n\nRegards,\nClient Company",
+task:"একটি ব্যবসায়িক পার্টনারের জন্য একটি Endorsement Letter লিখুন যাদের সেবা আপনি ব্যবহার করেছেন।",
+vocab:["endorse – অনুমোদন/সমর্থন করা","reliability – নির্ভরযোগ্যতা","prompt support – দ্রুত সহায়তা","dependable – নির্ভরযোগ্য"],
+phrasal:["work with – সাথে কাজ করা","seek out – খোঁজ করা"],
+colloc:["confidently endorse – আত্মবিশ্বাসের সাথে সমর্থন করা","dependable IT partners – নির্ভরযোগ্য আইটি অংশীদার"],
+grammar:"'can confidently endorse' — মডাল verb 'can' এখানে ক্ষমতা নয় বরং একটা নিশ্চয়তা (certainty) বোঝাচ্ছে — 'আমরা এটা বলার মতো যথেষ্ট অভিজ্ঞতা রাখি'। Business endorsement-এ can/could দিয়ে বিশ্বাসযোগ্যতা প্রকাশ করা একটা সাধারণ কৌশল।"},
+
+/* ===================== 4. ACADEMIC ===================== */
+{cat:"Academic & Educational Letters", title:"Application for Admission",
+example:"Dear Admissions Committee,\n\nI am writing to apply for admission to the Diploma in Networking program for the upcoming academic session. I have attached my academic transcripts and certificates for your review.\n\nThank you for your consideration.\n\nSincerely,\nApplicant",
+task:"কোনো ডিপ্লোমা বা কোর্সে ভর্তির জন্য একটি Application for Admission লিখুন।",
+vocab:["admissions committee – ভর্তি কমিটি","transcripts – একাডেমিক নথি","upcoming – আসন্ন","session – সেশন/মেয়াদ"],
+phrasal:["apply for – আবেদন করা","attach for review – পর্যালোচনার জন্য সংযুক্ত করা"],
+colloc:["apply for admission – ভর্তির জন্য আবেদন করা","academic transcripts – একাডেমিক নথি"],
+grammar:"'for the upcoming academic session' — 'upcoming' একটা adjective যা সরাসরি noun-এর আগে বসে (আসন্ন সেশন)। ইংরেজিতে বেশিরভাগ adjective noun-এর আগে বসে, কিন্তু কিছু বিশেষ সময়সংক্রান্ত শব্দে (upcoming, forthcoming) এটা খুব প্রচলিত ফরমাল বাক্যে।"},
+
+{cat:"Academic & Educational Letters", title:"Scholarship Application Letter",
+example:"Dear Scholarship Committee,\n\nI am applying for the Merit Scholarship for the 2026-27 academic year. Despite financial hardship, I have maintained strong academic performance and believe this scholarship would help me continue my education.\n\nThank you for your consideration.\n\nSincerely,\nApplicant",
+task:"আর্থিক সমস্যার কারণে একটি Scholarship Application Letter লিখুন।",
+vocab:["merit – যোগ্যতা","financial hardship – আর্থিক কষ্ট","maintained – বজায় রাখা","academic performance – শিক্ষাগত ফলাফল"],
+phrasal:["apply for – আবেদন করা","continue with – চালিয়ে যাওয়া"],
+colloc:["despite financial hardship – আর্থিক কষ্ট সত্ত্বেও","maintain strong performance – ভালো ফলাফল বজায় রাখা"],
+grammar:"'Despite financial hardship, I have maintained...' — বাক্যের শুরুতে 'despite + noun' বসিয়ে একটা বৈপরীত্য (contrast) তৈরি করা হয়েছে। এই গঠনটা জোর দেয় যে কষ্ট সত্ত্বেও ফলাফল ভালো ছিল — বাক্যের কাঠামোই আবেদনের মূল যুক্তিটা তুলে ধরে।"},
+
+{cat:"Academic & Educational Letters", title:"Leave Application (School/College)",
+example:"Dear Principal,\n\nI am writing to request leave for three days, from August 5 to August 7, due to a family function I need to attend. I will complete any missed coursework upon my return.\n\nSincerely,\nStudent",
+task:"স্কুল বা কলেজে কিছুদিন ছুটির জন্য একটি Leave Application লিখুন।",
+vocab:["leave – ছুটি","function – অনুষ্ঠান","coursework – পাঠক্রমের কাজ","upon return – ফিরে আসার পর"],
+phrasal:["attend to – উপস্থিত থাকা/মনোযোগ দেওয়া","complete upon – পরে সম্পন্ন করা"],
+colloc:["request leave for – এর জন্য ছুটির অনুরোধ","upon my return – ফিরে আসার সাথে সাথে"],
+grammar:"'I will complete any missed coursework upon my return' — 'upon' এখানে 'as soon as' এর মতো একটা formal সময়সূচক preposition। 'upon + noun/gerund' দিয়ে ভবিষ্যতের একটা নির্দিষ্ট মুহূর্ত বোঝানো যায়, এটা 'when' এর চেয়ে বেশি আনুষ্ঠানিক শোনায়।"},
+
+{cat:"Academic & Educational Letters", title:"Bonafide Certificate Request",
+example:"Dear Registrar,\n\nI am currently enrolled in the second year of the Diploma in IT program. I request a bonafide certificate for the purpose of opening a bank account.\n\nThank you.\n\nSincerely,\nStudent",
+task:"ব্যাংক অ্যাকাউন্ট খোলার জন্য একটি Bonafide Certificate Request লিখুন।",
+vocab:["enrolled – ভর্তিকৃত","bonafide – প্রকৃত/সত্যতা প্রমাণকারী","for the purpose of – উদ্দেশ্যে"],
+phrasal:["enroll in – ভর্তি হওয়া"],
+colloc:["currently enrolled in – বর্তমানে ভর্তি আছি","for the purpose of – এর উদ্দেশ্যে"],
+grammar:"'for the purpose of opening a bank account' — 'purpose of' এর পর verb -ing form হয় (opening), কারণ 'of' একটা preposition। এই একই preposition-পরবর্তী -ing নিয়ম বারবার আসছে — এটা ইংরেজি ব্যাকরণের একটা খুবই গুরুত্বপূর্ণ ও নির্ভরযোগ্য প্যাটার্ন।"},
+
+{cat:"Academic & Educational Letters", title:"Internship Application Letter",
+example:"Dear Hiring Team,\n\nI am a final-year Computer Science student seeking a summer internship in your networking department. I am eager to apply my classroom knowledge in a real-world setting.\n\nThank you for considering my application.\n\nSincerely,\nApplicant",
+task:"গ্রীষ্মকালীন ইন্টার্নশিপের জন্য একটি Internship Application Letter লিখুন।",
+vocab:["seeking – খুঁজছেন","eager – আগ্রহী","real-world setting – বাস্তব পরিবেশ","considering – বিবেচনা করা"],
+phrasal:["apply to – প্রয়োগ করা","seek out – খুঁজে বের করা"],
+colloc:["seeking an internship – ইন্টার্নশিপ খুঁজছি","real-world setting – বাস্তব পরিস্থিতি"],
+grammar:"'eager to apply my classroom knowledge' — 'eager' একটা adjective যা 'to + base verb' নেয় (eager to apply), 'interested' এর মতো নয় যেটা 'in + -ing' নেয়। বিশেষণ (adjective) অনুযায়ী কোন preposition/structure আসবে তা মুখস্থ না করে বেশি বেশি পড়ার মাধ্যমে অভ্যস্ত হওয়াই ভালো।"},
+
+{cat:"Academic & Educational Letters", title:"Statement of Purpose (SOP)",
+example:"My interest in network engineering began during my early exposure to hardware troubleshooting at a small office. Over the years, this curiosity grew into a certified skill set, including my RHCE certification. I now wish to deepen my expertise through formal study in Information Systems, with a long-term goal of designing secure network infrastructures.",
+task:"আপনার নিজের ক্যারিয়ারের যাত্রা বর্ণনা করে একটি সংক্ষিপ্ত Statement of Purpose লিখুন।",
+vocab:["exposure – পরিচিতি/অভিজ্ঞতা","curiosity – কৌতূহল","deepen – গভীর করা","long-term goal – দীর্ঘমেয়াদী লক্ষ্য"],
+phrasal:["grow into – ক্রমশ পরিণত হওয়া","wish to – ইচ্ছা প্রকাশ করা"],
+colloc:["deepen my expertise – আমার দক্ষতা গভীর করা","long-term goal – দীর্ঘমেয়াদী লক্ষ্য"],
+grammar:"SOP অন্য ফরমাল চিঠির থেকে আলাদা কারণ এখানে narrative (গল্পের মতো) tense ব্যবহৃত হয় — past simple (began, grew) দিয়ে অতীত বর্ণনা করে present (now wish) দিয়ে বর্তমান ইচ্ছায় আসা হয়। এই সময়ের পরিবর্তনটাই SOP-কে একটা যাত্রার (journey) মতো শোনায়, শুধু তথ্যের তালিকা নয়।"},
+
+{cat:"Academic & Educational Letters", title:"Letter of Recommendation (LOR)",
+example:"To the Admissions Committee,\n\nI have taught Ms. Farzana Yasmin for two years and can attest to her exceptional analytical skills and discipline. She consistently ranked among the top students in her cohort.\n\nI recommend her wholeheartedly for your program.\n\nSincerely,\nProfessor",
+task:"একজন প্রাক্তন ছাত্র/ছাত্রীর জন্য একটি Letter of Recommendation লিখুন কোনো প্রোগ্রামে ভর্তির জন্য।",
+vocab:["attest to – সাক্ষ্য দেওয়া","analytical – বিশ্লেষণাত্মক","cohort – ব্যাচ/দল","wholeheartedly – আন্তরিকভাবে"],
+phrasal:["attest to – সাক্ষ্য দেওয়া","rank among – মধ্যে স্থান পাওয়া"],
+colloc:["attest to her skills – তার দক্ষতার সাক্ষ্য দিতে পারি","recommend wholeheartedly – পূর্ণ আন্তরিকতার সাথে সুপারিশ করছি"],
+grammar:"'can attest to her exceptional skills' — এখানেও 'attest to' এর পর noun বসেছে, verb এলে -ing হতো। LOR-এর ভাষায় লক্ষ্য করুন প্রায়ই strong adjective (exceptional, outstanding) ব্যবহৃত হয় — কারণ LOR-এর উদ্দেশ্যই হলো জোরালোভাবে সমর্থন প্রকাশ করা, মৃদু ভাষায় নয়।"},
+
+{cat:"Academic & Educational Letters", title:"Academic Appeal Letter",
+example:"Dear Examination Board,\n\nI am writing to appeal my grade in the Networking Fundamentals course, as I believe there may have been an error in grading my final project. I have attached my submission for re-evaluation.\n\nThank you for your time.\n\nSincerely,\nStudent",
+task:"একটি পরীক্ষার নম্বর পুনর্মূল্যায়নের জন্য একটি Academic Appeal Letter লিখুন।",
+vocab:["appeal – আপিল করা","grading – নম্বর দেওয়া","re-evaluation – পুনর্মূল্যায়ন","error – ভুল"],
+phrasal:["appeal a grade – নম্বরের বিরুদ্ধে আপিল করা"],
+colloc:["appeal my grade – আমার নম্বরের বিরুদ্ধে আপিল","attached for re-evaluation – পুনর্মূল্যায়নের জন্য সংযুক্ত"],
+grammar:"'as I believe there may have been an error' — 'may have been' একটা past modal যা অতীতের একটা অনিশ্চিত সম্ভাবনা বোঝায় (হয়তো ভুল হয়েছিল, নিশ্চিত না)। এভাবে সরাসরি অভিযোগ না করে সম্ভাবনার ভাষা ব্যবহার করলে appeal-টা বেশি ভদ্র ও গ্রহণযোগ্য শোনায়।"},
+
+{cat:"Academic & Educational Letters", title:"Research Proposal Letter",
+example:"Dear Professor Ahmed,\n\nI would like to propose a research project on optimizing home-network security for small offices in Bangladesh, focusing on low-cost intrusion detection methods. I would value your guidance as supervisor.\n\nSincerely,\nStudent Researcher",
+task:"আপনার আগ্রহের ক্ষেত্র নিয়ে একটি Research Proposal Letter লিখুন কোনো অধ্যাপকের কাছে।",
+vocab:["optimizing – উন্নত করা","intrusion detection – অনুপ্রবেশ শনাক্তকরণ","guidance – দিকনির্দেশনা","supervisor – তত্ত্বাবধায়ক"],
+phrasal:["focus on – কেন্দ্রীভূত হওয়া","value guidance – দিকনির্দেশনাকে মূল্য দেওয়া"],
+colloc:["propose a research project – গবেষণা প্রকল্পের প্রস্তাব করা","value your guidance – আপনার দিকনির্দেশনাকে গুরুত্ব দেওয়া"],
+grammar:"'focusing on low-cost intrusion detection methods' — এখানে present participle (focusing) দিয়ে আগের noun phrase-কে আরও specific করা হয়েছে, নতুন বাক্য শুরু না করে। এভাবে -ing clause ব্যবহার করলে একই বাক্যে অতিরিক্ত তথ্য জোড়া লাগানো যায় সহজে।"},
+
+/* ===================== 5. PERSONAL ===================== */
+{cat:"Personal Letters", title:"Friendly Letter",
+example:"Dear Kamal,\n\nIt's been too long since we last talked! I've been busy with a new networking certification, but things are going well. How's life treating you these days? Let's catch up soon.\n\nTake care,\nRahim",
+task:"একজন পুরনো বন্ধুকে একটি Friendly Letter লিখুন, সাম্প্রতিক জীবনের আপডেট দিয়ে।",
+vocab:["catch up – আড্ডা দেওয়া/খবর নেওয়া","these days – আজকাল","take care – নিজের যত্ন নিও"],
+phrasal:["catch up – পুরনো খবর জেনে নেওয়া","talk soon – শীঘ্রই কথা হবে"],
+colloc:["it's been too long – অনেক দিন হয়ে গেছে","let's catch up – চলো আড্ডা দিই"],
+grammar:"'It's been too long since we last talked' — present perfect (has been) + since + past simple (talked) — এই combination ব্যাখ্যা করে একটা সময়ের ব্যবধান যা শুরু হয়েছিল অতীতে (last talked) এবং এখনো চলছে (it's been)। বন্ধুদের চিঠিতে এই casual কিন্তু natural গঠন খুব সাধারণ।"},
+
+{cat:"Personal Letters", title:"Love Letter",
+example:"My dearest,\n\nEvery day without you feels incomplete. I carry the memory of your smile with me wherever I go, and I find myself counting the days until we meet again.\n\nAlways yours,\nYour Name",
+task:"আপনার কাছের মানুষের জন্য একটি ছোট ও আন্তরিক Love Letter লিখুন।",
+vocab:["dearest – প্রিয়তম","incomplete – অসম্পূর্ণ","carry – বহন করা","counting the days – দিন গোনা"],
+phrasal:["count the days – দিন গোনা","find oneself – নিজেকে আবিষ্কার করা"],
+colloc:["counting the days until – পর্যন্ত দিন গুনছি","always yours – সবসময় তোমার"],
+grammar:"'I find myself counting the days' — 'find + oneself + -ing' একটা সুন্দর গঠন যা বোঝায় কেউ নিজের অজান্তেই কিছু করছে বা অনুভব করছে (unconsciously)। এটা সরাসরি 'I count the days' বলার চেয়ে বেশি আবেগপূর্ণ ও কাব্যিক শোনায়।"},
+
+{cat:"Personal Letters", title:"Thank You Letter",
+example:"Dear Aunty,\n\nThank you so much for the wonderful gift you gave me on my birthday. It truly meant a lot to have your support and love on this special day.\n\nWith gratitude,\nRahim",
+task:"কারো কাছ থেকে পাওয়া কোনো উপহার বা সাহায্যের জন্য একটি Thank You Letter লিখুন।",
+vocab:["wonderful – চমৎকার","truly – সত্যিকারভাবে","gratitude – কৃতজ্ঞতা","support – সহায়তা"],
+phrasal:["mean a lot – অনেক গুরুত্বপূর্ণ হওয়া"],
+colloc:["thank you so much for – অনেক ধন্যবাদ এর জন্য","meant a lot – অনেক গুরুত্বপূর্ণ ছিল"],
+grammar:"'It truly meant a lot' — এখানে 'truly' adverb টা verb-এর আগে বসে অনুভূতিকে জোর দিচ্ছে। ইংরেজিতে emphasis (গুরুত্ব) দেওয়ার সহজ উপায় হলো truly, really, genuinely-এর মতো adverb ব্যবহার করা।"},
+
+{cat:"Personal Letters", title:"Apology Letter",
+example:"Dear Salma,\n\nI am really sorry for missing your birthday celebration last week. It was never my intention to hurt you, and I hope you can forgive my carelessness.\n\nWith love,\nRahim",
+task:"কোনো ভুলের জন্য কাছের মানুষের কাছে একটি Apology Letter লিখুন।",
+vocab:["intention – উদ্দেশ্য","forgive – ক্ষমা করা","carelessness – অসতর্কতা"],
+phrasal:["miss out – অংশ না নিতে পারা"],
+colloc:["never my intention – কখনোই আমার উদ্দেশ্য ছিল না","hope you can forgive – আশা করি ক্ষমা করবে"],
+grammar:"'It was never my intention to hurt you' — এখানে 'it' একটা dummy subject, আসল বিষয় হলো 'to hurt you was never my intention' কিন্তু ইংরেজিতে এভাবে বাক্য শুরু করা অস্বাভাবিক, তাই 'it' দিয়ে শুরু করে আসল subject-টা পরে বসানো হয় — একে বলে 'extraposition'।"},
+
+{cat:"Personal Letters", title:"Congratulations Letter",
+example:"Dear Fahim,\n\nCongratulations on your recent promotion! Your hard work and dedication have truly paid off, and I couldn't be happier for you.\n\nWishing you continued success.\n\nBest,\nRahim",
+task:"কারো সাফল্যের জন্য একটি Congratulations Letter লিখুন।",
+vocab:["dedication – নিষ্ঠা","paid off – ফল দিয়েছে","continued success – অব্যাহত সাফল্য"],
+phrasal:["pay off – ফলপ্রসূ হওয়া"],
+colloc:["hard work paid off – পরিশ্রম ফল দিয়েছে","couldn't be happier – আরও খুশি হতে পারতাম না"],
+grammar:"'I couldn't be happier for you' — এটা একটা idiomatic superlative-এর মতো গঠন। আক্ষরিক অর্থে 'আমি আরও খুশি হতে পারতাম না' মানে 'আমি বর্তমানে সর্বোচ্চ খুশি'। এই ধরনের negative-দিয়ে-positive-বোঝানো বাক্য ইংরেজিতে খুবই প্রচলিত আবেগ প্রকাশের ভঙ্গি।"},
+
+{cat:"Personal Letters", title:"Invitation Letter",
+example:"Dear Friends and Family,\n\nYou are warmly invited to celebrate my daughter's first birthday on August 20, 2026, at our home starting at 5 PM. Your presence would mean the world to us.\n\nWith love,\nThe Sheikh Family",
+task:"একটি পারিবারিক অনুষ্ঠানের জন্য একটি Invitation Letter লিখুন।",
+vocab:["warmly – আন্তরিকভাবে","celebrate – উদযাপন করা","presence – উপস্থিতি"],
+phrasal:["invite to – আমন্ত্রণ জানানো"],
+colloc:["warmly invited – আন্তরিকভাবে আমন্ত্রিত","mean the world – অনেক গুরুত্বপূর্ণ হওয়া"],
+grammar:"'You are warmly invited' — passive voice ব্যবহৃত হয়েছে কারণ কে আমন্ত্রণ জানাচ্ছে সেটার চেয়ে গুরুত্বপূর্ণ হলো প্রাপক আমন্ত্রিত — এটা প্রাপককে কেন্দ্রে রাখে, যা একটা আমন্ত্রণপত্রের জন্য উপযুক্ত ভদ্রতা।"},
+
+{cat:"Personal Letters", title:"Condolence Letter",
+example:"Dear Amina,\n\nI was deeply saddened to hear about the passing of your father. He was a kind and respected man, and my thoughts are with you and your family during this difficult time.\n\nWith heartfelt sympathy,\nRahim",
+task:"একজন কাছের মানুষের প্রিয়জনের মৃত্যুতে একটি Condolence Letter লিখুন।",
+vocab:["deeply saddened – গভীরভাবে ব্যথিত","passing – মৃত্যু","respected – সম্মানিত","heartfelt sympathy – আন্তরিক সমবেদনা"],
+phrasal:["think of – কারো কথা ভাবা"],
+colloc:["deeply saddened to hear – শুনে গভীরভাবে ব্যথিত","thoughts are with you – আমার চিন্তা তোমার সাথে আছে"],
+grammar:"'my thoughts are with you' — এটা একটা fixed idiomatic expression শোকপ্রকাশের জন্য। এখানে 'passing' শব্দটা 'death'-এর চেয়ে বেশি নরম ও সম্মানজনক — সংবেদনশীল বিষয়ে ইংরেজিতে সরাসরি কঠিন শব্দ এড়িয়ে নরম প্রতিশব্দ ব্যবহার করা প্রথাগত ভদ্রতা।"},
+
+{cat:"Personal Letters", title:"Farewell Letter",
+example:"Dear Team,\n\nAs I prepare to leave TechNet Solutions after four wonderful years, I want to thank each of you for your support and friendship. This is not goodbye, just see you later.\n\nWarm regards,\nRahim",
+task:"একটি প্রতিষ্ঠান বা দল ছেড়ে যাওয়ার সময় একটি Farewell Letter লিখুন।",
+vocab:["prepare to – প্রস্তুতি নেওয়া","wonderful – চমৎকার","friendship – বন্ধুত্ব"],
+phrasal:["leave after – পরে ত্যাগ করা","see you later – পরে দেখা হবে"],
+colloc:["as I prepare to leave – আমি যখন চলে যাওয়ার প্রস্তুতি নিচ্ছি","not goodbye, just see you later – বিদায় নয়, শুধু আবার দেখা হবে"],
+grammar:"'As I prepare to leave' — 'as' এখানে 'while/at the time when' অর্থে ব্যবহৃত হয়েছে, কারণ বোঝাতে নয় (আগে দেখেছিলাম as = because)। প্রসঙ্গ (context) দেখেই বুঝতে হয় as এখানে কোন অর্থে ব্যবহৃত হয়েছে — এটাই ইংরেজি ব্যাকরণের একটা চ্যালেঞ্জিং কিন্তু গুরুত্বপূর্ণ দিক।"},
+
+{cat:"Personal Letters", title:"Get Well Soon Letter",
+example:"Dear Nazma,\n\nI was sorry to hear you're unwell. I hope you get plenty of rest and feel back to your usual self very soon. Thinking of you.\n\nTake care,\nRahim",
+task:"অসুস্থ কোনো বন্ধু বা আত্মীয়কে একটি Get Well Soon Letter লিখুন।",
+vocab:["unwell – অসুস্থ","plenty of rest – পর্যাপ্ত বিশ্রাম","usual self – স্বাভাবিক অবস্থা"],
+phrasal:["get back to – আবার ফিরে আসা"],
+colloc:["get plenty of rest – পর্যাপ্ত বিশ্রাম নিন","feel back to your usual self – নিজের স্বাভাবিক অবস্থায় ফিরে আসা"],
+grammar:"'I hope you get plenty of rest' — 'hope' এর পরের clause-এ present simple (get) ব্যবহৃত হয়েছে ভবিষ্যতের ইচ্ছা বোঝাতে, will বসানো হয়নি। 'hope' এর পর সাধারণত present simple বা will দুটোই চলে, তবে কাছের ভবিষ্যতের শুভকামনায় present simple বেশি প্রাকৃতিক শোনায়।"},
+
+{cat:"Personal Letters", title:"Holiday / Greeting Letter",
+example:"Dear Friends,\n\nWishing you and your family a joyful Eid filled with happiness, good health, and togetherness. May this festive season bring you closer to the ones you love.\n\nWarm wishes,\nRahim",
+task:"যেকোনো উৎসব উপলক্ষে বন্ধু বা আত্মীয়দের একটি Holiday Greeting Letter লিখুন।",
+vocab:["joyful – আনন্দময়","togetherness – একত্রতা","festive season – উৎসবের মৌসুম"],
+phrasal:["bring closer – কাছাকাছি নিয়ে আসা"],
+colloc:["wishing you a joyful [festival] – আনন্দময় [উৎসব] কামনা করছি","bring you closer – আপনাকে কাছাকাছি নিয়ে আসুক"],
+grammar:"'May this festive season bring you closer' — 'May' এখানে শুভকামনা প্রকাশ করছে, এটা একটা subjunctive-জাতীয় ব্যবহার (May + subject + base verb)। এই গঠনটা শুধু প্রার্থনা/আশীর্বাদ প্রকাশে ব্যবহৃত হয়, সাধারণ বাক্যে নয়।"},
+
+/* ===================== 6. LEGAL ===================== */
+{cat:"Legal & Formal Documentation Letters", title:"Legal Notice",
+example:"To Mr. Karim Sheikh,\n\nTake notice that you have failed to repay the outstanding loan amount of BDT 50,000 despite repeated reminders. You are hereby required to settle the amount within 15 days, failing which legal action will be initiated.\n\nOn behalf of the Claimant,\nAdvocate",
+task:"একটি বকেয়া পাওনা আদায়ের জন্য একটি Legal Notice-এর খসড়া তৈরি করুন (শুধু অনুশীলনের জন্য)।",
+vocab:["outstanding – বকেয়া","reminders – স্মরণ করিয়ে দেওয়া","settle – নিষ্পত্তি করা","initiated – শুরু করা"],
+phrasal:["fail to – ব্যর্থ হওয়া","settle within – নির্দিষ্ট সময়ের মধ্যে নিষ্পত্তি করা"],
+colloc:["failing which – যা না হলে","legal action will be initiated – আইনি ব্যবস্থা নেওয়া হবে"],
+grammar:"'failing which legal action will be initiated' — 'failing which' একটা আইনি ফরমাল phrase, যার অর্থ 'if this does not happen'। এটা conditional-কে খুব সংক্ষিপ্ত ও কঠোরভাবে প্রকাশ করে, আইনি নোটিশে এই ধরনের ঘন (dense) গঠন সাধারণ।"},
+
+{cat:"Legal & Formal Documentation Letters", title:"Demand Letter",
+example:"Dear Mr. Alam,\n\nThis letter serves as formal demand for payment of BDT 30,000 owed for services rendered on July 1, 2026. Payment must be made within 10 days of this letter, failing which further action will be taken.\n\nSincerely,\nService Provider",
+task:"বকেয়া অর্থ আদায়ের জন্য একটি Demand Letter লিখুন।",
+vocab:["formal demand – আনুষ্ঠানিক দাবি","owed – পাওনা","rendered – প্রদত্ত (সেবা)","further action – পরবর্তী পদক্ষেপ"],
+phrasal:["owe for – পাওনা থাকা","take action – ব্যবস্থা নেওয়া"],
+colloc:["formal demand for payment – পেমেন্টের জন্য আনুষ্ঠানিক দাবি","services rendered – প্রদত্ত সেবা"],
+grammar:"'services rendered on July 1' — 'rendered' একটা past participle যা 'services' কে বিশেষায়িত করছে (the services that were rendered)। আইনি/ব্যবসায়িক চিঠিতে 'rendered' শব্দটা 'given/provided'-এর চেয়ে বেশি ফরমাল ও প্রথাগত।"},
+
+{cat:"Legal & Formal Documentation Letters", title:"Settlement Letter",
+example:"Dear Mr. Hossain,\n\nIn full and final settlement of the outstanding dispute regarding the delayed project delivery, both parties agree to a payment of BDT 20,000, after which no further claims will be made by either party.\n\nSincerely,\nLegal Representative",
+task:"একটি বিরোধের নিষ্পত্তি সংক্রান্ত একটি Settlement Letter লিখুন।",
+vocab:["dispute – বিরোধ","parties – পক্ষসমূহ","claims – দাবি","full and final – সম্পূর্ণ ও চূড়ান্ত"],
+phrasal:["agree to – রাজি হওয়া","settle a dispute – বিরোধ নিষ্পত্তি করা"],
+colloc:["full and final settlement – সম্পূর্ণ ও চূড়ান্ত নিষ্পত্তি","no further claims – আর কোনো দাবি নেই"],
+grammar:"'after which no further claims will be made by either party' — 'either party' মানে দুই পক্ষের যেকোনো একটি, negative sentence-এ 'either' ব্যবহার হয় যেখানে ইতিবাচক বাক্যে 'both' ব্যবহার হতো। আইনি নথিতে এই সূক্ষ্ম শব্দচয়ন খুব গুরুত্বপূর্ণ, কারণ ভুল শব্দ দায়বদ্ধতার অর্থ বদলে দিতে পারে।"},
+
+{cat:"Legal & Formal Documentation Letters", title:"Agreement Letter",
+example:"This letter confirms the agreement between Mr. Rahim Sheikh (Service Provider) and Mr. Karim Uddin (Client) for network maintenance services, to be rendered monthly at a fee of BDT 10,000, effective August 1, 2026.\n\nBoth parties agree to the above terms.",
+task:"দুই পক্ষের মধ্যে একটি সাধারণ Agreement Letter লিখুন কোনো সার্ভিসের জন্য।",
+vocab:["confirms – নিশ্চিত করে","service provider – সেবাদাতা","monthly – মাসিক","above terms – উপরোক্ত শর্তাবলী"],
+phrasal:["agree to – সম্মত হওয়া"],
+colloc:["confirms the agreement between – এর মধ্যে চুক্তি নিশ্চিত করে","agree to the above terms – উপরোক্ত শর্তে সম্মত"],
+grammar:"'to be rendered monthly' — এখানে 'to be + past participle' একটা passive infinitive, যা ভবিষ্যতের একটা নিয়মিত দায়িত্ব বোঝাচ্ছে (সার্ভিসগুলো দেওয়া হবে)। Agreement/Contract-এ ভবিষ্যতের নিয়মিত দায়িত্ব বোঝাতে এই গঠন খুব প্রচলিত।"},
+
+{cat:"Legal & Formal Documentation Letters", title:"Affidavit Letter",
+example:"I, Nasrin Akter, daughter of Mr. Abdul Karim, do hereby solemnly affirm and declare that the information provided herein is true and correct to the best of my knowledge and belief.\n\nVerified at Dhaka on this 29th day of July, 2026.",
+task:"কোনো তথ্যের সত্যতা নিশ্চিত করে একটি Affidavit-এর খসড়া লিখুন।",
+vocab:["solemnly – গম্ভীরভাবে","affirm – নিশ্চিতকরণ করা","herein – এতে/এই নথিতে","belief – বিশ্বাস"],
+phrasal:["affirm and declare – নিশ্চিত করা ও ঘোষণা করা"],
+colloc:["solemnly affirm and declare – গম্ভীরভাবে নিশ্চিত করছি ও ঘোষণা করছি","true and correct – সত্য ও সঠিক"],
+grammar:"'do hereby solemnly affirm' — এখানে 'do' একটা emphatic auxiliary (জোর দেওয়ার সহায়ক ক্রিয়া), সাধারণ প্রশ্ন বা নেতিবাচক বাক্যে ব্যবহৃত 'do' নয়। আইনি ভাষায় 'do hereby' একসাথে বসিয়ে বিবৃতির গুরুত্ব ও আনুষ্ঠানিকতা বাড়ানো হয়।"},
+
+{cat:"Legal & Formal Documentation Letters", title:"Power of Attorney Letter",
+example:"I, Rahim Sheikh, hereby appoint Mr. Karim Uddin as my lawful attorney to act on my behalf in all matters relating to the sale of my property located in Dhaka, until this authority is revoked in writing.\n\nSincerely,\nRahim Sheikh",
+task:"সম্পত্তি সংক্রান্ত কাজের জন্য কাউকে ক্ষমতা অর্পণ করে একটি Power of Attorney Letter-এর খসড়া লিখুন।",
+vocab:["appoint – নিযুক্ত করা","lawful attorney – আইনসম্মত প্রতিনিধি","revoked – প্রত্যাহার","in writing – লিখিতভাবে"],
+phrasal:["act on behalf of – পক্ষে কাজ করা","revoke in writing – লিখিতভাবে প্রত্যাহার করা"],
+colloc:["appoint as my lawful attorney – আমার আইনসম্মত প্রতিনিধি নিযুক্ত করছি","until revoked – প্রত্যাহার না হওয়া পর্যন্ত"],
+grammar:"'until this authority is revoked in writing' — 'until' একটা সময়সীমা বোঝায় যা একটা শর্ত পূরণ না হওয়া পর্যন্ত চলতে থাকে। Present simple passive (is revoked) এখানে ব্যবহৃত হয়েছে কারণ এটা একটা সাধারণ, ভবিষ্যতে যেকোনো সময় ঘটতে পারা শর্ত — future tense না বসিয়ে present ব্যবহার করাই ইংরেজির নিয়ম when-clauses/until-clauses-এ।"},
+
+{cat:"Legal & Formal Documentation Letters", title:"Complaint to Police",
+example:"To the Officer-in-Charge,\n\nI wish to report the theft of my mobile phone, which occurred on July 27, 2026, near Gulshan-1 Circle at approximately 8 PM. I request that this complaint be duly registered and investigated.\n\nSincerely,\nComplainant",
+task:"একটি চুরির ঘটনা সম্পর্কে থানায় একটি Complaint Letter লিখুন।",
+vocab:["theft – চুরি","occurred – ঘটেছিল","approximately – আনুমানিক","duly – যথাযথভাবে"],
+phrasal:["report to – রিপোর্ট করা"],
+colloc:["wish to report – রিপোর্ট করতে চাই","duly registered and investigated – যথাযথভাবে নথিভুক্ত ও তদন্ত করা"],
+grammar:"'I request that this complaint be duly registered' — আবারও mandative subjunctive (be registered, is registered নয়) — এটা আগে Employee Complaint Letter-এও দেখেছিলাম। request/demand/insist-এর পরের clause-এ base form (be) ব্যবহার করাটা ফরমাল আইনি ও অফিসিয়াল ইংরেজির একটা ধারাবাহিক নিয়ম।"},
+
+{cat:"Legal & Formal Documentation Letters", title:"Cease and Desist Letter",
+example:"Dear Mr. Chowdhury,\n\nYou are hereby notified to cease and desist from using our registered trademark 'TechNet' in your business materials with immediate effect, failing which we will pursue legal remedies.\n\nSincerely,\nLegal Counsel",
+task:"কোনো ট্রেডমার্ক অপব্যবহার বন্ধ করতে একটি Cease and Desist Letter-এর খসড়া লিখুন।",
+vocab:["cease – বন্ধ করা","desist – বিরত থাকা","trademark – ট্রেডমার্ক","legal remedies – আইনি প্রতিকার"],
+phrasal:["cease and desist – বন্ধ করা ও বিরত থাকা","pursue remedies – প্রতিকারের পথে যাওয়া"],
+colloc:["with immediate effect – তাৎক্ষণিকভাবে কার্যকর","pursue legal remedies – আইনি প্রতিকার গ্রহণ করা"],
+grammar:"'cease and desist' একটা legal doublet — দুটো প্রায় একই অর্থের শব্দ (cease = থামা, desist = বিরত থাকা) একসাথে ব্যবহার করা হয় আইনি ভাষায় জোর ও অস্পষ্টতা এড়ানোর জন্য। এই ধরনের doublet (যেমন null and void, terms and conditions) ইংরেজি আইনি ভাষার একটা ঐতিহ্যগত বৈশিষ্ট্য।"},
+
+/* ===================== 7. FINANCIAL & BANKING ===================== */
+{cat:"Financial & Banking Letters", title:"Bank Account Opening Letter",
+example:"Dear Branch Manager,\n\nI would like to open a savings account with your bank. I have enclosed the required documents, including my NID and a passport-size photograph.\n\nKindly guide me through the remaining process.\n\nSincerely,\nApplicant",
+task:"একটি নতুন ব্যাংক অ্যাকাউন্ট খোলার জন্য একটি Bank Account Opening Letter লিখুন।",
+vocab:["savings account – সঞ্চয়ী হিসাব","enclosed – সংযুক্ত","required documents – প্রয়োজনীয় নথি","remaining process – বাকি প্রক্রিয়া"],
+phrasal:["guide through – ধাপে ধাপে সাহায্য করা"],
+colloc:["open a savings account – সঞ্চয়ী হিসাব খোলা","required documents – প্রয়োজনীয় কাগজপত্র"],
+grammar:"'I would like to open' — 'would like' হলো 'want' এর একটা বিনয়ী রূপ। ফরমাল চিঠিতে সরাসরি 'I want' না বলে সবসময় 'I would like' ব্যবহার করা হয়, কারণ এটা অনুরোধকে আদেশের বদলে একটা বিনম্র ইচ্ছা হিসেবে উপস্থাপন করে।"},
+
+{cat:"Financial & Banking Letters", title:"Loan Request Letter",
+example:"Dear Branch Manager,\n\nI am writing to apply for a personal loan of BDT 200,000 to fund home renovation. I have attached my salary certificate and bank statements for your assessment.\n\nThank you for your consideration.\n\nSincerely,\nApplicant",
+task:"কোনো ব্যক্তিগত প্রয়োজনে একটি Loan Request Letter লিখুন ব্যাংকে।",
+vocab:["fund – অর্থায়ন করা","renovation – সংস্কার","salary certificate – বেতন সনদ","assessment – মূল্যায়ন"],
+phrasal:["apply for – আবেদন করা","fund a project – প্রকল্পে অর্থায়ন করা"],
+colloc:["apply for a personal loan – ব্যক্তিগত ঋণের জন্য আবেদন করা","for your assessment – আপনার মূল্যায়নের জন্য"],
+grammar:"'to fund home renovation' — এখানে 'to + verb' infinitive of purpose হিসেবে ব্যবহৃত হয়েছে, অর্থাৎ 'in order to fund'। ঋণ কেন দরকার সেটা এক শব্দে ব্যাখ্যা করার এই পদ্ধতি ফরমাল আবেদনপত্রে খুব কার্যকর ও সংক্ষিপ্ত।"},
+
+{cat:"Financial & Banking Letters", title:"Loan Closure Letter",
+example:"Dear Branch Manager,\n\nI am writing to inform you that I have fully repaid my personal loan (Account No. 123456) as of July 25, 2026. Kindly issue a No Dues Certificate confirming closure of this loan.\n\nSincerely,\nCustomer",
+task:"একটি ঋণ সম্পূর্ণ পরিশোধ করার পর একটি Loan Closure Letter লিখুন।",
+vocab:["fully repaid – সম্পূর্ণ পরিশোধ","as of – পর্যন্ত/থেকে","issue – ইস্যু করা","closure – সমাপ্তি/বন্ধ হওয়া"],
+phrasal:["repay in full – সম্পূর্ণ পরিশোধ করা","issue a certificate – সনদ প্রদান করা"],
+colloc:["fully repaid the loan – ঋণ সম্পূর্ণ পরিশোধ করেছি","no dues certificate – বকেয়াহীনতার সনদ"],
+grammar:"'as of July 25, 2026' — 'as of' একটা নির্দিষ্ট তারিখ থেকে কোনো অবস্থা কার্যকর হওয়া বোঝায় (from this date onward, this is the status)। এটা ব্যাংকিং ও আর্থিক চিঠিতে তারিখ উল্লেখের একটা খুবই প্রচলিত ও নির্ভুল উপায়।"},
+
+{cat:"Financial & Banking Letters", title:"Credit Request Letter",
+example:"Dear Sir,\n\nWe would like to request a 30-day credit facility for our upcoming bulk purchase of networking equipment, given our long-standing business relationship with your company.\n\nWe look forward to your favourable response.\n\nRegards,\nProcurement Manager",
+task:"একটি সাপ্লায়ারের কাছে ক্রেডিট সুবিধা চেয়ে একটি Credit Request Letter লিখুন।",
+vocab:["credit facility – ঋণ সুবিধা","bulk purchase – পাইকারি ক্রয়","long-standing – দীর্ঘদিনের","favourable response – অনুকূল উত্তর"],
+phrasal:["request for – অনুরোধ করা"],
+colloc:["long-standing business relationship – দীর্ঘদিনের ব্যবসায়িক সম্পর্ক","favourable response – অনুকূল সাড়া"],
+grammar:"'given our long-standing business relationship' — 'given' এখানে preposition-এর মতো ব্যবহৃত হয়েছে, অর্থ 'considering/because of'। এই ব্যবহারে 'given' একটা কারণ উপস্থাপন করে খুব সংক্ষিপ্তভাবে, পুরো clause না লিখেই (given that we have had...)।"},
+
+{cat:"Financial & Banking Letters", title:"Payment Reminder Letter",
+example:"Dear Mr. Islam,\n\nThis is a gentle reminder that an invoice for BDT 15,000 (Invoice #2201), due on July 20, 2026, remains unpaid. We would appreciate settlement at your earliest convenience.\n\nThank you.\n\nAccounts Team",
+task:"একটি বকেয়া চালান নিয়ে একটি Payment Reminder Letter লিখুন।",
+vocab:["gentle reminder – নম্র স্মারক","invoice – চালান","remains unpaid – অপরিশোধিত রয়ে গেছে","settlement – নিষ্পত্তি"],
+phrasal:["remain unpaid – অপরিশোধিত থাকা","appreciate settlement – নিষ্পত্তির জন্য কৃতজ্ঞ থাকা"],
+colloc:["gentle reminder – ভদ্র স্মরণ করিয়ে দেওয়া","at your earliest convenience – আপনার সুবিধামতো যত দ্রুত সম্ভব"],
+grammar:"'This is a gentle reminder' — 'gentle' শব্দটা টোন নরম করার জন্য ইচ্ছাকৃতভাবে বসানো হয়েছে। প্রথম reminder চিঠিতে সবসময় নরম ভাষা ব্যবহার হয় (gentle, kind, friendly reminder), কড়া ভাষা শুধু বারবার অগ্রাহ্য করা হলে ব্যবহৃত হয়।"},
+
+{cat:"Financial & Banking Letters", title:"Salary Request Letter",
+example:"Dear HR Manager,\n\nI am writing to request a review of my current salary, considering my expanded responsibilities and consistent performance over the past year. I would appreciate the opportunity to discuss this further.\n\nSincerely,\nEmployee",
+task:"বেতন বৃদ্ধির অনুরোধ জানিয়ে একটি Salary Request Letter লিখুন।",
+vocab:["review – পর্যালোচনা","expanded responsibilities – বর্ধিত দায়িত্ব","consistent performance – ধারাবাহিক পারফরম্যান্স"],
+phrasal:["request a review – পর্যালোচনার অনুরোধ করা"],
+colloc:["review of my current salary – আমার বর্তমান বেতনের পর্যালোচনা","discuss this further – এই বিষয়ে আরও আলোচনা"],
+grammar:"'considering my expanded responsibilities' — 'considering' এখানে preposition-এর মতো কাজ করছে, অর্থ 'because of/in view of'। এভাবে participle (considering, given, regarding) ব্যবহার করে কারণ দেখানো ফরমাল ইংরেজির একটা গুরুত্বপূর্ণ স্টাইল।"},
+
+{cat:"Financial & Banking Letters", title:"Insurance Claim Letter",
+example:"Dear Claims Department,\n\nI am writing to file a claim under my home insurance policy (Policy No. 78452) for water damage caused by a burst pipe on July 15, 2026. Supporting photographs and a repair estimate are enclosed.\n\nSincerely,\nPolicyholder",
+task:"একটি বীমা দাবি জানিয়ে একটি Insurance Claim Letter লিখুন।",
+vocab:["file a claim – দাবি জমা দেওয়া","policy – বীমা পলিসি","burst pipe – ফেটে যাওয়া পাইপ","estimate – প্রাক্কলন"],
+phrasal:["file a claim – দাবি দাখিল করা","caused by – দ্বারা সৃষ্ট"],
+colloc:["file a claim under – এর অধীনে দাবি জমা দেওয়া","supporting photographs enclosed – সহায়ক ছবি সংযুক্ত"],
+grammar:"'water damage caused by a burst pipe' — 'caused by' একটা past participle phrase যা 'damage'-কে বিশেষায়িত করছে (damage which was caused by)। বীমা দাবিতে কারণ স্পষ্টভাবে উল্লেখ করা জরুরি, তাই এই সংক্ষিপ্ত participle গঠন খুব কার্যকর।"},
+
+/* ===================== 8. DIGITAL / MODERN ===================== */
+{cat:"Digital / Modern Letters", title:"Email (Formal)",
+example:"Subject: Request for IT Support Ticket Update\n\nDear Mr. Rahman,\n\nCould you please provide an update on ticket #4521 regarding the office router issue? It has been pending for three days and is affecting daily operations.\n\nBest regards,\nRahim Sheikh",
+task:"অফিসের কোনো টেকনিক্যাল সমস্যা নিয়ে একটি ফরমাল ইমেইল লিখুন, subject line সহ।",
+vocab:["subject line – বিষয় লাইন","pending – মুলতবি","affecting – প্রভাবিত করছে","daily operations – দৈনন্দিন কার্যক্রম"],
+phrasal:["pending for – নির্দিষ্ট সময় ধরে মুলতবি থাকা"],
+colloc:["provide an update – আপডেট দেওয়া","affecting daily operations – দৈনন্দিন কাজে প্রভাব ফেলছে"],
+grammar:"ফরমাল ইমেইলে Subject line অবশ্যই স্পষ্ট ও নির্দিষ্ট হতে হয় — এটা noun phrase আকারে লেখা হয় (Request for...), পূর্ণ বাক্য নয়। ইমেইল আর চিঠির মূল পার্থক্য এটাই: ইমেইলে subject line তথ্যের সারমর্ম আগেই বলে দেয়।"},
+
+{cat:"Digital / Modern Letters", title:"Email (Informal)",
+example:"Subject: Long time!\n\nHey Kamal,\n\nHope you're doing well! Just wanted to check in — are you free this weekend for a coffee? Would love to catch up.\n\nTalk soon,\nRahim",
+task:"একজন বন্ধুকে একটি ইনফরমাল ইমেইল লিখুন কোনো পরিকল্পনার জন্য।",
+vocab:["check in – খোঁজ নেওয়া","would love to – করতে চাই (আন্তরিকভাবে)"],
+phrasal:["check in – খোঁজখবর নেওয়া","catch up – আড্ডা দেওয়া"],
+colloc:["hope you're doing well – আশা করি ভালো আছো","talk soon – শীঘ্রই কথা হবে"],
+grammar:"Informal ইমেইলে contractions (you're, wanted, would love to) ব্যবহার হয় স্বাভাবিকভাবে — ফরমাল চিঠিতে এগুলো এড়ানো হয় (you are, I wanted)। Contraction ব্যবহার/না-ব্যবহারই একটা চিঠি formal না informal তা প্রথমেই বুঝিয়ে দেয়।"},
+
+{cat:"Digital / Modern Letters", title:"Newsletter",
+example:"TechNet Monthly Update — July 2026\n\nThis month, we rolled out enhanced network monitoring tools for all clients, reducing downtime incidents by 25%. We also welcomed two new engineers to our support team.\n\nStay tuned for more updates next month!",
+task:"আপনার কর্মক্ষেত্রের মাসিক কার্যক্রম নিয়ে একটি সংক্ষিপ্ত Newsletter লিখুন।",
+vocab:["rolled out – চালু করা হয়েছে","enhanced – উন্নত","downtime – অকার্যকর সময়","stay tuned – অপেক্ষায় থাকুন"],
+phrasal:["roll out – চালু করা","stay tuned – আগ্রহ নিয়ে অপেক্ষা করা"],
+colloc:["rolled out enhanced tools – উন্নত টুল চালু করা হয়েছে","reduce downtime incidents – ডাউনটাইম কমানো"],
+grammar:"Newsletter-এর ভাষা marketing-এর কাছাকাছি — active, energetic verb ব্যবহৃত হয় (rolled out, welcomed) past simple-এ, কারণ এটা সদ্য ঘটে যাওয়া অর্জনগুলো উদযাপনের মতো উপস্থাপন করে, নিছক তথ্য জানানো নয়।"},
+
+{cat:"Digital / Modern Letters", title:"Open Letter",
+example:"An Open Letter to Local Authorities on Digital Access\n\nWe, the residents of this community, write to express our collective concern over the lack of affordable broadband access in our area. We urge immediate policy attention to bridge this digital divide.\n\nConcerned Residents",
+task:"কোনো সামাজিক বিষয়ে একটি Open Letter লিখুন যা জনসাধারণের উদ্দেশ্যে প্রকাশিত হবে।",
+vocab:["collective concern – সম্মিলিত উদ্বেগ","affordable – সাশ্রয়ী","urge – আহ্বান জানানো","digital divide – ডিজিটাল বিভাজন"],
+phrasal:["urge for – জন্য আহ্বান জানানো","bridge a divide – ব্যবধান দূর করা"],
+colloc:["express collective concern – সম্মিলিত উদ্বেগ প্রকাশ করা","bridge the digital divide – ডিজিটাল ব্যবধান দূর করা"],
+grammar:"Open Letter-এ 'We' ব্যবহৃত হয় একক ব্যক্তি নয়, বরং একটা গোষ্ঠী বা সম্প্রদায়ের প্রতিনিধিত্ব করতে — কারণ Open Letter জনসাধারণের কাছে প্রকাশিত হয়, তাই এর কণ্ঠস্বর সম্মিলিত (collective voice) হওয়া জরুরি।"},
+
+{cat:"Digital / Modern Letters", title:"LinkedIn Message Letter",
+example:"Hi Mr. Islam,\n\nI came across your profile and was impressed by your work in network security. I'd love to connect and learn more about opportunities at your organization.\n\nBest,\nRahim Sheikh",
+task:"একজন পেশাদারের সাথে সংযোগ স্থাপনের জন্য একটি LinkedIn Message লিখুন।",
+vocab:["came across – হঠাৎ দেখা/পাওয়া","impressed by – মুগ্ধ","connect – যোগাযোগ স্থাপন করা"],
+phrasal:["come across – দেখতে পাওয়া (হঠাৎ)","connect with – সংযোগ স্থাপন করা"],
+colloc:["came across your profile – আপনার প্রোফাইল দেখলাম","impressed by your work – আপনার কাজে মুগ্ধ"],
+grammar:"LinkedIn Message ফরমাল ও ইনফরমাল-এর মাঝামাঝি একটা টোন ব্যবহার করে — 'Hi' দিয়ে শুরু (ইনফরমাল) কিন্তু ভাষা পেশাদার (impressed, opportunities)। এই মিশ্র টোনকে বলা হয় 'semi-formal', আধুনিক পেশাদার যোগাযোগে খুব প্রচলিত।"},
+
+{cat:"Digital / Modern Letters", title:"Customer Support Email",
+example:"Dear Customer,\n\nThank you for reaching out regarding your internet connectivity issue. Our technician has been assigned and will contact you within 2 hours to resolve the matter.\n\nWe appreciate your patience.\n\nSupport Team",
+task:"একজন গ্রাহকের সমস্যার উত্তরে একটি Customer Support Email লিখুন।",
+vocab:["reaching out – যোগাযোগ করা","assigned – নিয়োজিত","resolve – সমাধান করা","patience – ধৈর্য"],
+phrasal:["reach out – যোগাযোগ করা","assign to – নিয়োগ দেওয়া"],
+colloc:["thank you for reaching out – যোগাযোগ করার জন্য ধন্যবাদ","appreciate your patience – আপনার ধৈর্যের প্রশংসা করছি"],
+grammar:"'has been assigned' — present perfect passive দেখায় এই মুহূর্তে technician নির্ধারিত হয়ে গেছে এবং সেটার ফলাফল এখনো প্রাসঙ্গিক (সে শীঘ্রই যোগাযোগ করবে)। Customer support-এ এই ধরনের ভাষা গ্রাহককে আশ্বস্ত করে যে ব্যবস্থা ইতিমধ্যে নেওয়া হয়েছে।"},
+
+{cat:"Digital / Modern Letters", title:"Feedback Letter",
+example:"Dear Manager,\n\nI recently used your company's IT support service and wanted to share my experience. The technician was prompt and knowledgeable, though the waiting time on call could be improved.\n\nThank you for the opportunity to provide feedback.\n\nSincerely,\nCustomer",
+task:"কোনো সার্ভিস ব্যবহারের অভিজ্ঞতা নিয়ে একটি Feedback Letter লিখুন, ইতিবাচক ও গঠনমূলক দুই দিক উল্লেখ করে।",
+vocab:["prompt – দ্রুত","knowledgeable – জ্ঞানী/দক্ষ","waiting time – অপেক্ষার সময়","could be improved – উন্নত করা যেতে পারে"],
+phrasal:["share an experience – অভিজ্ঞতা শেয়ার করা"],
+colloc:["prompt and knowledgeable – দ্রুত ও দক্ষ","could be improved – উন্নত করা যেতে পারে"],
+grammar:"'though the waiting time...could be improved' — 'though' এখানে একটা contrast যোগ করছে ভালো মন্তব্যের সাথে (prompt and knowledgeable, কিন্তু...)। Feedback Letter-এ এই কৌশল গুরুত্বপূর্ণ: গঠনমূলক সমালোচনার আগে প্রশংসা করলে ভাষা আরও ভারসাম্যপূর্ণ ও গ্রহণযোগ্য হয়।"},
+
+/* ===================== 9. TRAVEL & IMMIGRATION ===================== */
+{cat:"Travel & Immigration Letters", title:"Visa Application Letter",
+example:"Dear Visa Officer,\n\nI am applying for a tourist visa to visit Malaysia from October 5–15, 2026, to attend a family gathering. I have attached my travel itinerary, hotel booking, and financial statements.\n\nThank you for your consideration.\n\nSincerely,\nApplicant",
+task:"একটি দেশের ভ্রমণের জন্য একটি Visa Application Letter লিখুন।",
+vocab:["tourist visa – পর্যটক ভিসা","itinerary – ভ্রমণ পরিকল্পনা","financial statements – আর্থিক বিবরণী","attend – অংশগ্রহণ করা"],
+phrasal:["apply for – আবেদন করা","attend a gathering – অনুষ্ঠানে যোগ দেওয়া"],
+colloc:["applying for a tourist visa – পর্যটক ভিসার জন্য আবেদন করছি","travel itinerary – ভ্রমণ পরিকল্পনা"],
+grammar:"'to visit Malaysia...to attend a family gathering' — এখানে দুটো 'to + verb' পরপর ব্যবহৃত হয়েছে, দুটোই purpose (উদ্দেশ্য) বোঝাচ্ছে কিন্তু ভিন্ন স্তরে (ভ্রমণের উদ্দেশ্য, তারপর সেই ভ্রমণের ভেতরের উদ্দেশ্য)। ভিসা আবেদনে ভ্রমণের সুনির্দিষ্ট কারণ স্পষ্টভাবে উল্লেখ করা অত্যন্ত গুরুত্বপূর্ণ।"},
+
+{cat:"Travel & Immigration Letters", title:"Invitation Letter (for Visa)",
+example:"To the Visa Officer,\n\nI, Karim Uddin, residing in Kuala Lumpur, hereby invite Mr. Rahim Sheikh to visit me from October 5–15, 2026. I will bear all expenses related to his stay and travel within the country.\n\nSincerely,\nKarim Uddin",
+task:"বিদেশে থাকা কেউ যদি দেশ থেকে কাউকে আমন্ত্রণ জানায় ভ্রমণের জন্য, সেই রকম একটি Invitation Letter লিখুন।",
+vocab:["residing – বসবাসরত","bear expenses – খরচ বহন করা","stay – অবস্থান"],
+phrasal:["bear expenses – খরচ বহন করা"],
+colloc:["hereby invite – এতদ্বারা আমন্ত্রণ জানাচ্ছি","bear all expenses – সকল খরচ বহন করা"],
+grammar:"'I will bear all expenses related to his stay' — 'related to' একটা past participle phrase যা 'expenses'-কে বিশেষায়িত করছে। ভিসা Invitation Letter-এ আর্থিক দায়িত্ব স্পষ্টভাবে উল্লেখ করা বাধ্যতামূলক, কারণ এটাই ভিসা অফিসারের প্রধান উদ্বেগের বিষয়।"},
+
+{cat:"Travel & Immigration Letters", title:"Travel Consent Letter",
+example:"To Whom It May Concern,\n\nI, Nasima Khatun, hereby give consent for my minor son, Adnan Khan, to travel to Cox's Bazar with his school group from August 10–12, 2026, under the supervision of Mr. Faruk Ahmed.\n\nSincerely,\nNasima Khatun",
+task:"একজন অভিভাবক হিসেবে সন্তানের ভ্রমণের জন্য একটি Travel Consent Letter লিখুন।",
+vocab:["consent – সম্মতি","minor – নাবালক","supervision – তত্ত্বাবধান"],
+phrasal:["give consent – সম্মতি দেওয়া","travel under supervision – তত্ত্বাবধানে ভ্রমণ করা"],
+colloc:["hereby give consent – এতদ্বারা সম্মতি প্রদান করছি","under the supervision of – এর তত্ত্বাবধানে"],
+grammar:"'to travel to Cox's Bazar...under the supervision of' — পুরো বাক্যটা একটাই to-infinitive clause-এর মধ্যে বিস্তারিত তথ্য (কোথায়, কার সাথে, কার তত্ত্বাবধানে) জুড়ে দিচ্ছে। Consent Letter-এ প্রতিটা শর্ত স্পষ্টভাবে লেখা জরুরি, কারণ এটা একটা আইনি অনুমতিপত্র হিসেবে ব্যবহৃত হতে পারে।"},
+
+{cat:"Travel & Immigration Letters", title:"Sponsorship Letter",
+example:"To the Visa Officer,\n\nI, Faruk Ahmed, hereby confirm that I will financially sponsor Ms. Ruma Akter's trip to the United Kingdom from September 1–14, 2026, covering all travel, accommodation, and daily expenses.\n\nSincerely,\nFaruk Ahmed",
+task:"কারো ভ্রমণের আর্থিক দায়িত্ব নিয়ে একটি Sponsorship Letter লিখুন।",
+vocab:["financially sponsor – আর্থিকভাবে পৃষ্ঠপোষকতা করা","accommodation – থাকার ব্যবস্থা","covering – বহন করা"],
+phrasal:["cover expenses – খরচ বহন করা"],
+colloc:["financially sponsor – আর্থিকভাবে দায়িত্ব নেওয়া","covering all expenses – সকল খরচ বহন করা"],
+grammar:"'covering all travel, accommodation, and daily expenses' — এখানে present participle (covering) দিয়ে আগের বাক্যের একটা বিস্তারিত ব্যাখ্যা যোগ হয়েছে, নতুন বাক্য না লিখেই। এভাবে -ing clause বাক্যকে দীর্ঘ না করে অতিরিক্ত তথ্য দেয়, ফরমাল লেখায় খুব দরকারি কৌশল।"},
+
+{cat:"Travel & Immigration Letters", title:"Immigration Appeal Letter",
+example:"Dear Immigration Officer,\n\nI am writing to appeal the decision denying my residency application (Reference No. IMG-4521). I believe key supporting documents were not adequately considered, as detailed in the attached submission.\n\nI kindly request a re-examination of my case.\n\nSincerely,\nApplicant",
+task:"একটি প্রত্যাখ্যাত ইমিগ্রেশন সিদ্ধান্তের বিরুদ্ধে একটি Appeal Letter লিখুন।",
+vocab:["residency – বসবাসের অনুমতি","denying – প্রত্যাখ্যান করা","adequately – পর্যাপ্তভাবে","re-examination – পুনঃপরীক্ষা"],
+phrasal:["appeal against – বিরুদ্ধে আপিল করা"],
+colloc:["appeal the decision – সিদ্ধান্তের বিরুদ্ধে আপিল","re-examination of my case – আমার মামলার পুনঃপরীক্ষা"],
+grammar:"'I believe key supporting documents were not adequately considered' — passive voice (were not considered) ব্যবহার হয়েছে দোষারোপ না করে (who didn't consider them বলা হয়নি)। এটা কূটনৈতিক ভাষা — সমস্যাটা তুলে ধরা হচ্ছে কিন্তু সরাসরি কর্মকর্তাকে দায়ী না করেই।"},
+
+/* ===================== 10. SPECIAL PURPOSE ===================== */
+{cat:"Special Purpose Letters", title:"Letter to Editor",
+example:"Dear Editor,\n\nThrough your esteemed newspaper, I wish to draw attention to the deteriorating condition of public Wi-Fi services in our city, which affects students and small businesses alike. Immediate policy intervention is needed.\n\nSincerely,\nConcerned Citizen",
+task:"কোনো সামাজিক সমস্যা নিয়ে একটি Letter to Editor লিখুন কোনো পত্রিকার উদ্দেশ্যে।",
+vocab:["esteemed – সম্মানিত","deteriorating – অবনতিশীল","alike – একইভাবে","intervention – হস্তক্ষেপ"],
+phrasal:["draw attention to – দৃষ্টি আকর্ষণ করা"],
+colloc:["draw attention to – দিকে দৃষ্টি আকর্ষণ করা","policy intervention – নীতিগত হস্তক্ষেপ"],
+grammar:"'which affects students and small businesses alike' — 'alike' এখানে adverb হিসেবে বাক্যের শেষে বসেছে, অর্থ 'in the same way / both equally'। এটা দুটো ভিন্ন গোষ্ঠীর ওপর একই প্রভাব বোঝাতে একটা compact ও세련 (elegant) উপায়।"},
+
+{cat:"Special Purpose Letters", title:"Public Complaint Letter",
+example:"To the City Corporation,\n\nOn behalf of the residents of Block C, we wish to lodge a formal complaint regarding the irregular waste collection in our area over the past month. We request immediate corrective measures.\n\nSincerely,\nResidents' Committee",
+task:"একটি সাধারণ জনগণের সমস্যা নিয়ে একটি Public Complaint Letter লিখুন কর্তৃপক্ষকে।",
+vocab:["on behalf of – পক্ষে","lodge a complaint – অভিযোগ দাখিল করা","irregular – অনিয়মিত","corrective measures – সংশোধনমূলক ব্যবস্থা"],
+phrasal:["lodge a complaint – অভিযোগ দায়ের করা"],
+colloc:["on behalf of the residents – বাসিন্দাদের পক্ষে","corrective measures – সংশোধনমূলক ব্যবস্থা"],
+grammar:"'we wish to lodge a formal complaint' — 'lodge' শব্দটা 'file/submit'-এর একটা বেশি ফরমাল প্রতিশব্দ, বিশেষত অভিযোগের প্রসঙ্গে ব্যবহৃত হয় (lodge a complaint একটা fixed collocation)। শব্দচয়নই বাক্যকে আরও অফিসিয়াল করে তোলে।"},
+
+{cat:"Special Purpose Letters", title:"Whistleblower Letter",
+example:"To the Ethics Committee,\n\nI am writing to report a serious concern regarding financial irregularities observed in the procurement department. I request that this matter be investigated confidentially and my identity be protected.\n\nSincerely,\nConcerned Employee",
+task:"কোনো প্রতিষ্ঠানে অনিয়ম দেখে একটি Whistleblower Letter-এর কাঠামো অনুশীলন করুন (কাল্পনিক পরিস্থিতিতে)।",
+vocab:["irregularities – অনিয়ম","procurement – ক্রয় প্রক্রিয়া","confidentially – গোপনীয়ভাবে","identity – পরিচয়"],
+phrasal:["report on – নিয়ে রিপোর্ট করা","protect identity – পরিচয় সুরক্ষিত রাখা"],
+colloc:["financial irregularities – আর্থিক অনিয়ম","investigated confidentially – গোপনীয়ভাবে তদন্ত করা"],
+grammar:"'my identity be protected' — এখানেও mandative subjunctive (be protected, is protected নয়), কারণ 'request that' এর পরের clause। Whistleblower চিঠিতে passive + subjunctive দুটোই ব্যবহৃত হয় বিষয়টাকে objective এবং জরুরি করে তুলতে, ব্যক্তিগত আবেগ ছাড়াই।"},
+
+{cat:"Special Purpose Letters", title:"Motivation Letter",
+example:"Dear Admissions Team,\n\nMy motivation to pursue this course in Network Security stems from years of hands-on troubleshooting experience, during which I realized the growing importance of protecting digital infrastructure. I am eager to formalize this passion through structured learning.\n\nSincerely,\nApplicant",
+task:"কোনো কোর্স বা প্রোগ্রামে ভর্তির জন্য একটি Motivation Letter লিখুন, ব্যক্তিগত অভিজ্ঞতা যুক্ত করে।",
+vocab:["stems from – উদ্ভূত হওয়া","realized – উপলব্ধি করেছি","formalize – আনুষ্ঠানিক রূপ দেওয়া","passion – আগ্রহ/ভালোবাসা"],
+phrasal:["stem from – থেকে উদ্ভূত হওয়া"],
+colloc:["stems from years of experience – বছরের অভিজ্ঞতা থেকে উদ্ভূত","formalize this passion – এই আগ্রহকে আনুষ্ঠানিক রূপ দেওয়া"],
+grammar:"'stems from years of hands-on troubleshooting experience' — 'stem from' একটা phrasal verb যার অর্থ 'originate from/come from'। Motivation Letter-এ personal story বলার সময় এই ধরনের causal (কারণসূচক) verb ব্যবহার করলে লেখাটা আরও যুক্তিসঙ্গত ও বিশ্বাসযোগ্য শোনায়।"},
+
+{cat:"Special Purpose Letters", title:"Covering Letter (for Documents)",
+example:"Dear Sir/Madam,\n\nPlease find enclosed the following documents in support of my application: academic certificates, experience letters, and a copy of my national ID.\n\nKindly acknowledge receipt at your convenience.\n\nSincerely,\nApplicant",
+task:"কোনো আবেদনের সাথে পাঠানো ডকুমেন্টের জন্য একটি Covering Letter লিখুন।",
+vocab:["in support of – সমর্থনে","acknowledge receipt – প্রাপ্তি স্বীকার করা","at your convenience – আপনার সুবিধামতো"],
+phrasal:["find enclosed – সংযুক্ত পাওয়া","acknowledge receipt – প্রাপ্তি নিশ্চিত করা"],
+colloc:["in support of my application – আমার আবেদনের সমর্থনে","acknowledge receipt – প্রাপ্তি স্বীকার করুন"],
+grammar:"'the following documents' — 'following' এখানে adjective হিসেবে ব্যবহৃত হয়েছে যার অর্থ 'listed below/mentioned next'। এটা তালিকা শুরুর আগে একটা signal দেয় পাঠককে যে এরপর কিছু items আসছে — অফিসিয়াল চিঠিতে তালিকা উপস্থাপনের একটা প্রমিত (standard) উপায়।"},
+
+{cat:"Special Purpose Letters", title:"Intent Letter (LOI – Letter of Intent)",
+example:"Dear Ms. Karim,\n\nThis letter serves to express our intent to enter into a formal contract with your company for the supply of networking hardware over the next 12 months, subject to final terms being agreed upon.\n\nSincerely,\nProcurement Director",
+task:"একটি সম্ভাব্য ব্যবসায়িক চুক্তির প্রাথমিক আগ্রহ প্রকাশ করে একটি Letter of Intent লিখুন।",
+vocab:["intent – অভিপ্রায়","enter into – প্রবেশ করা (চুক্তিতে)","subject to – শর্তসাপেক্ষে","agreed upon – সম্মত হওয়া"],
+phrasal:["enter into – প্রবেশ করা/করা (চুক্তি)"],
+colloc:["express our intent – আমাদের অভিপ্রায় প্রকাশ করা","subject to final terms – চূড়ান্ত শর্তসাপেক্ষে"],
+grammar:"'subject to final terms being agreed upon' — 'subject to' একটা fixed formal phrase অর্থ 'depending on/conditional upon'। এর পরে verb এলে -ing (being agreed) বসে, কারণ এটাও একটা preposition-এর মতো কাজ করছে। LOI-এর মূল বৈশিষ্ট্যই হলো এটা একটা প্রাথমিক প্রতিশ্রুতি, চূড়ান্ত বাধ্যবাধকতা নয় — তাই 'subject to' শব্দটা এত গুরুত্বপূর্ণ।"},
+
+{cat:"Special Purpose Letters", title:"Memorandum Letter",
+example:"MEMORANDUM\n\nTo: All IT Staff\nFrom: IT Manager\nDate: July 29, 2026\nRe: Scheduled Server Maintenance\n\nPlease be advised that all servers will undergo scheduled maintenance on August 2 from 11 PM to 2 AM. Plan accordingly to avoid disruption.",
+task:"অফিসের কোনো অভ্যন্তরীণ ঘোষণার জন্য একটি Memorandum লিখুন, সঠিক ফরম্যাট মেনে।",
+vocab:["scheduled – নির্ধারিত","undergo – মধ্য দিয়ে যাওয়া","plan accordingly – সেই অনুযায়ী পরিকল্পনা করা","disruption – ব্যাঘাত"],
+phrasal:["undergo maintenance – রক্ষণাবেক্ষণের মধ্য দিয়ে যাওয়া","plan accordingly – সেই মোতাবেক পরিকল্পনা করা"],
+colloc:["please be advised that – দয়া করে জেনে রাখুন যে","avoid disruption – ব্যাঘাত এড়ানো"],
+grammar:"Memorandum-এর কাঠামো (To/From/Date/Re) সাধারণ চিঠির থেকে সম্পূর্ণ ভিন্ন — এখানে salutation (Dear...) বা closing (Sincerely) থাকে না, কারণ Memo অভ্যন্তরীণ ও দ্রুত তথ্য আদান-প্রদানের জন্য, তাই ভাষা সরাসরি ও কাঠামোবদ্ধ (structured) রাখা হয়।"}
+];
+
+/* Build category order (preserve first-seen order) */
+const catOrder = [];
+DATA.forEach(d=>{ if(!catOrder.includes(d.cat)) catOrder.push(d.cat); });
+DATA.forEach((d,i)=>{ d.id = i; });
+
+let currentIndex = null;
+const learned = new Set();
+
+function renderSidebar(){
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '';
+  catOrder.forEach((cat, ci) => {
+    const items = DATA.filter(d=>d.cat===cat);
+    const catDiv = document.createElement('div');
+    catDiv.className = 'cat' + (ci===0 ? ' open' : '');
+    const head = document.createElement('div');
+    head.className = 'cat-head';
+    head.innerHTML = `<span>${cat}</span><span class="count">${items.length}</span><span class="cat-arrow">▶</span>`;
+    head.onclick = ()=>{ catDiv.classList.toggle('open'); };
+    const itemsWrap = document.createElement('div');
+    itemsWrap.className = 'cat-items';
+    items.forEach(d=>{
+      const it = document.createElement('div');
+      it.className = 'item' + (d.id===currentIndex ? ' active':'') + (learned.has(d.id)?' learned':'');
+      it.innerHTML = `<span class="stamp-mini"></span><span>${d.title}</span>`;
+      it.onclick = ()=> openLesson(d.id);
+      it.dataset.id = d.id;
+      itemsWrap.appendChild(it);
+    });
+    catDiv.appendChild(head);
+    catDiv.appendChild(itemsWrap);
+    sb.appendChild(catDiv);
+  });
+  updateProgress();
+}
+
+function updateProgress(){
+  const total = DATA.length;
+  const done = learned.size;
+  document.getElementById('progressFill').style.width = (done/total*100)+'%';
+  document.getElementById('progressCount').textContent = done + ' / ' + total + ' stamped';
+}
+
+function openLesson(id){
+  currentIndex = id;
+  const d = DATA[id];
+  const main = document.getElementById('main');
+
+  const vocabRows = d.vocab.map(v=>{
+    const [w,m] = v.split(' – ');
+    return `<tr><td><b>${w}</b></td><td class="bn">${m||''}</td></tr>`;
+  }).join('');
+
+  const phrasalChips = d.phrasal.map(p=>{
+    const [w,m] = p.split(' – ');
+    return `<span class="chip"><b>${w}</b> — <span class="bn">${m||''}</span></span>`;
+  }).join('');
+
+  const collocChips = d.colloc.map(p=>{
+    const [w,m] = p.split(' – ');
+    return `<span class="chip"><b>${w}</b> — <span class="bn">${m||''}</span></span>`;
+  }).join('');
+
+  main.innerHTML = `
+    <span class="eyebrow">${d.cat}</span>
+    <h2 class="lesson-title">${d.title}</h2>
+
+    <div class="block">
+      <h3><span class="num">1</span> বাস্তব উদাহরণ / Real-life Example</h3>
+      <div class="letter-card">${d.example}</div>
+    </div>
+
+    <div class="block">
+      <h3><span class="num">2</span> অনুশীলন</h3>
+      <div class="task-card bn">${d.task}</div>
+    </div>
+
+    <div class="block">
+      <h3><span class="num">3</span> Vocabulary</h3>
+      <table class="vocab"><tr><th>Word / Phrase</th><th>বাংলা অর্থ</th></tr>${vocabRows}</table>
+    </div>
+
+    <div class="block">
+      <h3><span class="num">4</span> Phrasal Verbs</h3>
+      <div class="chips">${phrasalChips}</div>
+    </div>
+
+    <div class="block">
+      <h3><span class="num">5</span> Collocations</h3>
+      <div class="chips">${collocChips}</div>
+    </div>
+
+    <div class="block">
+      <h3><span class="num">6</span> ব্যাকরণ ও ধারণা (কেন এভাবে লেখা হলো)</h3>
+      <div class="grammar-card bn">${d.grammar}</div>
+    </div>
+
+    <button class="mark-btn ${learned.has(id)?'done':''}" id="markBtn" onclick="toggleLearned(${id})">
+      ${learned.has(id) ? '✓ শেখা হয়ে গেছে — সিল পাওয়া গেছে' : 'শেখা হয়ে গেছে — মার্ক করুন'}
+    </button>
+
+    <div class="nav-buttons">
+      <button onclick="navLesson(-1)" ${id===0?'disabled':''}>← আগেরটা</button>
+      <button onclick="navLesson(1)" ${id===DATA.length-1?'disabled':''}>পরেরটা →</button>
+    </div>
+  `;
+  renderSidebar();
+  main.scrollTop = 0;
+}
+
+function toggleLearned(id){
+  if(learned.has(id)) learned.delete(id); else learned.add(id);
+  openLesson(id);
+}
+
+function navLesson(dir){
+  const next = currentIndex + dir;
+  if(next>=0 && next<DATA.length) openLesson(next);
+}
+
+renderSidebar();
+</script>
+</body>
+</html>

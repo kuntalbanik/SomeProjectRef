@@ -1,0 +1,4048 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Go প্রোডাকশন-রেডি রেফারেন্স — 99 Concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+:root {
+  --bg: #0b0f14;
+  --bg-panel: #10161d;
+  --bg-card: #131a22;
+  --border: #1f2a35;
+  --gopher-cyan: #00ADD8;
+  --gopher-blue: #00768d;
+  --accent-warm: #ffcb47;
+  --text-main: #dbe4ec;
+  --text-dim: #7f92a3;
+  --text-faint: #4b5c6b;
+  --radius: 10px;
+  --font-bn: 'Hind Siliguri', sans-serif;
+  --font-ui: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: var(--font-bn);
+  font-size: 15.5px;
+  line-height: 1.7;
+}
+::selection { background: var(--gopher-cyan); color: #001a20; }
+
+/* ---------- Top bar ---------- */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 24px;
+  background: rgba(11,15,20,0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+.gopher-mark {
+  width: 34px; height: 34px; flex-shrink: 0;
+}
+.topbar .title {
+  font-family: var(--font-ui);
+  font-weight: 800;
+  font-size: 17px;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+.topbar .title small {
+  display: block;
+  font-weight: 500;
+  font-size: 11.5px;
+  color: var(--gopher-cyan);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+.topbar .stats {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  display: flex; gap: 18px;
+}
+.topbar .stats b { color: var(--accent-warm); }
+.menu-toggle {
+  display: none;
+  background: var(--bg-card); border: 1px solid var(--border);
+  color: var(--text-main); border-radius: 8px; padding: 8px 12px;
+  font-family: var(--font-ui); font-size: 13px; cursor: pointer;
+}
+
+/* ---------- Layout ---------- */
+.layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.sidebar {
+  position: sticky;
+  top: 63px;
+  height: calc(100vh - 63px);
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+  padding: 20px 14px 60px;
+  background: var(--bg-panel);
+}
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.search-box {
+  position: relative;
+  margin-bottom: 18px;
+}
+.search-box input {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px 9px 34px;
+  color: var(--text-main);
+  font-family: var(--font-bn);
+  font-size: 13.5px;
+  outline: none;
+}
+.search-box input:focus { border-color: var(--gopher-cyan); }
+.search-box svg {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  width: 14px; height: 14px; color: var(--text-faint);
+}
+
+.nav-group { margin-bottom: 4px; }
+.nav-cat {
+  font-family: var(--font-ui);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--gopher-cyan);
+  padding: 14px 10px 6px;
+  opacity: 0.85;
+}
+.nav-group ul { list-style: none; margin: 0; padding: 0; }
+.nav-link {
+  display: block;
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-family: var(--font-bn);
+  border-left: 2px solid transparent;
+  transition: background .12s, color .12s;
+}
+.nav-link:hover { background: rgba(0,173,216,0.08); color: var(--text-main); }
+.nav-link.active {
+  background: rgba(0,173,216,0.14);
+  color: #fff;
+  border-left-color: var(--gopher-cyan);
+}
+.nav-link.hidden { display: none; }
+.nav-group.hidden { display: none; }
+
+/* ---------- Main content ---------- */
+main { padding: 32px 40px 100px; min-width: 0; }
+
+.hero {
+  margin-bottom: 40px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+}
+.hero .eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--gopher-cyan);
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+.hero h1 {
+  font-family: var(--font-ui);
+  font-weight: 800;
+  font-size: clamp(26px, 4vw, 38px);
+  color: #fff;
+  letter-spacing: -0.02em;
+  margin: 0 0 14px;
+}
+.hero p {
+  max-width: 720px;
+  color: var(--text-dim);
+  font-size: 15.5px;
+  margin: 0;
+}
+.hero .accent { color: var(--accent-warm); font-weight: 600; }
+
+.cat-heading {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gopher-cyan);
+  margin: 56px 0 18px;
+  padding-top: 10px;
+  display: flex; align-items: center; gap: 12px;
+}
+.cat-heading::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+.topic {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px 24px;
+  margin-bottom: 22px;
+  scroll-margin-top: 80px;
+}
+.topic-head {
+  display: flex; align-items: baseline; gap: 12px;
+  margin-bottom: 16px;
+}
+.topic-index {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--bg);
+  background: var(--gopher-cyan);
+  border-radius: 5px;
+  padding: 2px 7px;
+  font-weight: 600;
+}
+.topic-head h3 {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 19px;
+  color: #fff;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.topic-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 22px;
+  margin-bottom: 18px;
+}
+.field p { margin: 0; color: var(--text-main); font-size: 14.5px; }
+.field-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 5px;
+}
+.field-label .en { text-transform: none; font-weight: 500; letter-spacing: 0; opacity: 0.7; }
+.field.note {
+  grid-column: 1 / -1;
+  background: rgba(255,203,71,0.06);
+  border: 1px solid rgba(255,203,71,0.18);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.field.note .field-label { color: var(--accent-warm); }
+
+pre {
+  margin: 0;
+  border-radius: 8px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+}
+pre code.hljs {
+  font-family: var(--font-mono) !important;
+  font-size: 13px !important;
+  padding: 16px 18px !important;
+  line-height: 1.6;
+}
+
+footer {
+  text-align: center;
+  padding: 30px 20px 60px;
+  color: var(--text-faint);
+  font-size: 12.5px;
+  font-family: var(--font-ui);
+}
+footer .gopher-mark { width: 22px; height: 22px; opacity: 0.5; margin: 0 auto 10px; display:block; }
+
+/* Back to top */
+#toTop {
+  position: fixed; right: 26px; bottom: 26px;
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--gopher-cyan); color: #001a20;
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(0,173,216,0.35);
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s, transform .2s;
+  z-index: 60;
+}
+#toTop.show { opacity: 1; pointer-events: auto; }
+#toTop:hover { transform: translateY(-2px); }
+
+@media (max-width: 980px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; width: 82%; max-width: 320px;
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+    z-index: 100;
+    height: 100vh;
+    padding-top: 76px;
+  }
+  .sidebar.open { transform: translateX(0); box-shadow: 20px 0 40px rgba(0,0,0,0.4); }
+  .menu-toggle { display: block; }
+  main { padding: 24px 18px 100px; }
+  .topic-grid { grid-template-columns: 1fr; }
+  .topbar .stats { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <svg class="gopher-mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="50" cy="58" rx="34" ry="30" fill="#00ADD8"/>
+    <circle cx="30" cy="40" r="11" fill="#00ADD8"/>
+    <circle cx="70" cy="40" r="11" fill="#00ADD8"/>
+    <circle cx="30" cy="40" r="5.5" fill="#0b0f14"/>
+    <circle cx="70" cy="40" r="5.5" fill="#0b0f14"/>
+    <circle cx="31.5" cy="38.5" r="1.6" fill="#fff"/>
+    <circle cx="71.5" cy="38.5" r="1.6" fill="#fff"/>
+    <ellipse cx="42" cy="66" rx="4" ry="5" fill="#0b0f14"/>
+    <ellipse cx="58" cy="66" rx="4" ry="5" fill="#0b0f14"/>
+  </svg>
+  <button class="menu-toggle" id="menuToggle">☰ Topics</button>
+  <div class="title">Go প্রোডাকশন রেফারেন্স<small>From Basics to Production-Grade</small></div>
+  <div class="stats"><span><b>99</b> Concepts</span><span><b>15</b> Categories</span></div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="text" id="searchInput" placeholder="টপিক খুঁজুন... (search topic)">
+    </div>
+    <div class="nav-group"><div class="nav-cat">Basics</div><ul>
+<li><a href="#topic-1" class="nav-link" data-search="values &amp; basics">Values &amp; Basics</a></li>
+<li><a href="#topic-2" class="nav-link" data-search="variables">Variables</a></li>
+<li><a href="#topic-3" class="nav-link" data-search="constants">Constants</a></li>
+<li><a href="#topic-4" class="nav-link" data-search="comments">Comments</a></li>
+</ul></div>
+<div class="nav-group"><div class="nav-cat">Data Types</div><ul>
+<li><a href="#topic-5" class="nav-link" data-search="numbers">Numbers</a></li>
+<li><a href="#topic-6" class="nav-link" data-search="floating-point numbers">Floating-Point Numbers</a></li>
+<li><a href="#topic-7" class="nav-link" data-search="arithmetic operators">Arithmetic Operators</a></li>
+<li><a href="#topic-8" class="nav-link" data-search="booleans">Booleans</a></li>
+<li><a href="#topic-9" class="nav-link" data-search="strings">Strings</a></li>
+<li><a href="#topic-10" class="nav-link" data-search="strings and runes">Strings and Runes</a></li>
+<li><a href="#topic-11" class="nav-link" data-search="runes">Runes</a></li>
+<li><a href="#topic-12" class="nav-link" data-search="strings package">Strings Package</a></li>
+<li><a href="#topic-13" class="nav-link" data-search="string functions">String Functions</a></li>
+<li><a href="#topic-14" class="nav-link" data-search="string formatting">String Formatting</a></li>
+<li><a href="#topic-15" class="nav-link" data-search="comparison">Comparison</a></li>
+<li><a href="#topic-16" class="nav-link" data-search="zero values">Zero Values</a></li>
+<li><a href="#topic-17" class="nav-link" data-search="type conversion">Type Conversion</a></li>
+</ul></div>
+<div class="nav-group"><div class="nav-cat">Control Flow</div><ul>
+<li><a href="#topic-18" class="nav-link" data-search="conditionals: if / if-else">Conditionals: If / If-Else</a></li>
+<li><a href="#topic-19" class="nav-link" data-search="conditionals: switch">Conditionals: Switch</a></li>
+<li><a href="#topic-20" class="nav-link" data-search="for / for loops">For / For Loops</a></li>
+<li><a href="#topic-21" class="nav-link" data-search="range iteration (built-in types)">Range Iteration (Built-in Types)</a></li>
+</ul></div>
+<div class="nav-group"><div class="nav-cat">Collections</div><ul>
+<li><a href="#topic-22" class="nav-link" data-search="arrays">Arrays</a></li>
+<li><a href="#topic-23" class="nav-link" data-search="slices">Slices</a></li>
+<li><a href="#topic-24" class="nav-link" data-search="maps">Maps</a></li>
+</ul></div>
+<div class="nav-group"><div class="nav-cat">Functions</div><ul>
+<li><a href="#topic-25" class="nav-link" data-search="functions">Functions</a></li>
+<li><a href="#topic-26" class="nav-link" data-search="multiple return values">Multiple Return Values</a></li>
+<li><a href="#topic-27" class="nav-link" data-search="variadic functions">Variadic Functions</a></li>
+<li><a href="#topic-28" class="nav-link" data-search="closures">Closures</a></li>
+<li><a href="#topic-29" class="nav-link" data-search="recursion">Recursion</a></li>
+<li><a href="#topic-30" class="nav-link" data-search="first class functions">First Class Functions</a></li>
+</ul></div>
+<div class="nav-group"><div class="nav-cat">Pointers &amp; Structs</div><ul>
+<li><a href="#topic-31" class="nav-link" data-search="pointers">Pointers</a></li>
+<li><a href="#topic-32" class="nav-link" data-search="structs">Structs</a></li>
+<li><a href="#topic-33" class="nav-link" data-search="methods">Methods</a></li>
+<li><a href="#topic-34" class="nav-link" data-search="struct embedding">Struct Embedding</a></li>
+<li><a href="#topic-35" class="nav-link" data-search="generics">Generics</a></li>
+<li><a href="#topic-36" class="nav-link" data-search="range over iterators">Range over Iterators</a></li>
+</ul></div>
+<div class="nav-group"><div class="nav-cat">Interfaces &amp; Polymorphism</div><ul>
+<li><a href="#topic-37" class="nav-link" data-search="interfaces">Interfaces</a></li>
+<li><a href="#topic-38" class="nav-link" data-search="stringers">Stringers</a></li>
+<li><a href="#topic-39" class="nav-link" data-search="type assertion">Type Assertion</a></li>
+<li><a href="#topic-40" class="nav-link" data-search="type definitions">Type Definitions</a></li>
+<li><a href="#topic-41" class="nav-link" data-search="enums">Enums</a></li>
+</ul></div>
+<div class="nav-group"><div class="nav-cat">Error Handling</div><ul>
+<li><a href="#topic-42" class="nav-link" data-search="errors">Errors</a></li>
+<li><a href="#topic-43" class="nav-link" data-search="custom errors">Custom Errors</a></li>
+<li><a href="#topic-44" class="nav-link" data-search="panic">Panic</a></li>
+<li><a href="#topic-45" class="nav-link" data-search="defer">Defer</a></li>
+<li><a href="#topic-46" class="nav-link" data-search="recover">Recover</a></li>
+</ul></div>
+<div class="nav-group"><div class="nav-cat">Concurrency</div><ul>
+<li><a href="#topic-47" class="nav-link" data-search="goroutines">Goroutines</a></li>
+<li><a href="#topic-48" class="nav-link" data-search="channels">Channels</a></li>
+<li><a href="#topic-49" class="nav-link" data-search="channel buffering">Channel Buffering</a></li>
+<li><a href="#topic-50" class="nav-link" data-search="channel synchronization">Channel Synchronization</a></li>
+<li><a href="#topic-51" class="nav-link" data-search="channel directions">Channel Directions</a></li>
+<li><a href="#topic-52" class="nav-link" data-search="select">Select</a></li>
+<li><a href="#topic-53" class="nav-link" data-search="timeouts">Timeouts</a></li>
+<li><a href="#topic-54" class="nav-link" data-search="non-blocking channel operations">Non-Blocking Channel Operations</a></li>
+<li><a href="#topic-55" class="nav-link" data-search="closing channels">Closing Channels</a></li>
+<li><a href="#topic-56" class="nav-link" data-search="range over channels">Range over Channels</a></li>
+<li><a href="#topic-57" class="nav-link" data-search="timers">Timers</a></li>
+<li><a href="#topic-58" class="nav-link" data-search="tickers">Tickers</a></li>
+<li><a href="#topic-59" class="nav-link" data-search="worker pools">Worker Pools</a></li>
+<li><a href="#topic-60" class="nav-link" data-search="waitgroups">WaitGroups</a></li>
+<li><a href="#topic-61" class="nav-link" data-search="rate limiting">Rate Limiting</a></li>
+<li><a href="#topic-62" class="nav-link" data-search="atomic counters">Atomic Counters</a></li>
+<li><a href="#topic-63" class="nav-link" data-search="mutexes">Mutexes</a></li>
+<li><a href="#topic-64" class="nav-link" data-search="stateful goroutines">Stateful Goroutines</a></li>
+<li><a href="#topic-65" class="nav-link" data-search="context">Context</a></li>
+</ul></div>
+<div class="nav-group"><div class="nav-cat">Sorting</div><ul>
+<li><a href="#topic-66" class="nav-link" data-search="sorting">Sorting</a></li>
+<li><a href="#topic-67" class="nav-link" data-search="sorting by functions">Sorting by Functions</a></li>
+</ul></div>
+<div class="nav-group"><div class="nav-cat">Text &amp; Encoding</div><ul>
+<li><a href="#topic-68" class="nav-link" data-search="regular expressions">Regular Expressions</a></li>
+<li><a href="#topic-69" class="nav-link" data-search="json">JSON</a></li>
+<li><a href="#topic-70" class="nav-link" data-search="xml">XML</a></li>
+<li><a href="#topic-71" class="nav-link" data-search="text templates">Text Templates</a></li>
+<li><a href="#topic-72" class="nav-link" data-search="sha256 hashes">SHA256 Hashes</a></li>
+<li><a href="#topic-73" class="nav-link" data-search="base64 encoding">Base64 Encoding</a></li>
+<li><a href="#topic-74" class="nav-link" data-search="packages">Packages</a></li>
+</ul></div>
+<div class="nav-group"><div class="nav-cat">Time &amp; Numbers</div><ul>
+<li><a href="#topic-75" class="nav-link" data-search="time">Time</a></li>
+<li><a href="#topic-76" class="nav-link" data-search="epoch">Epoch</a></li>
+<li><a href="#topic-77" class="nav-link" data-search="time formatting / parsing">Time Formatting / Parsing</a></li>
+<li><a href="#topic-78" class="nav-link" data-search="randomness / random numbers">Randomness / Random Numbers</a></li>
+<li><a href="#topic-79" class="nav-link" data-search="number parsing">Number Parsing</a></li>
+<li><a href="#topic-80" class="nav-link" data-search="url parsing">URL Parsing</a></li>
+</ul></div>
+<div class="nav-group"><div class="nav-cat">Files &amp; OS</div><ul>
+<li><a href="#topic-81" class="nav-link" data-search="reading files">Reading Files</a></li>
+<li><a href="#topic-82" class="nav-link" data-search="writing files">Writing Files</a></li>
+<li><a href="#topic-83" class="nav-link" data-search="line filters">Line Filters</a></li>
+<li><a href="#topic-84" class="nav-link" data-search="file paths">File Paths</a></li>
+<li><a href="#topic-85" class="nav-link" data-search="directories">Directories</a></li>
+<li><a href="#topic-86" class="nav-link" data-search="temporary files and directories">Temporary Files and Directories</a></li>
+<li><a href="#topic-87" class="nav-link" data-search="embed directive">Embed Directive</a></li>
+</ul></div>
+<div class="nav-group"><div class="nav-cat">CLI &amp; Testing</div><ul>
+<li><a href="#topic-88" class="nav-link" data-search="command-line arguments">Command-Line Arguments</a></li>
+<li><a href="#topic-89" class="nav-link" data-search="command-line flags">Command-Line Flags</a></li>
+<li><a href="#topic-90" class="nav-link" data-search="command-line subcommands">Command-Line Subcommands</a></li>
+<li><a href="#topic-91" class="nav-link" data-search="environment variables">Environment Variables</a></li>
+<li><a href="#topic-92" class="nav-link" data-search="logging">Logging</a></li>
+<li><a href="#topic-93" class="nav-link" data-search="testing and benchmarking">Testing and Benchmarking</a></li>
+</ul></div>
+<div class="nav-group"><div class="nav-cat">Networking</div><ul>
+<li><a href="#topic-94" class="nav-link" data-search="http client">HTTP Client</a></li>
+<li><a href="#topic-95" class="nav-link" data-search="http server">HTTP Server</a></li>
+<li><a href="#topic-96" class="nav-link" data-search="tcp server">TCP Server</a></li>
+<li><a href="#topic-97" class="nav-link" data-search="spawning processes">Spawning Processes</a></li>
+<li><a href="#topic-98" class="nav-link" data-search="exec'ing processes">Exec'ing Processes</a></li>
+<li><a href="#topic-99" class="nav-link" data-search="signals">Signals</a></li>
+</ul></div>
+
+  </aside>
+
+  <main>
+    <div class="hero">
+      <div class="eyebrow">// package main — production readiness guide</div>
+      <h1>Go দিয়ে প্রোডাকশন-গ্রেড ডেভেলপার হওয়ার রোডম্যাপ</h1>
+      <p>Basic syntax থেকে শুরু করে concurrency, error handling ও networking পর্যন্ত <span class="accent">99টি core concept</span> — প্রতিটার concept, purpose, use-case, এবং একজন professional developer-এর নোট সহ। বাম পাশের মেনু থেকে যেকোনো টপিকে সরাসরি চলে যান, বা সার্চ করুন।</p>
+    </div>
+    <h2 class="cat-heading" id="cat-Basics">Basics</h2>
+
+<section class="topic" id="topic-1" data-search="values &amp; basics">
+  <div class="topic-head">
+    <span class="topic-index">01</span>
+    <h3>Values &amp; Basics</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Go-তে সবকিছুই একটি ভ্যালু — string, int, bool ইত্যাদি। Go একটি statically typed, compiled ভাষা, তাই টাইপ কম্পাইল টাইমেই ঠিক হয়ে যায়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>প্রোগ্রামের বেসিক building block বোঝা — লিটারাল ভ্যালু, টাইপ সিস্টেমের ধারণা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>প্রতিটা Go প্রোগ্রামের শুরুতেই — println, arithmetic, string concat ইত্যাদিতে।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Production কোডে কখনোই টাইপ নিয়ে অনুমান করবেন না — fmt.Printf("%T", v) দিয়ে চেক করুন যখন সন্দেহ থাকে। Go interpreted না, তাই runtime এ টাইপ error পাবেন না, কিন্তু compile time এ ধরা পড়বে যা বাগ কমায়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    fmt.Println("go" + "lang")
+    fmt.Println("1+1 =", 1+1)
+    fmt.Println(7.0/3.0)
+    fmt.Println(true &amp;&amp; false, true || false, !true)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-2" data-search="variables">
+  <div class="topic-head">
+    <span class="topic-index">02</span>
+    <h3>Variables</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>var কীওয়ার্ড দিয়ে explicit ভাবে ভ্যারিয়েবল ডিক্লেয়ার করা যায়, আর := দিয়ে shorthand (type inference সহ) ডিক্লেয়ার+assign একসাথে করা যায়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Memory-তে একটা নাম দিয়ে ভ্যালু রাখা এবং পরে সেটা পড়া/পরিবর্তন করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Function এর ভেতরে := ব্যবহার হয়, package-level এ var লাগবেই (:= শুধু function body-তে চলে)।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>প্রোডাকশনে var ব্লক ব্যবহার করে related ভ্যারিয়েবল গ্রুপ করুন। := বেশি ব্যবহার হয় কারণ ছোট, কিন্তু package-scope এবং zero-value দরকার হলে var ব্যবহার করুন। Unused variable থাকলে Go compile error দেয় — এটা code cleanliness এর জন্য ভালো।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">var a = "initial"
+var b, c int = 1, 2
+var d = true
+var e int // zero value 0
+f := "apple" // shorthand, শুধু function এর ভেতরে</code></pre>
+</section>
+
+<section class="topic" id="topic-3" data-search="constants">
+  <div class="topic-head">
+    <span class="topic-index">03</span>
+    <h3>Constants</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>const কীওয়ার্ড দিয়ে এমন ভ্যালু ডিফাইন করা যা compile time এ ফিক্সড থাকে, রানটাইমে পরিবর্তন করা যায় না।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>এমন ভ্যালুর জন্য যা কখনো বদলাবে না — যেমন mathematical constant, config key, status code।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>String, numeric constant, বিশেষ করে iota দিয়ে enum-এর মতো তৈরি করতে।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Constants শুধু character, string, boolean, numeric value হতে পারে — struct বা slice const হতে পারে না। numeric constant গুলো untyped থাকে যতক্ষণ না context থেকে টাইপ চাপানো হয়, ফলে খুব বড় precision-এর arithmetic করা যায়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">const s string = "constant"
+const n = 500000000
+const d = 3e20 / n
+func main() {
+    fmt.Println(s, n, d)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-4" data-search="comments">
+  <div class="topic-head">
+    <span class="topic-index">04</span>
+    <h3>Comments</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>// দিয়ে single-line আর /* */ দিয়ে multi-line কমেন্ট লেখা হয়। Package/function/type/const এর ঠিক উপরে লেখা কমেন্ট Go-এর ডকুমেন্টেশন টুল (godoc) ব্যবহার করে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>কোডের উদ্দেশ্য ব্যাখ্যা করা এবং auto-generated ডকুমেন্টেশন তৈরি করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>প্রতিটা exported function/type এর উপরে (Go convention অনুযায়ী কমেন্ট function/type-এর নাম দিয়েই শুরু হয়)।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Production Go কোডে exported identifier (Capital letter দিয়ে শুরু) এর উপরে কমেন্ট লেখা প্রায় বাধ্যতামূলক গণ্য করা হয় — golint/staticcheck এটা flag করে। কমেন্ট 'কী করে' না লিখে 'কেন করে' লেখাই ভালো প্র্যাকটিস।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">// User represents a registered user in the system.
+type User struct {
+    Name string
+}
+
+/* এটা একটা
+   multi-line comment */
+func main() {}</code></pre>
+</section>
+<h2 class="cat-heading" id="cat-Data-Types">Data Types</h2>
+
+<section class="topic" id="topic-5" data-search="numbers">
+  <div class="topic-head">
+    <span class="topic-index">05</span>
+    <h3>Numbers</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Go-তে int, int8/16/32/64, uint variants, float32/float64, complex64/128 এর মতো একাধিক numeric টাইপ আছে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>সঠিক মেমরি সাইজ ও precision অনুযায়ী সংখ্যা সংরক্ষণ করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Counter, ID, বাফার সাইজ, বৈজ্ঞানিক গণনা ইত্যাদিতে।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Platform-independent কোডে সাধারণত int ব্যবহার করুন (এটা platform অনুযায়ী 32/64 bit)। Network protocol বা binary file format handle করলে নির্দিষ্ট সাইজ (int32, uint8) ব্যবহার করা উচিত যাতে predictable behavior থাকে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    var x int = 42
+    var y int64 = 1 &lt;&lt; 40
+    var z uint8 = 255
+    fmt.Println(x, y, z)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-6" data-search="floating-point numbers">
+  <div class="topic-head">
+    <span class="topic-index">06</span>
+    <h3>Floating-Point Numbers</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>float32 এবং float64 IEEE-754 স্ট্যান্ডার্ড অনুযায়ী দশমিক সংখ্যা রিপ্রেজেন্ট করে। math প্যাকেজ এর সাথে কাজ করার জন্য দরকারি ফাংশন দেয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>দশমিক/fractional সংখ্যা নিয়ে হিসাব করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Financial calculation (সতর্কতার সাথে), scientific computation, graphics ইত্যাদিতে।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>টাকা-পয়সার হিসাবে float ব্যবহার এড়িয়ে চলুন — rounding error হয়। Production এ money represent করতে integer (cents/paisa) অথবা shopspring/decimal-এর মতো লাইব্রেরি ব্যবহার করুন। float তুলনা করার সময় == ব্যবহার না করে epsilon-based comparison করুন।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "math")
+func main() {
+    const f = 3.141592653589793
+    fmt.Println(math.Sin(f), math.Pow(f, 2))
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-7" data-search="arithmetic operators">
+  <div class="topic-head">
+    <span class="topic-index">07</span>
+    <h3>Arithmetic Operators</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>+, -, *, /, % (modulus) এবং bitwise operator (&amp;, |, ^, &lt;&lt;, &gt;&gt;) দিয়ে গাণিতিক অপারেশন করা হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>সংখ্যা নিয়ে যোগ-বিয়োগ-গুণ-ভাগ এবং bit-level manipulation করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Algorithm, hashing, bit-flag, performance-critical কোডে।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Integer division-এ ভাগফল truncate হয় (7/2 = 3, float না)। Overflow এর ব্যাপারে সতর্ক থাকুন — fixed-size int টাইপে overflow silently wrap around করে, panic দেয় না।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    fmt.Println(7 / 2)     // 3
+    fmt.Println(7 % 2)     // 1
+    fmt.Println(1 &lt;&lt; 3)    // 8, bitwise shift
+    fmt.Println(7 &amp; 3)     // bitwise AND
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-8" data-search="booleans">
+  <div class="topic-head">
+    <span class="topic-index">08</span>
+    <h3>Booleans</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>true/false ভ্যালু নেওয়া bool টাইপ, লজিক্যাল অপারেটর &amp;&amp;, ||, ! দিয়ে কম্বাইন করা যায়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>শর্তসাপেক্ষ decision নেওয়া এবং flag হিসেবে state track করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>if/switch condition, feature flag, validation result-এ।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Go-তে অন্য ভাষার মতো implicit truthy/falsy নেই — int বা string কে bool হিসেবে ব্যবহার করা যায় না, explicit comparison লিখতে হয়। এটা কোড আরও explicit ও bug-free করে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    var isActive bool = true
+    fmt.Println(isActive &amp;&amp; false, isActive || false, !isActive)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-9" data-search="strings">
+  <div class="topic-head">
+    <span class="topic-index">09</span>
+    <h3>Strings</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>string হলো immutable byte sequence, ডিফল্টভাবে UTF-8 এনকোডেড।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>টেক্সট ডেটা সংরক্ষণ ও প্রসেস করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>প্রায় প্রতিটা অ্যাপ্লিকেশনে — নাম, মেসেজ, JSON, URL ইত্যাদি।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>String immutable, তাই বারবার concatenation (+=) loop এ করলে performance খারাপ হয় — এক্ষেত্রে strings.Builder ব্যবহার করুন। len(s) byte-count দেয়, character count না — মাল্টিবাইট (Bangla, Emoji) স্ট্রিং হ্যান্ডল করতে rune সচেতন থাকতে হবে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    s := "সুপ্রভাত, world"
+    fmt.Println(len(s))      // byte length
+    fmt.Println(s[0])        // byte value
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-10" data-search="strings and runes">
+  <div class="topic-head">
+    <span class="topic-index">10</span>
+    <h3>Strings and Runes</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Go string আসলে byte slice; rune হলো একটা int32 যা একটা Unicode code point represent করে। for range দিয়ে string iterate করলে rune পাওয়া যায়, byte না।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Multi-byte/Unicode ক্যারেক্টার (যেমন বাংলা, ইমোজি) সঠিকভাবে হ্যান্ডেল করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Internationalization (i18n), text processing, string reversal-এর মতো কাজে।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>byte index দিয়ে সরাসরি s[i] করলে multi-byte ক্যারেক্টার ভেঙে যেতে পারে। সবসময় []rune(s) এ কনভার্ট করে বা utf8 প্যাকেজ ব্যবহার করে Unicode-safe ভাবে string manipulate করুন — এটা production i18n বাগের সবচেয়ে বড় কারণ।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    const s = "বাংলা"
+    for i, r := range s {
+        fmt.Printf("%d:%c ", i, r)
+    }
+    runes := []rune(s)
+    fmt.Println("\nrune count:", len(runes))
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-11" data-search="runes">
+  <div class="topic-head">
+    <span class="topic-index">11</span>
+    <h3>Runes</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>rune হলো int32-এর alias, একটা single Unicode code point ধরে রাখে। '' (single quote) দিয়ে rune literal লেখা হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একক character নিয়ে কাজ করা যখন byte যথেষ্ট না (multi-byte ক্যারেক্টার)।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Character validation, parsing, custom tokenizer লেখায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>rune আর byte গুলিয়ে ফেলা কমন ভুল — ASCII এর জন্য দুটো এক হলেও non-ASCII এর জন্য না। unicode প্যাকেজের IsLetter, IsDigit ইত্যাদি rune এর উপর কাজ করে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "unicode")
+func main() {
+    r := 'A'
+    fmt.Println(r, string(r), unicode.IsUpper(r))
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-12" data-search="strings package">
+  <div class="topic-head">
+    <span class="topic-index">12</span>
+    <h3>Strings Package</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>strings প্যাকেজ string manipulation-এর জন্য অনেক ready-made ফাংশন দেয় — Contains, Split, Join, ToUpper, TrimSpace ইত্যাদি।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>কমন string অপারেশনের জন্য নিজে ফাংশন না লিখে standard library ব্যবহার করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Input validation, parsing, formatting — প্রায় সব জায়গায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>চাকা পুনরাবিষ্কার না করে strings প্যাকেজ ভালোভাবে জানুন — এটা performance-optimized এবং well-tested। strings.Builder বড় string তৈরিতে concatenation থেকে অনেক দ্রুত।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "strings")
+func main() {
+    fmt.Println(strings.Contains("test", "es"))
+    fmt.Println(strings.Split("a,b,c", ","))
+    fmt.Println(strings.ToUpper("golang"))
+    var sb strings.Builder
+    sb.WriteString("hello ")
+    sb.WriteString("world")
+    fmt.Println(sb.String())
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-13" data-search="string functions">
+  <div class="topic-head">
+    <span class="topic-index">13</span>
+    <h3>String Functions</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>strings প্যাকেজের বাইরেও strconv (parsing/formatting) এবং bytes প্যাকেজ string/byte-level ফাংশন দেয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>টেক্সট প্রসেসিং, ভ্যালিডেশন, ট্রান্সফরমেশনের জন্য বিভিন্ন utility ব্যবহার করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Log parsing, CSV processing, input sanitization এ।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>strings.Fields() whitespace-split করে (Split(" ") থেকে বেশি robust কারণ multiple space handle করে)। HasPrefix/HasSuffix ব্যবহার করুন substring index নিজে বের করার বদলে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "strings")
+func main() {
+    fmt.Println(strings.Fields("  foo  bar  baz "))
+    fmt.Println(strings.HasPrefix("golang", "go"))
+    fmt.Println(strings.Replace("oink oink", "oink", "moo", -1))
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-14" data-search="string formatting">
+  <div class="topic-head">
+    <span class="topic-index">14</span>
+    <h3>String Formatting</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>fmt প্যাকেজ দিয়ে Printf/Sprintf verb (%d, %s, %v, %T, %+v ইত্যাদি) ব্যবহার করে ফরম্যাটেড আউটপুট তৈরি করা হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>ভ্যালুকে readable/structured string এ কনভার্ট করে দেখানো বা লগ করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Logging, error message, CLI output, debug printing।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>%v জেনেরিক ভ্যালু, %+v struct এর field name সহ দেখায়, %#v Go-syntax representation দেয় — debugging-এ %+v বা %#v খুব কাজে লাগে। Sprintf দিয়ে string বানিয়ে error বা log এ পাঠানো common pattern।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+type point struct{ x, y int }
+func main() {
+    p := point{1, 2}
+    fmt.Printf("%v\n", p)
+    fmt.Printf("%+v\n", p)
+    fmt.Printf("%T\n", p)
+    s := fmt.Sprintf("%d apples", 5)
+    fmt.Println(s)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-15" data-search="comparison">
+  <div class="topic-head">
+    <span class="topic-index">15</span>
+    <h3>Comparison</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>==, !=, &lt;, &gt;, &lt;=, &gt;= দিয়ে ভ্যালু তুলনা করা হয়; struct/array-ও তুলনা করা যায় যদি তাদের সব field comparable হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>দুটো ভ্যালু সমান কিনা বা কার relative order বড়/ছোট তা যাচাই করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Sorting, conditional logic, validation, deduplication এ।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Slice, map, function টাইপ সরাসরি == দিয়ে comparable না (nil check বাদে) — কম্পাইল এরর দেয়। এগুলোর জন্য reflect.DeepEqual অথবা ম্যানুয়াল লুপ লাগবে। Float comparison-এ precision issue মাথায় রাখুন।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    fmt.Println(1 == 1, 2 &lt; 3)
+    a, b := struct{ x int }{1}, struct{ x int }{1}
+    fmt.Println(a == b) // struct comparable হলে true
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-16" data-search="zero values">
+  <div class="topic-head">
+    <span class="topic-index">16</span>
+    <h3>Zero Values</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Go-তে ডিক্লেয়ার করা মাত্র প্রতিটা ভ্যারিয়েবল একটা predictable zero value পায় — int→0, string→"", bool→false, pointer/slice/map/interface→nil।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Explicitly initialize না করলেও ভ্যারিয়েবল সবসময় একটা valid, well-defined state এ থাকে (garbage value নয়)।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Struct initialization, default config value, uninitialized field হ্যান্ডেল করায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Zero value নিয়ে চিন্তা করে struct design করলে কোড অনেক safer হয় — যেমন sync.Mutex এর zero value ব্যবহারযোগ্য (unlocked)। কিন্তু nil map-এ write করলে panic হয় (read করা যায়, write না) — এটা একটা কমন রানটাইম বাগ।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    var i int
+    var s string
+    var m map[string]int
+    fmt.Println(i, s == "", m == nil)
+    // m["x"] = 1 // panic: assignment to entry in nil map
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-17" data-search="type conversion">
+  <div class="topic-head">
+    <span class="topic-index">17</span>
+    <h3>Type Conversion</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>T(v) সিনট্যাক্স দিয়ে এক টাইপের ভ্যালুকে compatible অন্য টাইপে explicit ভাবে কনভার্ট করা হয়। Go implicit conversion সাপোর্ট করে না।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একটা টাইপের ভ্যালু আরেকটা টাইপ যেখানে দরকার সেখানে ব্যবহার করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>int↔float conversion, string↔[]byte, custom type ↔ underlying type।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>int থেকে int8/int32 কনভার্ট করলে overflow হলে silently truncate হয় (error দেয় না) — বড় সংখ্যা ছোট টাইপে ঢোকানোর সময় সতর্ক থাকুন। string(int) করলে সেই int কে rune/character হিসেবে ইন্টারপ্রেট করে, সংখ্যার string রূপ পেতে strconv.Itoa লাগবে — এটা প্রায়ই বিভ্রান্তির কারণ হয়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    i := 65
+    f := float64(i)
+    u := uint(f)
+    fmt.Println(i, f, u)
+    fmt.Println(string(rune(i))) // "A", not "65"
+}</code></pre>
+</section>
+<h2 class="cat-heading" id="cat-Control-Flow">Control Flow</h2>
+
+<section class="topic" id="topic-18" data-search="conditionals: if / if-else">
+  <div class="topic-head">
+    <span class="topic-index">18</span>
+    <h3>Conditionals: If / If-Else</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>if কন্ডিশন কোনো bool এক্সপ্রেশন নেয়, প্যারেন্থেসিস ছাড়াই। if statement এ একটা optional init statement (if x := f(); x &gt; 0) থাকতে পারে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>শর্ত অনুযায়ী কোড path নির্বাচন করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Validation, business logic branching, error checking (if err != nil) — এটা Go-তে সবচেয়ে বেশি ব্যবহৃত প্যাটার্ন।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>if err != nil প্যাটার্ন এতটাই common যে এটাকে Go-এর 'idiom' বলা হয়। if-init statement দিয়ে variable scope শুধু if/else ব্লকের মধ্যেই সীমাবদ্ধ রাখা যায়, যা variable leak প্রতিরোধ করে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    if 7%2 == 0 {
+        fmt.Println("even")
+    } else if 7 &lt; 0 {
+        fmt.Println("negative")
+    } else {
+        fmt.Println("odd")
+    }
+    if num := 9; num &lt; 0 {
+        fmt.Println("negative")
+    } else {
+        fmt.Println(num, "positive")
+    }
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-19" data-search="conditionals: switch">
+  <div class="topic-head">
+    <span class="topic-index">19</span>
+    <h3>Conditionals: Switch</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>switch একাধিক if-else chain কে readable করে; Go-তে প্রতিটা case-এ automatic break থাকে (fallthrough না লিখলে পরের case-এ পড়ে না)। Expression-less switch (switch { case cond: }) ও চলে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একাধিক সম্ভাব্য value/condition এর মধ্যে branching readable ভাবে করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>State machine, HTTP method routing, type-based branching (type switch)।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Go-তে C/Java-এর মতো fallthrough হয় না বলে ভুলে break না দেওয়ার বাগ হয় না — এটা নিরাপদ ডিফল্ট। type switch (switch v := i.(type)) দিয়ে interface{} এর আসল টাইপ বের করা production কোডে খুবই কমন।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    i := 2
+    switch i {
+    case 1:
+        fmt.Println("one")
+    case 2, 3:
+        fmt.Println("two or three")
+    default:
+        fmt.Println("other")
+    }
+    switch v := interface{}(true).(type) {
+    case bool:
+        fmt.Println("bool", v)
+    default:
+        fmt.Println("unknown")
+    }
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-20" data-search="for / for loops">
+  <div class="topic-head">
+    <span class="topic-index">20</span>
+    <h3>For / For Loops</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Go-তে একমাত্র লুপিং কনস্ট্রাক্ট হলো for — এটাই while এর কাজও করে, এবং infinite loop (for {}) ও সাপোর্ট করে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>কোনো ব্লক বারবার execute করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Iteration, retry logic, polling, batch processing।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>for i, for cond {}, for {} — এই তিন ফর্মই মনে রাখুন। break/continue label সহ ব্যবহার করে nested loop থেকে বের হওয়া যায় (outer: for {...}), যা জটিল nested loop control-এ দরকার হয়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    i := 1
+    for i &lt;= 3 { fmt.Println(i); i = i + 1 }
+    for j := 0; j &lt; 3; j++ { fmt.Println(j) }
+outer:
+    for i := 0; i &lt; 3; i++ {
+        for j := 0; j &lt; 3; j++ {
+            if j == 1 { continue outer }
+            fmt.Println(i, j)
+        }
+    }
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-21" data-search="range iteration (built-in types)">
+  <div class="topic-head">
+    <span class="topic-index">21</span>
+    <h3>Range Iteration (Built-in Types)</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>range keyword দিয়ে slice, array, map, string, channel iterate করা যায় — প্রতিটার জন্য (index/key, value) পেয়ার রিটার্ন হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Collection-এর প্রতিটা উপাদান নিয়ে কাজ করা এক ইউনিফর্ম সিনট্যাক্সে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Data processing, transformation, aggregation এর প্রায় সব জায়গায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Loop ভ্যারিয়েবল আগে (Go 1.21-এর আগে) প্রতি ইটারেশনে reuse হতো — closure-এ ক্যাপচার করলে ভুল ভ্যালু পাওয়া common বাগ ছিল। Go 1.22+ এ এটা fix হয়েছে (প্রতি iteration-এ নতুন variable), তবে পুরনো কোড/version নিয়ে কাজ করলে এই ইতিহাস জানা জরুরি।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    nums := []int{2, 3, 4}
+    sum := 0
+    for _, n := range nums { sum += n }
+    fmt.Println("sum:", sum)
+    for i, n := range nums { fmt.Println(i, n) }
+    kvs := map[string]string{"a": "apple"}
+    for k, v := range kvs { fmt.Println(k, "-&gt;", v) }
+}</code></pre>
+</section>
+<h2 class="cat-heading" id="cat-Collections">Collections</h2>
+
+<section class="topic" id="topic-22" data-search="arrays">
+  <div class="topic-head">
+    <span class="topic-index">22</span>
+    <h3>Arrays</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>array হলো fixed-length, একই টাইপের element-এর collection — সাইজ টাইপেরই অংশ ([5]int আর [3]int ভিন্ন টাইপ)।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Fixed-size, contiguous memory-তে ডেটা রাখা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>খুব কম — সাধারণত slice ব্যবহার হয়; array ব্যবহার হয় fixed buffer, hash এর মতো জায়গায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Practical Go কোডে array-এর চেয়ে slice অনেক বেশি ব্যবহৃত হয় কারণ slice dynamic এবং flexible। array পাসিং value দিয়ে হয় (পুরো কপি হয়) — বড় array function এ পাস করলে performance cost আছে, তাই pointer বা slice ব্যবহার করাই ভালো।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    var a [5]int
+    a[4] = 100
+    b := [5]int{1, 2, 3, 4, 5}
+    twoD := [2][3]int{{1, 2, 3}, {4, 5, 6}}
+    fmt.Println(a, b, twoD)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-23" data-search="slices">
+  <div class="topic-head">
+    <span class="topic-index">23</span>
+    <h3>Slices</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>slice হলো array-এর উপর dynamic, resizable একটা view — এটার একটা pointer, length, capacity থাকে। make([]T, len, cap) দিয়ে তৈরি হয়, append দিয়ে বাড়ানো যায়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Dynamic-size list/collection নিয়ে কাজ করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>প্রায় সব জায়গায় — API response, DB row, in-memory list।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>append() মাঝে মাঝে নতুন underlying array allocate করে (যখন capacity ফুরিয়ে যায়), তাই append-এর রিটার্ন ভ্যালু সবসময় আসল ভ্যারিয়েবলে assign করতে হবে (s = append(s, x))। দুটো slice একই underlying array শেয়ার করতে পারে — একটাতে পরিবর্তন করলে অন্যটাতেও reflect করতে পারে, এটা subtle বাগের উৎস।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    s := make([]string, 3)
+    s[0] = "a"
+    s = append(s, "d", "e")
+    c := make([]string, len(s))
+    copy(c, s)
+    l := s[2:5] // slicing
+    fmt.Println(s, c, l, cap(s))
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-24" data-search="maps">
+  <div class="topic-head">
+    <span class="topic-index">24</span>
+    <h3>Maps</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>map[K]V হলো Go-এর built-in hash table — unordered key-value store। make(map[K]V) দিয়ে তৈরি হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Key দিয়ে দ্রুত value lookup, associative data রাখা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Caching, counting, config storage, lookup table-এ।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Map iteration order guaranteed random — একই map বারবার range করলে ভিন্ন order আসতে পারে, order দরকার হলে key গুলো আলাদা slice-এ রেখে সর্ট করুন। comma-ok idiom (v, ok := m[k]) দিয়ে key exist করে কিনা zero-value থেকে আলাদা করে বুঝা যায় — এটা না করলে missing key আর zero-value গুলিয়ে ফেলার বাগ হয়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    m := make(map[string]int)
+    m["k1"] = 7
+    v, ok := m["k2"]
+    fmt.Println(v, ok) // 0 false
+    delete(m, "k1")
+    fmt.Println(m)
+}</code></pre>
+</section>
+<h2 class="cat-heading" id="cat-Functions">Functions</h2>
+
+<section class="topic" id="topic-25" data-search="functions">
+  <div class="topic-head">
+    <span class="topic-index">25</span>
+    <h3>Functions</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>func কীওয়ার্ড দিয়ে function ডিফাইন করা হয়, প্যারামিটার ও রিটার্ন টাইপ explicit ভাবে লিখতে হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>কোড reuse, লজিক encapsulate করা, modular design।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>প্রতিটা প্রোগ্রামের core building block।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>একই টাইপের consecutive parameter এ টাইপ একবার লেখা যায় (func add(a, b int) int)। Named return value ব্যবহার করলে কোড readability বাড়ে কিন্তু বেশি ব্যবহার করলে confusion তৈরি করতে পারে — সংযমের সাথে ব্যবহার করুন।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func plus(a int, b int) int { return a + b }
+func plusPlus(a, b, c int) int { return a + b + c }
+func main() {
+    fmt.Println(plus(1, 2), plusPlus(1, 2, 3))
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-26" data-search="multiple return values">
+  <div class="topic-head">
+    <span class="topic-index">26</span>
+    <h3>Multiple Return Values</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Go function একাধিক ভ্যালু একসাথে রিটার্ন করতে পারে — এটা Go-এর সবচেয়ে distinctive feature গুলোর একটা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একটা ভ্যালুর সাথে error বা ok flag রিটার্ন করা, tuple-এর দরকার এড়ানো।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>(result, error) প্যাটার্ন — Go-এর প্রায় সব standard library function এই প্যাটার্ন অনুসরণ করে।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>(value, error) রিটার্ন প্যাটার্ন Go-এর error handling philosophy-এর মূল ভিত্তি — exception এর বদলে explicit error check। _ ব্যবহার করে অপ্রয়োজনীয় রিটার্ন ভ্যালু discard করা যায়, কিন্তু error কখনো discard করা উচিত না production কোডে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func vals() (int, int) { return 3, 7 }
+func divide(a, b int) (int, error) {
+    if b == 0 { return 0, fmt.Errorf("division by zero") }
+    return a / b, nil
+}
+func main() {
+    a, b := vals()
+    fmt.Println(a, b)
+    r, err := divide(10, 0)
+    fmt.Println(r, err)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-27" data-search="variadic functions">
+  <div class="topic-head">
+    <span class="topic-index">27</span>
+    <h3>Variadic Functions</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>... সিনট্যাক্স দিয়ে function কে অনির্দিষ্ট সংখ্যক argument নিতে দেওয়া হয়, যেগুলো ভেতরে একটা slice হিসেবে আসে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একই function কে flexible সংখ্যক argument দিয়ে call করার সুবিধা দেওয়া।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>fmt.Println/Printf, append, নিজস্ব logging/aggregation helper function-এ।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>existing slice কে ...-suffix দিয়ে variadic function এ পাস করা যায় (nums...) — এটা না জানলে অনেকে slice কে element-by-element লুপ করে পাঠান, যেটা অপ্রয়োজনীয়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func sum(nums ...int) {
+    total := 0
+    for _, n := range nums { total += n }
+    fmt.Println(nums, total)
+}
+func main() {
+    sum(1, 2)
+    nums := []int{1, 2, 3, 4}
+    sum(nums...)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-28" data-search="closures">
+  <div class="topic-head">
+    <span class="topic-index">28</span>
+    <h3>Closures</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Closure হলো এমন একটা anonymous function যা তার বাইরের scope-এর ভ্যারিয়েবল ক্যাপচার করে রাখে এবং পরবর্তীতে সেই state মনে রাখে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>State encapsulate করে function-এর মধ্যে রাখা, function factory তৈরি করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Counter, middleware, callback, event handler-এ।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>প্রতিটা closure call তার নিজস্ব ক্যাপচার করা variable এর reference রাখে (shared না, যদি না একই enclosing scope থেকে একাধিক closure একই variable শেয়ার করে) — goroutine-এ loop variable ক্যাপচার করার সময় এটা নিয়ে সতর্ক থাকা জরুরি।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func intSeq() func() int {
+    i := 0
+    return func() int { i++; return i }
+}
+func main() {
+    nextInt := intSeq()
+    fmt.Println(nextInt(), nextInt(), nextInt())
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-29" data-search="recursion">
+  <div class="topic-head">
+    <span class="topic-index">29</span>
+    <h3>Recursion</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>একটা function নিজেকে নিজে call করে — একটা base case না থাকলে infinite loop এ পড়বে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>সমস্যাকে ছোট ছোট একই ধরনের সাব-প্রবলেমে ভেঙে সমাধান করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Tree/graph traversal, factorial/fibonacci, divide-and-conquer algorithm।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Go compiler tail-call optimization করে না (অন্য কিছু ভাষার মতো), তাই খুব deep recursion stack overflow করতে পারে — বড় ডেটাসেটে recursion এর বদলে iterative approach বিবেচনা করুন।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func fact(n int) int {
+    if n == 0 { return 1 }
+    return n * fact(n-1)
+}
+func main() { fmt.Println(fact(7)) }</code></pre>
+</section>
+
+<section class="topic" id="topic-30" data-search="first class functions">
+  <div class="topic-head">
+    <span class="topic-index">30</span>
+    <h3>First Class Functions</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Go-তে function হলো first-class citizen — এদের ভ্যারিয়েবলে assign, argument হিসেবে পাস, রিটার্ন ভ্যালু হিসেবে ব্যবহার করা যায়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Function কে ডেটার মতো ট্রিট করে flexible, composable কোড লেখা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Callback, strategy pattern, middleware chaining, sort.Slice এর comparator।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Function টাইপ signature (func(int) int) নামিয়ে দিলে কোড readability বাড়ে। Higher-order function বেশি ব্যবহার করলে কোড elegant হয় কিন্তু over-abstraction এড়িয়ে চলুন, বিশেষত junior team-মেম্বার থাকলে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func apply(f func(int) int, v int) int { return f(v) }
+func main() {
+    double := func(x int) int { return x * 2 }
+    fmt.Println(apply(double, 5))
+}</code></pre>
+</section>
+<h2 class="cat-heading" id="cat-Pointers-&amp;-Structs">Pointers &amp; Structs</h2>
+
+<section class="topic" id="topic-31" data-search="pointers">
+  <div class="topic-head">
+    <span class="topic-index">31</span>
+    <h3>Pointers</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Pointer একটা মেমরি অ্যাড্রেস ধরে রাখে। &amp;v দিয়ে address নেওয়া, *p দিয়ে dereference করে ভ্যালু access করা হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একটা ভ্যালুর কপি না করে সরাসরি সেই মেমরিতে reference দিয়ে পরিবর্তন করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>বড় struct পাস করা (কপি এড়াতে), function এর ভেতর থেকে caller-এর ভ্যালু পরিবর্তন করা।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Go-তে pointer arithmetic নেই (C-এর মতো), যা memory-safety বাড়ায়। nil pointer dereference করলে runtime panic হয় — production কোডে pointer ব্যবহারের আগে nil check করা জরুরি অভ্যাস।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func zeroval(ival int) { ival = 0 }
+func zeroptr(iptr *int) { *iptr = 0 }
+func main() {
+    i := 1
+    zeroval(i)
+    fmt.Println(i) // 1, unchanged
+    zeroptr(&amp;i)
+    fmt.Println(i) // 0, changed
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-32" data-search="structs">
+  <div class="topic-head">
+    <span class="topic-index">32</span>
+    <h3>Structs</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>struct হলো related field-এর একটা named collection — Go-তে user-defined data type বানানোর প্রধান উপায়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>সম্পর্কিত ডেটাকে একটা logical unit হিসেবে গ্রুপ করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Domain model (User, Order), config struct, DTO/API payload-এ।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Struct literal-এ field name উল্লেখ করে initialize করা (point{X: 1, Y: 2}) positional initialization (point{1, 2}) থেকে নিরাপদ — কারণ পরে field অর্ডার বদলালেও কোড ভাঙবে না। JSON marshal/unmarshal-এর জন্য struct tag (`json:"name"`) ব্যবহার খুবই common।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+type point struct{ X, Y int }
+func main() {
+    p := point{X: 1, Y: 2}
+    p.X = 10
+    pp := &amp;p
+    pp.X = 20 // Go auto-dereferences: (*pp).X
+    fmt.Println(p)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-33" data-search="methods">
+  <div class="topic-head">
+    <span class="topic-index">33</span>
+    <h3>Methods</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Method হলো একটা receiver (struct বা যেকোনো named type) সহ function — value receiver (v Type) বা pointer receiver (v *Type) হতে পারে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একটা টাইপের সাথে behavior/function সংযুক্ত করা — object-oriented স্টাইল আচরণ পাওয়া।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Domain logic (order.Total(), user.FullName()), business rule encapsulation-এ।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Struct-এর ভেতরের state পরিবর্তন করতে হলে pointer receiver ব্যবহার করতে হবে, নাহলে কপির উপর পরিবর্তন হবে যা caller দেখতে পাবে না। একটা টাইপের সব method একই ধরনের receiver (সব value বা সব pointer) ব্যবহার করা convention হিসেবে ভালো।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+type rect struct{ width, height int }
+func (r *rect) scale(f int) { r.width *= f; r.height *= f }
+func (r rect) area() int { return r.width * r.height }
+func main() {
+    r := rect{width: 10, height: 5}
+    r.scale(2)
+    fmt.Println(r.area())
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-34" data-search="struct embedding">
+  <div class="topic-head">
+    <span class="topic-index">34</span>
+    <h3>Struct Embedding</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>একটা struct এর ভেতর আরেকটা struct কে নাম ছাড়া (anonymous field) embed করলে বাইরের struct সরাসরি ভেতরের struct-এর field ও method access করতে পারে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Composition এর মাধ্যমে code reuse করা (Go-তে inheritance নেই, তার বদলে embedding ব্যবহার হয়)।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Base struct-এর common behavior extend করা, interface satisfy করার জন্য।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Go-তে 'is-a' inheritance নেই, শুধু composition আছে — এটা design mindset-এ পার্থক্য তৈরি করে ('composition over inheritance' Go-তে built-in idiom)। Embedded টাইপের method override করলে outer struct-এর নিজের method প্রায়োরিটি পায়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+type base struct{ name string }
+func (b base) describe() string { return "I am " + b.name }
+type employee struct {
+    base
+    role string
+}
+func main() {
+    e := employee{base: base{name: "Karim"}, role: "Engineer"}
+    fmt.Println(e.describe(), e.name, e.role)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-35" data-search="generics">
+  <div class="topic-head">
+    <span class="topic-index">35</span>
+    <h3>Generics</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Go 1.18+ থেকে generics এসেছে — function/type-এ type parameter ([T any]) দিয়ে একই কোড একাধিক টাইপে reuse করা যায়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>টাইপ-নিরপেক্ষ (type-safe) reusable কোড লেখা, code duplication এড়ানো।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Generic data structure (Stack[T], LinkedList[T]), utility function (Map, Filter, Reduce)।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Generics আসার আগে Go-তে interface{} দিয়ে টাইপ-agnostic কোড লেখা হতো, যা runtime এ type assertion দরকার করত এবং compile-time safety হারাতো — generics এখন compile-time type safety সহ একই সুবিধা দেয়। Overuse এড়িয়ে চলুন — যেখানে সাধারণ কোডই যথেষ্ট, সেখানে অহেতুক generic বানাবেন না, এতে readability কমে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+type Number interface{ int64 | float64 }
+func SumNumbers[T Number](nums []T) T {
+    var sum T
+    for _, n := range nums { sum += n }
+    return sum
+}
+func main() {
+    fmt.Println(SumNumbers([]int64{1, 2, 3}))
+    fmt.Println(SumNumbers([]float64{1.1, 2.2}))
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-36" data-search="range over iterators">
+  <div class="topic-head">
+    <span class="topic-index">36</span>
+    <h3>Range over Iterators</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Go 1.23+ এ range এখন একটা function (iterator, func(yield func(K, V) bool)) এর উপরও কাজ করতে পারে, যাকে বলে range-over-func।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>কাস্টম sequence/collection কে built-in slice/map এর মতো idiomatic ভাবে iterate করার সুবিধা দেওয়া।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Custom container টাইপ, lazy evaluation দরকার এমন data pipeline-এ।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>এটা তুলনামূলক নতুন feature (Go 1.23) — production এ ব্যবহার করার আগে আপনার deployment এর Go version নিশ্চিত করুন। iter প্যাকেজে Seq/Seq2 টাইপ ডিফাইন করা আছে যা standard library gradually adopt করছে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func Count(start, end int) func(func(int) bool) {
+    return func(yield func(int) bool) {
+        for i := start; i &lt;= end; i++ {
+            if !yield(i) { return }
+        }
+    }
+}
+func main() {
+    for n := range Count(1, 3) { fmt.Println(n) }
+}</code></pre>
+</section>
+<h2 class="cat-heading" id="cat-Interfaces-&amp;-Polymorphism">Interfaces &amp; Polymorphism</h2>
+
+<section class="topic" id="topic-37" data-search="interfaces">
+  <div class="topic-head">
+    <span class="topic-index">37</span>
+    <h3>Interfaces</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Interface হলো method signature-এর একটা set। কোনো টাইপ যদি interface-এর সব method implement করে, সে implicitly সেই interface satisfy করে — আলাদা করে 'implements' লেখার দরকার নেই।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Behavior-ভিত্তিক abstraction তৈরি করা, concrete টাইপ থেকে decouple করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Dependency injection, mocking/testing, plugin architecture, polymorphism।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Go interface implicit — এটা Java/C# থেকে বড় পার্থক্য এবং এটাই duck-typing এর মতো flexibility দেয়। ছোট interface লেখা Go-এর idiom ('accept interfaces, return structs') — যত ছোট interface, তত বেশি reusable ও testable কোড।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "math")
+type geometry interface {
+    area() float64
+    perim() float64
+}
+type circle struct{ radius float64 }
+func (c circle) area() float64 { return math.Pi * c.radius * c.radius }
+func (c circle) perim() float64 { return 2 * math.Pi * c.radius }
+func measure(g geometry) { fmt.Println(g.area(), g.perim()) }
+func main() { measure(circle{radius: 5}) }</code></pre>
+</section>
+
+<section class="topic" id="topic-38" data-search="stringers">
+  <div class="topic-head">
+    <span class="topic-index">38</span>
+    <h3>Stringers</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>fmt.Stringer হলো একটা built-in interface যেখানে একটা মাত্র method: String() string। কোনো টাইপ এটা implement করলে fmt.Println/Printf(%v/%s) automatically সেটা ব্যবহার করে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একটা কাস্টম টাইপকে কিভাবে string হিসেবে প্রিন্ট/লগ করা হবে তা নিয়ন্ত্রণ করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Domain টাইপের readable log output, debug-friendly toString-এর মতো ব্যবহার।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Error টাইপ, enum-এর মতো custom টাইপে String() implement করা প্রায় standard practice — এতে fmt.Println(myEnum) সরাসরি readable আউটপুট দেয়, integer value না দেখিয়ে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+type Status int
+const ( Active Status = iota; Inactive )
+func (s Status) String() string {
+    return [...]string{"Active", "Inactive"}[s]
+}
+func main() { fmt.Println(Active) } // prints "Active"</code></pre>
+</section>
+
+<section class="topic" id="topic-39" data-search="type assertion">
+  <div class="topic-head">
+    <span class="topic-index">39</span>
+    <h3>Type Assertion</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>i.(T) সিনট্যাক্স দিয়ে একটা interface ভ্যালুর আসল underlying concrete টাইপ চেক/extract করা হয়। comma-ok ফর্ম (v, ok := i.(T)) নিরাপদ, না হলে panic হতে পারে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একটা interface{} বা interface ভ্যালু থেকে নির্দিষ্ট concrete টাইপ বের করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>JSON unmarshal করা interface{} data নিয়ে কাজ করা, error টাইপ চেক করা।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>comma-ok ছাড়া assertion (v := i.(T)) টাইপ না মিললে panic করে — production কোডে সবসময় ok ভ্যালু চেক করুন যদি নিশ্চিত না থাকেন। errors.As() ব্যবহার করা error টাইপ assertion-এর জন্য বেশি idiomatic (wrapped error handle করে)।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    var i interface{} = "hello"
+    s, ok := i.(string)
+    fmt.Println(s, ok)
+    f, ok := i.(float64)
+    fmt.Println(f, ok) // 0 false, no panic
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-40" data-search="type definitions">
+  <div class="topic-head">
+    <span class="topic-index">40</span>
+    <h3>Type Definitions</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>type কীওয়ার্ড দিয়ে একটা নতুন named টাইপ ডিফাইন করা যায় — সেটা কোনো existing টাইপের উপর ভিত্তি করে (type Celsius float64) অথবা struct/interface হতে পারে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Domain-specific টাইপ তৈরি করে কোডকে বেশি expressive ও type-safe করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Domain modeling (UserID, Money), enum-এর মতো constant গ্রুপ, unit conversion।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>একই underlying টাইপ (যেমন int) হলেও দুটো ভিন্ন named type সরাসরি একসাথে ব্যবহার করা যায় না (কম্পাইল error) — এটা accidental mixing (যেমন UserID আর OrderID গুলিয়ে ফেলা) প্রতিরোধ করে, যা বড় codebase-এ bug কমায়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+type Celsius float64
+type Fahrenheit float64
+func (c Celsius) ToF() Fahrenheit { return Fahrenheit(c*9/5 + 32) }
+func main() {
+    c := Celsius(100)
+    fmt.Println(c.ToF())
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-41" data-search="enums">
+  <div class="topic-head">
+    <span class="topic-index">41</span>
+    <h3>Enums</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Go-তে dedicated enum keyword নেই — const ব্লকে iota ব্যবহার করে auto-incrementing constant দিয়ে enum-এর মতো ব্যবহার করা হয়, সাথে একটা named type।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একটা নির্দিষ্ট, সীমিত সংখ্যক valid ভ্যালুর সেট represent করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Status/state field (Pending, Active, Closed), category, level/priority।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>iota শুধুমাত্র একটা int-এর মতো ভ্যালু, তাই invalid value (যেমন Status(99)) assign করা টাইপ সিস্টেম আটকাতে পারে না — production এ validation function বা String() method দিয়ে এটা mitigate করতে হয়। Go community-তে stringer টুল (go generate) দিয়ে String() method auto-generate করা common practice।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+type Weekday int
+const (
+    Sunday Weekday = iota
+    Monday
+    Tuesday
+)
+func main() { fmt.Println(Sunday, Monday, Tuesday) } // 0 1 2</code></pre>
+</section>
+<h2 class="cat-heading" id="cat-Error-Handling">Error Handling</h2>
+
+<section class="topic" id="topic-42" data-search="errors">
+  <div class="topic-head">
+    <span class="topic-index">42</span>
+    <h3>Errors</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>error হলো একটা built-in interface (Error() string method সহ)। Go exception ব্যবহার করে না — function গুলো error কে সাধারণ রিটার্ন ভ্যালু হিসেবে দেয়, caller explicit if err != nil দিয়ে চেক করে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>কোনো অপারেশন ব্যর্থ হলে সেটা caller কে জানানো, explicit ও predictable error handling।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>File I/O, network call, parsing, validation — যেকোনো fallible অপারেশনে।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Error-কে ignore না করে সবসময় হ্যান্ডেল করুন (linter এটা enforce করতে সাহায্য করে)। errors.New বা fmt.Errorf("...: %w", err) দিয়ে wrapping করলে error-এর context হারায় না — production debugging-এ এই context অমূল্য।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("errors"; "fmt")
+func mayFail(arg int) (int, error) {
+    if arg == 42 {
+        return -1, errors.New("can't work with 42")
+    }
+    return arg + 3, nil
+}
+func main() {
+    if r, err := mayFail(42); err != nil {
+        fmt.Println("error:", err)
+    } else {
+        fmt.Println("result:", r)
+    }
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-43" data-search="custom errors">
+  <div class="topic-head">
+    <span class="topic-index">43</span>
+    <h3>Custom Errors</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>নিজের struct-এ error interface (Error() string method) implement করে domain-specific, structured error তৈরি করা যায়, যাতে extra context/field রাখা যায়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>শুধু একটা message না, error-এর সাথে structured metadata (error code, field name ইত্যাদি) বহন করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>API error response, validation error (যেখানে কোন field ভুল তা জানানো দরকার), retryable vs non-retryable error আলাদা করায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>errors.Is() আর errors.As() দিয়ে wrapped custom error চেক করা Go 1.13+ এর idiomatic উপায় — sentinel error (var ErrNotFound = errors.New(...)) আর custom error type দুটোরই নিজস্ব use-case আছে, প্রয়োজন বুঝে বেছে নিন।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+type ValidationError struct {
+    Field string
+    Msg   string
+}
+func (e *ValidationError) Error() string {
+    return fmt.Sprintf("%s: %s", e.Field, e.Msg)
+}
+func main() {
+    var err error = &amp;ValidationError{Field: "email", Msg: "invalid format"}
+    fmt.Println(err)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-44" data-search="panic">
+  <div class="topic-head">
+    <span class="topic-index">44</span>
+    <h3>Panic</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>panic হলো একটা runtime অবস্থা যেখানে প্রোগ্রাম immediately স্বাভাবিক execution বন্ধ করে stack unwind করতে থাকে — recover না করলে প্রোগ্রাম crash করে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>এমন unrecoverable/unexpected অবস্থার জন্য যা থেকে সঠিকভাবে চলা সম্ভব না (যেমন programmer bug, missing dependency)।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>সাধারণত ব্যবহার এড়ানো হয়; মূলত library init, invariant violation ধরায় ব্যবহৃত হয়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Production Go কোডে panic ব্যবহার করে normal error flow control করা anti-pattern — expected error-এর জন্য সবসময় error রিটার্ন ভ্যালু ব্যবহার করুন, panic শুধু সত্যিকারের exceptional/unrecoverable অবস্থার জন্য রাখুন।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    defer fmt.Println("deferred still runs")
+    panic("something went horribly wrong")
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-45" data-search="defer">
+  <div class="topic-head">
+    <span class="topic-index">45</span>
+    <h3>Defer</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>defer কোনো function call কে বর্তমান function রিটার্ন হওয়ার ঠিক আগ পর্যন্ত পিছিয়ে দেয়। একাধিক defer LIFO (last-in-first-out) অর্ডারে execute হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Cleanup/resource-release লজিক (file close, lock unlock) কে allocation-এর কাছাকাছি লিখে কোড readable ও leak-proof রাখা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>file.Close(), mutex.Unlock(), database connection release, panic-এর পরেও নিশ্চিতভাবে cleanup চালানো।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>defer এর argument defer statement execute হওয়ার সময়ই evaluate হয়, function আসলে call হওয়ার সময় না — এটা একটা subtle কিন্তু গুরুত্বপূর্ণ ব্যাপার (defer fmt.Println(i) এ i-এর তখনকার ভ্যালু ক্যাপচার হয়)। Loop-এর ভেতরে defer ব্যবহার করলে সব defer function-টার শেষ পর্যন্ত জমা থাকে — মেমরি লিক এড়াতে সতর্ক থাকুন।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    defer fmt.Println("1st deferred, prints last")
+    defer fmt.Println("2nd deferred, prints first")
+    fmt.Println("main body")
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-46" data-search="recover">
+  <div class="topic-head">
+    <span class="topic-index">46</span>
+    <h3>Recover</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>recover() একটা built-in function যা শুধু defer করা function-এর ভেতরে কাজ করে — এটা একটা চলমান panic ধরে ফেলে এবং প্রোগ্রামকে normal execution ফেরত দেয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একটা goroutine/function-এর panic হলেও পুরো প্রোগ্রাম crash হওয়া থেকে বাঁচানো।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>HTTP server middleware (per-request panic recovery), worker goroutine-এ crash isolate করা।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>recover() শুধু defer function-এর সরাসরি ভেতরে কাজ করে, nested function call থেকে না — এই সীমাবদ্ধতা না জানলে recover কাজ না করার বাগ হয়। প্রতিটা production HTTP handler-এ সাধারণত একটা recovery middleware থাকে যাতে একটা request-এর panic গোটা সার্ভার নামিয়ে না দেয়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func mayPanic() { panic("a problem") }
+func safelyDo() {
+    defer func() {
+        if r := recover(); r != nil {
+            fmt.Println("recovered from:", r)
+        }
+    }()
+    mayPanic()
+    fmt.Println("this line never runs")
+}
+func main() { safelyDo(); fmt.Println("program continues") }</code></pre>
+</section>
+<h2 class="cat-heading" id="cat-Concurrency">Concurrency</h2>
+
+<section class="topic" id="topic-47" data-search="goroutines">
+  <div class="topic-head">
+    <span class="topic-index">47</span>
+    <h3>Goroutines</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>go কীওয়ার্ড দিয়ে একটা function কে lightweight, concurrently-running goroutine হিসেবে launch করা হয় — এগুলো OS thread না, Go runtime দ্বারা multiplex করা হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একই সাথে একাধিক কাজ concurrently চালানো, কম overhead-এ।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Parallel HTTP request, background job, concurrent data processing।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>main() ফেরত এলে সব চলমান goroutine সাথে সাথে মারা যায়, তাই sync.WaitGroup বা channel দিয়ে সিঙ্ক্রোনাইজ করা জরুরি (নাহলে goroutine শেষ হওয়ার আগেই main বেরিয়ে যেতে পারে)। হাজার হাজার goroutine চালানো সাধারণ ব্যাপার — এদের memory footprint খুবই ছোট (few KB stack, growable)।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "sync")
+func f(id int, wg *sync.WaitGroup) {
+    defer wg.Done()
+    fmt.Println("worker", id, "done")
+}
+func main() {
+    var wg sync.WaitGroup
+    for i := 0; i &lt; 3; i++ {
+        wg.Add(1)
+        go f(i, &amp;wg)
+    }
+    wg.Wait()
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-48" data-search="channels">
+  <div class="topic-head">
+    <span class="topic-index">48</span>
+    <h3>Channels</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Channel হলো goroutine-দের মধ্যে টাইপ-সচেতনভাবে ভ্যালু পাঠানো-নেওয়ার একটা pipe — make(chan T) দিয়ে তৈরি হয়, &lt;- operator দিয়ে send/receive করা হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Goroutine-দের মধ্যে নিরাপদে ডেটা শেয়ার/সিঙ্ক্রোনাইজ করা ('shared memory দিয়ে communicate না করে, communicate করে memory শেয়ার করা' — Go-এর দর্শন)।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Producer-consumer pattern, pipeline, result aggregation।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Unbuffered channel-এ send ততক্ষণ block হয় যতক্ষণ না কেউ receive করে — এটা natural synchronization দেয় কিন্তু ভুলভাবে ব্যবহার করলে deadlock হতে পারে (কেউ receive না করলে send চিরতরে ব্লক থাকবে)।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    messages := make(chan string)
+    go func() { messages &lt;- "ping" }()
+    msg := &lt;-messages
+    fmt.Println(msg)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-49" data-search="channel buffering">
+  <div class="topic-head">
+    <span class="topic-index">49</span>
+    <h3>Channel Buffering</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>make(chan T, N) দিয়ে buffered channel তৈরি করা হয় — buffer ভর্তি না হওয়া পর্যন্ত send block হয় না।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Sender ও receiver-কে সাময়িকভাবে decouple করা, throughput বাড়ানো।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Rate-limited queue, batching, producer-consumer যেখানে সামান্য lag acceptable।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Buffer size ভুলভাবে বড় করলে backpressure হারিয়ে যায় (system overload হলেও সেটা দেরিতে ধরা পড়ে) — buffer size একটা deliberate capacity-planning সিদ্ধান্ত, শুধু 'error এড়ানোর জন্য' বড় করা উচিত না।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    messages := make(chan string, 2)
+    messages &lt;- "buffered"
+    messages &lt;- "channel"
+    fmt.Println(&lt;-messages, &lt;-messages)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-50" data-search="channel synchronization">
+  <div class="topic-head">
+    <span class="topic-index">50</span>
+    <h3>Channel Synchronization</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Channel শুধু ডেটা পাঠানোর জন্যই না, goroutine-দের মধ্যে সিঙ্ক্রোনাইজেশনের (একটা কাজ শেষ হয়েছে কি না জানানো) জন্যও ব্যবহার করা যায় — এমনকি খালি struct{} channel দিয়েও।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একটা goroutine অপেক্ষা করা যতক্ষণ না আরেকটা goroutine তার কাজ শেষ করে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Task completion signal, done channel প্যাটার্ন, graceful shutdown।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>খালি struct{} (chan struct{}) সিগন্যালিং-এর জন্য bool বা int channel থেকে ভালো কারণ এটা zero memory নেয় এবং intent স্পষ্ট করে (ভ্যালু গুরুত্বপূর্ণ না, শুধু event ঘটেছে কিনা সেটাই গুরুত্বপূর্ণ)।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "time")
+func worker(done chan bool) {
+    time.Sleep(time.Second)
+    fmt.Println("working done")
+    done &lt;- true
+}
+func main() {
+    done := make(chan bool, 1)
+    go worker(done)
+    &lt;-done
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-51" data-search="channel directions">
+  <div class="topic-head">
+    <span class="topic-index">51</span>
+    <h3>Channel Directions</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Function signature-এ channel টাইপকে send-only (chan&lt;- T) বা receive-only (&lt;-chan T) হিসেবে নির্দিষ্ট করা যায়, যা bidirectional channel থেকে বেশি restrictive।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Compile-time এ নিশ্চিত করা কোন function channel দিয়ে শুধু পাঠাবে বা শুধু পড়বে, ভুল ব্যবহার আটকানো।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Producer/consumer function সিগনেচার ডিজাইন করা, pipeline stage আলাদা করা।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>এটা শুধু documentation না — কম্পাইলার এটা enforce করে, তাই ভুল দিক দিয়ে channel ব্যবহারের চেষ্টা করলে compile error হয়। Public API ডিজাইন করার সময় directional channel ব্যবহার করলে API contract অনেক বেশি স্পষ্ট হয়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func ping(pings chan&lt;- string, msg string) { pings &lt;- msg }
+func pong(pings &lt;-chan string, pongs chan&lt;- string) { pongs &lt;- &lt;-pings }
+func main() {
+    pings := make(chan string, 1)
+    pongs := make(chan string, 1)
+    ping(pings, "passed message")
+    pong(pings, pongs)
+    fmt.Println(&lt;-pongs)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-52" data-search="select">
+  <div class="topic-head">
+    <span class="topic-index">52</span>
+    <h3>Select</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>select statement একাধিক channel অপারেশনের মধ্যে যেটা প্রথম ready হয় সেটা চালায় — একসাথে একাধিক channel এর উপর wait করার জন্য।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একাধিক channel সোর্স থেকে concurrently ডেটা হ্যান্ডেল করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Multiplexing multiple goroutine result, timeout ইমপ্লিমেন্ট করা, cancellation হ্যান্ডেল করা।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>default case সহ select non-blocking হয়ে যায় — কোনো channel ready না থাকলে সাথে সাথে default এ চলে যায়, এটা polling-এর মতো ব্যবহার করা যায় (তবে সতর্কতার সাথে, বেশি polling CPU নষ্ট করে)।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "time")
+func main() {
+    c1 := make(chan string)
+    c2 := make(chan string)
+    go func() { time.Sleep(1 * time.Second); c1 &lt;- "one" }()
+    go func() { time.Sleep(2 * time.Second); c2 &lt;- "two" }()
+    for i := 0; i &lt; 2; i++ {
+        select {
+        case msg1 := &lt;-c1: fmt.Println(msg1)
+        case msg2 := &lt;-c2: fmt.Println(msg2)
+        }
+    }
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-53" data-search="timeouts">
+  <div class="topic-head">
+    <span class="topic-index">53</span>
+    <h3>Timeouts</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>select-এর সাথে time.After() combine করে কোনো channel অপারেশনের জন্য একটা maximum wait time সেট করা হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একটা অপারেশন খুব বেশি সময় নিলে block হয়ে না থেকে গ্রেসফুলভাবে এগিয়ে যাওয়া।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>External API call, database query, দূরবর্তী worker-এর response wait করায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Production সিস্টেমে timeout ছাড়া কোনো blocking অপারেশন রাখা উচিত না — নাহলে একটা slow dependency পুরো সিস্টেমকে resource-starve করে ফেলতে পারে। context.WithTimeout আজকাল time.After-এর চেয়ে বেশি idiomatic কারণ এটা cancellation propagate করে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "time")
+func main() {
+    c1 := make(chan string, 1)
+    go func() { time.Sleep(2 * time.Second); c1 &lt;- "result" }()
+    select {
+    case res := &lt;-c1: fmt.Println(res)
+    case &lt;-time.After(1 * time.Second): fmt.Println("timeout!")
+    }
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-54" data-search="non-blocking channel operations">
+  <div class="topic-head">
+    <span class="topic-index">54</span>
+    <h3>Non-Blocking Channel Operations</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>select-এ default case দিয়ে channel send/receive কে non-blocking বানানো যায় — channel ready না থাকলে সাথে সাথে default execute হয়, wait করে না।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>কোনো channel অপারেশনের জন্য অপেক্ষা না করে immediately চেক করে এগিয়ে যাওয়া।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Optional message check, polling loop, graceful degradation-এ।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Non-blocking check বেশি ব্যবহার করলে সাধারণত ভুল ডিজাইন সিগন্যাল — বেশিরভাগ ক্ষেত্রে blocking channel অপারেশন বা select with timeout-ই সঠিক সমাধান, non-blocking শুধু বিশেষ প্রয়োজনে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    messages := make(chan string)
+    select {
+    case msg := &lt;-messages: fmt.Println("received", msg)
+    default: fmt.Println("no message received")
+    }
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-55" data-search="closing channels">
+  <div class="topic-head">
+    <span class="topic-index">55</span>
+    <h3>Closing Channels</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>close(ch) দিয়ে একটা channel বন্ধ করা হয়, যা বোঝায় আর কোনো ভ্যালু পাঠানো হবে না। বন্ধ channel থেকে receive করলে বাকি সব buffered ভ্যালু পাওয়া যায়, তারপর zero-value ও false (ok) পাওয়া যায়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একটা producer জানানো যে সে সব ডেটা পাঠিয়ে শেষ করেছে, যাতে receiver জানতে পারে iteration কখন থামবে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>range over channel শেষ করা, worker pool shutdown signal, pipeline completion।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>বন্ধ channel-এ আবার send করলে panic হয়, এবং একটা channel দুইবার close করলেও panic হয় — সাধারণত শুধু sender বন্ধ করবে, receiver না। nil channel-এ send/receive চিরতরে block হয়ে থাকে (panic না, deadlock)।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    jobs := make(chan int, 5)
+    done := make(chan bool)
+    go func() {
+        for {
+            j, more := &lt;-jobs
+            if more { fmt.Println("received job", j) } else {
+                fmt.Println("received all jobs")
+                done &lt;- true
+                return
+            }
+        }
+    }()
+    for j := 1; j &lt;= 3; j++ { jobs &lt;- j }
+    close(jobs)
+    &lt;-done
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-56" data-search="range over channels">
+  <div class="topic-head">
+    <span class="topic-index">56</span>
+    <h3>Range over Channels</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>range keyword দিয়ে channel থেকে সরাসরি ভ্যালু iterate করা যায়; channel close না হওয়া পর্যন্ত এটা প্রতিটা ভ্যালুর জন্য অপেক্ষা করে, close হলে লুপ থামে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একটা channel থেকে আসা সব ভ্যালু process করা এবং producer শেষ হলে স্বয়ংক্রিয়ভাবে থেমে যাওয়া।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Streaming data processing, worker result collection।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>যদি producer কখনো channel close না করে, তাহলে range লুপ চিরতরে block হয়ে থাকবে — এটা একটা কমন goroutine leak-এর কারণ, তাই producer side এ defer close(ch) প্যাটার্ন ব্যবহার করা ভালো অভ্যাস।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+func main() {
+    queue := make(chan string, 2)
+    queue &lt;- "one"
+    queue &lt;- "two"
+    close(queue)
+    for elem := range queue { fmt.Println(elem) }
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-57" data-search="timers">
+  <div class="topic-head">
+    <span class="topic-index">57</span>
+    <h3>Timers</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>time.NewTimer(d) একবার নির্দিষ্ট সময় পর একটা channel-এ ভ্যালু পাঠায়। time.Timer.Stop() দিয়ে সেটা বাতিল করা যায়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একটা নির্দিষ্ট সময় পরে একটা কাজ ঘটানো, বা একটা পেন্ডিং কাজ বাতিল করার সুযোগ রাখা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Delayed job scheduling, request timeout ইমপ্লিমেন্ট করার নিচু-লেভেল building block।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>সাধারণত time.Sleep()-এর চেয়ে time.NewTimer() ভালো যখন timer বাতিল/reset করার দরকার আছে — Sleep block করে ফেলে, কোনো cancellation সুযোগ থাকে না।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "time")
+func main() {
+    timer1 := time.NewTimer(2 * time.Second)
+    &lt;-timer1.C
+    fmt.Println("Timer 1 fired")
+    timer2 := time.NewTimer(time.Second)
+    go func() { &lt;-timer2.C; fmt.Println("Timer 2 fired") }()
+    stop2 := timer2.Stop()
+    if stop2 { fmt.Println("Timer 2 stopped") }
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-58" data-search="tickers">
+  <div class="topic-head">
+    <span class="topic-index">58</span>
+    <h3>Tickers</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>time.NewTicker(d) নির্দিষ্ট interval পরপর বারবার একটা channel-এ ভ্যালু পাঠাতে থাকে, যতক্ষণ না Stop() করা হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>পুনরাবৃত্তিমূলক (recurring) কাজ নির্দিষ্ট interval-এ চালানো।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Periodic health check, metrics collection, cache refresh, heartbeat।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Ticker.Stop() না করলে ticker চিরকাল চলতে থাকবে এবং গোরুটিন/রিসোর্স leak হবে — সবসময় defer ticker.Stop() ব্যবহার করুন, বিশেষত long-running সার্ভিসে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "time")
+func main() {
+    ticker := time.NewTicker(500 * time.Millisecond)
+    done := make(chan bool)
+    go func() {
+        for {
+            select {
+            case &lt;-done: return
+            case t := &lt;-ticker.C: fmt.Println("Tick at", t)
+            }
+        }
+    }()
+    time.Sleep(1600 * time.Millisecond)
+    ticker.Stop()
+    done &lt;- true
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-59" data-search="worker pools">
+  <div class="topic-head">
+    <span class="topic-index">59</span>
+    <h3>Worker Pools</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>একটা নির্দিষ্ট সংখ্যক worker goroutine একটা shared jobs channel থেকে কাজ নিয়ে প্রসেস করে results channel-এ পাঠায় — concurrency কে একটা fixed limit-এ bound করে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একসাথে কতগুলো concurrent কাজ চলবে তা নিয়ন্ত্রণ করা, রিসোর্স overload এড়ানো।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Bulk image processing, batch API call, database bulk operation-এ concurrency limit করা।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Worker সংখ্যা ভুলভাবে বেশি রাখলে downstream dependency (DB, external API) overwhelm হতে পারে — worker pool size টিউন করা একটা প্রোডাকশন capacity-planning সিদ্ধান্ত, শুধু 'যত বেশি goroutine তত ভালো' চিন্তা করবেন না।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "time")
+func worker(id int, jobs &lt;-chan int, results chan&lt;- int) {
+    for j := range jobs {
+        time.Sleep(time.Millisecond * 200)
+        results &lt;- j * 2
+    }
+}
+func main() {
+    jobs := make(chan int, 5)
+    results := make(chan int, 5)
+    for w := 1; w &lt;= 3; w++ { go worker(w, jobs, results) }
+    for j := 1; j &lt;= 5; j++ { jobs &lt;- j }
+    close(jobs)
+    for a := 1; a &lt;= 5; a++ { fmt.Println(&lt;-results) }
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-60" data-search="waitgroups">
+  <div class="topic-head">
+    <span class="topic-index">60</span>
+    <h3>WaitGroups</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>sync.WaitGroup দিয়ে একাধিক goroutine সব শেষ হওয়া পর্যন্ত অপেক্ষা করা হয় — Add() দিয়ে গণনা বাড়ানো, Done() দিয়ে কমানো, Wait() দিয়ে ব্লক করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>মেইন goroutine কে সব spawn করা goroutine শেষ হওয়ার আগে এগিয়ে যাওয়া থেকে আটকানো।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Parallel task execution যেখানে result channel দরকার নেই, শুধু 'সব শেষ হয়েছে' নিশ্চিত করা লাগে।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>wg.Add() সবসময় goroutine launch করার আগে call করুন, ভেতরে করলে race condition হতে পারে (Wait() আগে চলে যেতে পারে)। প্রতিটা goroutine-এর শুরুতেই defer wg.Done() করা নিরাপদ প্যাটার্ন, যাতে panic হলেও Done() call হয়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "sync")
+func worker(id int, wg *sync.WaitGroup) {
+    defer wg.Done()
+    fmt.Printf("Worker %d done\n", id)
+}
+func main() {
+    var wg sync.WaitGroup
+    for i := 1; i &lt;= 5; i++ {
+        wg.Add(1)
+        go worker(i, &amp;wg)
+    }
+    wg.Wait()
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-61" data-search="rate limiting">
+  <div class="topic-head">
+    <span class="topic-index">61</span>
+    <h3>Rate Limiting</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>time.Tick() বা time.Ticker দিয়ে একটা channel-based limiter তৈরি করে requests/operation-এর গতি নিয়ন্ত্রণ করা হয়; burst handle করতে একটা buffered 'bucket' channel ব্যবহার করা হয় (token bucket প্যাটার্ন)।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একটা সিস্টেমকে overload হওয়া থেকে বাঁচাতে অপারেশনের ফ্রিকোয়েন্সি সীমিত করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>External API call limit মেনে চলা, per-user request throttling, downstream service protection।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>শুধু নিজের কোড লিখে rate limiting করার বদলে production-এ golang.org/x/time/rate প্যাকেজ ব্যবহার করা বেশি ভরসাযোগ্য — এটা token bucket algorithm properly ইমপ্লিমেন্ট করে এবং burst handling দেয়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "time")
+func main() {
+    requests := make(chan int, 5)
+    for i := 1; i &lt;= 5; i++ { requests &lt;- i }
+    close(requests)
+    limiter := time.Tick(200 * time.Millisecond)
+    for req := range requests {
+        &lt;-limiter
+        fmt.Println("request", req, time.Now())
+    }
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-62" data-search="atomic counters">
+  <div class="topic-head">
+    <span class="topic-index">62</span>
+    <h3>Atomic Counters</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>sync/atomic প্যাকেজ (বা নতুন atomic.Int64 টাইপ) দিয়ে একাধিক goroutine থেকে নিরাপদে একটা shared numeric ভ্যালু increment/read করা যায়, mutex ছাড়াই।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>লো-লেভেল, lock-free ভাবে একটা counter-এর মতো shared state নিরাপদে আপডেট করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Request counter, metrics, simple shared flag/counter-এ যেখানে শুধু একটা numeric ভ্যালু ইনভলভড।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>সাধারণ counter ছাড়া বেশি জটিল shared state-এর জন্য atomic ব্যবহার না করে Mutex ব্যবহার করুন — atomic শুধু single primitive value-এর জন্য designed, একাধিক related field-এর consistency এটা guarantee করে না।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "sync"; "sync/atomic")
+func main() {
+    var ops atomic.Int64
+    var wg sync.WaitGroup
+    for i := 0; i &lt; 50; i++ {
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            for c := 0; c &lt; 1000; c++ { ops.Add(1) }
+        }()
+    }
+    wg.Wait()
+    fmt.Println("ops:", ops.Load())
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-63" data-search="mutexes">
+  <div class="topic-head">
+    <span class="topic-index">63</span>
+    <h3>Mutexes</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>sync.Mutex একটা critical section-এ একসাথে একটা মাত্র goroutine ঢুকতে দেয় — Lock()/Unlock() দিয়ে shared state নিয়ে race condition এড়ানো হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একাধিক goroutine যখন একই ডেটা পড়ে/লিখে, তখন data race রোধ করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Shared cache, in-memory counter/map, কোনো shared struct-এর state আপডেট।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Lock() করার পর defer mu.Unlock() করা প্রায় বাধ্যতামূলক অভ্যাস — নাহলে কোনো panic বা early return এ unlock miss হয়ে deadlock হতে পারে। sync.RWMutex ব্যবহার করুন যদি read বেশি, write কম হয় — এটা একাধিক reader কে একসাথে চলতে দেয়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "sync")
+type Container struct {
+    mu sync.Mutex
+    counters map[string]int
+}
+func (c *Container) inc(name string) {
+    c.mu.Lock()
+    defer c.mu.Unlock()
+    c.counters[name]++
+}
+func main() {
+    c := Container{counters: map[string]int{"a": 0}}
+    var wg sync.WaitGroup
+    for i := 0; i &lt; 10; i++ {
+        wg.Add(1)
+        go func() { defer wg.Done(); c.inc("a") }()
+    }
+    wg.Wait()
+    fmt.Println(c.counters)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-64" data-search="stateful goroutines">
+  <div class="topic-head">
+    <span class="topic-index">64</span>
+    <h3>Stateful Goroutines</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Mutex দিয়ে shared state protect করার বদলে, একটা single goroutine-এর ভেতরে state রাখা এবং channel দিয়ে সেই goroutine-এর সাথে communicate করা — Go-এর 'communicate to share memory' দর্শনের সরাসরি প্রয়োগ।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Shared state কে explicit lock ছাড়াই safely manage করা, একটা owner goroutine-এর মাধ্যমে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>যেখানে state ও logic জটিল, এবং mutex-based approach messy হয়ে যাচ্ছে — যেমন in-memory single-owner cache/registry।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>এই প্যাটার্ন mutex-এর একটা বিকল্প, প্রতিস্থাপন না — ছোট, focused state-এর জন্য mutex সহজ ও যথেষ্ট। জটিল coordination logic দরকার হলে stateful goroutine প্যাটার্ন কোডকে বেশি readable করতে পারে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import "fmt"
+type readOp struct{ resp chan int }
+func main() {
+    reads := make(chan readOp)
+    state := make(map[int]int)
+    go func() {
+        for {
+            read := &lt;-reads
+            read.resp &lt;- state[0]
+        }
+    }()
+    r := readOp{resp: make(chan int)}
+    reads &lt;- r
+    fmt.Println(&lt;-r.resp)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-65" data-search="context">
+  <div class="topic-head">
+    <span class="topic-index">65</span>
+    <h3>Context</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>context.Context একটা request-scoped ভ্যালু, deadline এবং cancellation সিগন্যাল বহন করে, যা function call chain-এর মধ্য দিয়ে propagate হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একাধিক goroutine/layer জুড়ে cancellation, timeout, এবং request-scoped ডেটা propagate করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>HTTP request handling (প্রতিটা request-এর নিজস্ব context থাকে), database query cancellation, gRPC call।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>প্রতিটা function যেটা blocking I/O করে বা goroutine spawn করে, তার প্রথম parameter হিসেবে ctx context.Context নেওয়া Go-community standard convention। Context struct-এর ভেতরে না রেখে explicit parameter হিসেবে পাস করাই সঠিক — এটা ভুল করলে linter warning দেয়। ctx.Done() চ্যানেল ক্লোজ হলে বুঝতে হবে cancel/timeout হয়েছে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("context"; "fmt"; "time")
+func main() {
+    ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+    defer cancel()
+    select {
+    case &lt;-time.After(200 * time.Millisecond):
+        fmt.Println("overslept")
+    case &lt;-ctx.Done():
+        fmt.Println("context done:", ctx.Err())
+    }
+}</code></pre>
+</section>
+<h2 class="cat-heading" id="cat-Sorting">Sorting</h2>
+
+<section class="topic" id="topic-66" data-search="sorting">
+  <div class="topic-head">
+    <span class="topic-index">66</span>
+    <h3>Sorting</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>sort প্যাকেজ built-in টাইপ (int, string, float64) এর slice সর্ট করার জন্য sort.Ints, sort.Strings, sort.Float64s ইত্যাদি দেয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একটা collection-কে ascending/logical order-এ সাজানো।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Display purpose, binary search-এর আগে প্রস্তুতি, deterministic output দরকার এমন জায়গায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>slices.Sort() (Go 1.21+, slices প্যাকেজ) পুরনো sort.Ints/Strings-এর চেয়ে বেশি generic ও idiomatic — নতুন কোডে এটা প্রেফার করুন। sort.SliceIsSorted দিয়ে আগে থেকেই sorted কিনা চেক করা যায়, অহেতুক sort এড়াতে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "sort")
+func main() {
+    strs := []string{"c", "a", "b"}
+    sort.Strings(strs)
+    fmt.Println(strs)
+    ints := []int{7, 2, 4}
+    sort.Ints(ints)
+    fmt.Println(ints, sort.IntsAreSorted(ints))
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-67" data-search="sorting by functions">
+  <div class="topic-head">
+    <span class="topic-index">67</span>
+    <h3>Sorting by Functions</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>sort.Slice() একটা custom less function নিয়ে যেকোনো slice কে যেকোনো custom criteria অনুযায়ী সর্ট করতে দেয়, built-in টাইপে সীমাবদ্ধ না থেকে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Custom struct/complex criteria অনুযায়ী sorting করা (যেমন length, multiple field দিয়ে)।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Struct slice-কে কোনো field (যেমন age, priority, created_at) অনুযায়ী সর্ট করায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>sort.Slice() stable না — একই ভ্যালুর element গুলোর relative order বজায় থাকার guarantee নেই, দরকার হলে sort.SliceStable() ব্যবহার করুন। Go 1.21+ এ slices.SortFunc() টাইপ-সেফ generic বিকল্প, নতুন কোডে এটাই বেশি প্রেফার করা হয়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "sort")
+type Person struct {
+    Name string
+    Age  int
+}
+func main() {
+    people := []Person{{"Rahim", 30}, {"Karim", 25}}
+    sort.Slice(people, func(i, j int) bool {
+        return people[i].Age &lt; people[j].Age
+    })
+    fmt.Println(people)
+}</code></pre>
+</section>
+<h2 class="cat-heading" id="cat-Text-&amp;-Encoding">Text &amp; Encoding</h2>
+
+<section class="topic" id="topic-68" data-search="regular expressions">
+  <div class="topic-head">
+    <span class="topic-index">68</span>
+    <h3>Regular Expressions</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>regexp প্যাকেজ RE2 syntax ব্যবহার করে pattern matching, search, ও replace সাপোর্ট করে — MatchString, FindString, ReplaceAllString ইত্যাদি ফাংশন দেয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>টেক্সটের ভেতর নির্দিষ্ট pattern খোঁজা, ভ্যালিডেট করা বা extract করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Input validation (email, phone), log parsing, text extraction/replace-এ।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>regexp.MustCompile() প্রোগ্রাম শুরুতে একবার compile করে package-level variable এ রাখা উচিত (প্রতিবার loop এ compile করলে performance খারাপ হয়)। Go-এর regexp (RE2) backtracking সাপোর্ট করে না, তাই কিছু advanced regex feature (lookahead) নেই — কিন্তু এটা ReDoS আক্রমণ থেকে নিরাপদ।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "regexp")
+var validEmail = regexp.MustCompile(`^[\w.-]+@[\w.-]+\.\w+$`)
+func main() {
+    fmt.Println(validEmail.MatchString("a@b.com"))
+    re := regexp.MustCompile(`p([a-z]+)ch`)
+    fmt.Println(re.FindString("peach punch"))
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-69" data-search="json">
+  <div class="topic-head">
+    <span class="topic-index">69</span>
+    <h3>JSON</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>encoding/json প্যাকেজ দিয়ে Go struct/map ↔ JSON string মার্শাল ও আনমার্শাল করা হয়। Struct tag (`json:"field_name"`) দিয়ে field naming নিয়ন্ত্রণ করা হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>API request/response, config file, inter-service ডেটা exchange serialize/deserialize করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>REST API handler, config loading, message queue payload-এ।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>শুধু exported (Capital letter) field marshal হয় — lowercase field silently বাদ পড়ে যায়, এটা কমন ভুল। omitempty tag দিয়ে zero-value field JSON output থেকে বাদ দেওয়া যায়। Unmarshal করার সময় unknown field default এ silently ignore হয় (strict চাইলে Decoder.DisallowUnknownFields দরকার)।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("encoding/json"; "fmt")
+type Response struct {
+    Page   int      `json:"page"`
+    Fruits []string `json:"fruits,omitempty"`
+}
+func main() {
+    b, _ := json.Marshal(Response{Page: 1, Fruits: []string{"apple"}})
+    fmt.Println(string(b))
+    var res Response
+    json.Unmarshal(b, &amp;res)
+    fmt.Println(res)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-70" data-search="xml">
+  <div class="topic-head">
+    <span class="topic-index">70</span>
+    <h3>XML</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>encoding/xml প্যাকেজ JSON-এর মতোই struct tag (`xml:"tag"`) ব্যবহার করে XML মার্শাল/আনমার্শাল করে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>লিগ্যাসি সিস্টেম, SOAP API, config file যেখানে XML ফরম্যাট এখনো ব্যবহৃত হয়, তাদের সাথে interact করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Enterprise integration, legacy SOAP service, SVG/RSS জাতীয় ফরম্যাট পার্স করায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>নতুন প্রজেক্টে সাধারণত JSON প্রেফার করা হয় — সরলতা ও performance-এর কারণে; XML মূলত legacy system-এর সাথে integrate করার সময়ই দরকার হয়। XML namespace হ্যান্ডলিং JSON-এর চেয়ে জটিল, ভালোভাবে test করা দরকার।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("encoding/xml"; "fmt")
+type Plant struct {
+    XMLName xml.Name `xml:"plant"`
+    Name    string   `xml:"name"`
+}
+func main() {
+    p := Plant{Name: "Rose"}
+    b, _ := xml.MarshalIndent(p, "", "  ")
+    fmt.Println(string(b))
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-71" data-search="text templates">
+  <div class="topic-head">
+    <span class="topic-index">71</span>
+    <h3>Text Templates</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>text/template (এবং HTML output-এর জন্য html/template) প্যাকেজ দিয়ে data-driven, প্লেসহোল্ডারসহ টেক্সট জেনারেট করা হয় — {{.Field}} সিনট্যাক্স।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Dynamic টেক্সট/কোড/ডকুমেন্ট তৈরি করা যেখানে ডেটা runtime এ inject করা হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Email template, config file generation, code generation (go generate), HTML page render।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>ইউজার-facing HTML output এর জন্য text/template না, html/template ব্যবহার করুন — এটা automatic contextual escaping করে XSS আক্রমণ প্রতিরোধ করে। text/template শুধু non-HTML output (plain text, config) এর জন্য নিরাপদ।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("os"; "text/template")
+func main() {
+    t := template.Must(template.New("greet").Parse("হ্যালো, {{.Name}}!\n"))
+    t.Execute(os.Stdout, struct{ Name string }{"Karim"})
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-72" data-search="sha256 hashes">
+  <div class="topic-head">
+    <span class="topic-index">72</span>
+    <h3>SHA256 Hashes</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>crypto/sha256 প্যাকেজ দিয়ে ডেটার একটা fixed-size, deterministic cryptographic hash তৈরি করা হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>ডেটার integrity যাচাই করা, বা fixed-length representation তৈরি করা (encryption না)।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>File integrity check, checksum, cache key generation — password hash এ না (sha256 password hashing এর জন্য যথেষ্ট না)।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>SHA256 সরাসরি password hash করতে ব্যবহার করবেন না — এটা খুব fast, তাই brute-force attack-এ vulnerable। Password এর জন্য bcrypt, scrypt বা argon2 ব্যবহার করুন যেগুলো ইচ্ছাকৃতভাবে slow ও salted।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("crypto/sha256"; "fmt")
+func main() {
+    s := "sha256 this string"
+    h := sha256.New()
+    h.Write([]byte(s))
+    bs := h.Sum(nil)
+    fmt.Printf("%x\n", bs)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-73" data-search="base64 encoding">
+  <div class="topic-head">
+    <span class="topic-index">73</span>
+    <h3>Base64 Encoding</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>encoding/base64 প্যাকেজ দিয়ে binary ডেটাকে ASCII-safe string এ এনকোড করা হয় (URL-safe এবং standard দুই variant আছে)।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Binary ডেটা এমন মাধ্যমে পাঠানো যা শুধু text সাপোর্ট করে (JSON, URL, email)।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Image/file embedding in JSON, JWT token, Basic Auth header, URL parameter।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Base64 এনক্রিপশন না — এটা শুধু encoding, যে কেউ decode করতে পারে, তাই sensitive ডেটা লুকানোর জন্য এটার উপর ভরসা করবেন না। URL-এ base64 ডেটা পাঠাতে হলে StdEncoding না, URLEncoding ব্যবহার করুন (+ ও / ক্যারেক্টার URL-এ সমস্যা করে)।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("encoding/base64"; "fmt")
+func main() {
+    data := "abc123!?$*&amp;()'-=@~"
+    sEnc := base64.StdEncoding.EncodeToString([]byte(data))
+    fmt.Println(sEnc)
+    sDec, _ := base64.StdEncoding.DecodeString(sEnc)
+    fmt.Println(string(sDec))
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-74" data-search="packages">
+  <div class="topic-head">
+    <span class="topic-index">74</span>
+    <h3>Packages</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>প্রতিটা Go ফাইল একটা package-এর অংশ; package দিয়ে কোড organize এবং namespace করা হয়। import দিয়ে অন্য প্যাকেজ ব্যবহার করা হয়, go.mod দিয়ে module ও dependency manage হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>কোডকে reusable, logically-grouped ইউনিটে ভাগ করা এবং dependency পরিষ্কারভাবে পরিচালনা করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>যেকোনো non-trivial প্রোজেক্টের প্রোজেক্ট স্ট্রাকচার ডিজাইনে।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Package নাম ছোট, lowercase, singular রাখা Go convention (utils না, বরং জিনিসটা কী তা বলে এমন নাম, যেমন user, order)। Circular import Go-তে compile error — এটা সাধারণত ভুল প্যাকেজ বিভাজনের ইঙ্গিত দেয়, layer/dependency direction নিয়ে ভালোভাবে ভাবুন।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import (
+    "fmt"
+    "math/rand"
+)
+func main() {
+    fmt.Println("random:", rand.Intn(10))
+}</code></pre>
+</section>
+<h2 class="cat-heading" id="cat-Time-&amp;-Numbers">Time &amp; Numbers</h2>
+
+<section class="topic" id="topic-75" data-search="time">
+  <div class="topic-head">
+    <span class="topic-index">75</span>
+    <h3>Time</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>time প্যাকেজ time.Time টাইপ দিয়ে তারিখ, সময়, duration নিয়ে কাজ করে — time.Now(), Add(), Sub(), Before/After ইত্যাদি ফাংশন দেয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>সময়-সম্পর্কিত সব হিসাব (elapsed time, scheduling, comparison) করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Logging timestamp, cache expiry, scheduled job, rate limiting।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>সবসময় UTC-তে সময় store করুন, শুধু display এর সময় local timezone এ কনভার্ট করুন — এটা timezone-related বাগ কমায়। সময় compare করতে == না, .Equal() ব্যবহার করুন কারণ time.Time-এ monotonic clock reading থাকতে পারে যা == কে অপ্রত্যাশিত করে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "time")
+func main() {
+    now := time.Now()
+    later := now.Add(2 * time.Hour)
+    fmt.Println(later.After(now))
+    fmt.Println(later.Sub(now))
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-76" data-search="epoch">
+  <div class="topic-head">
+    <span class="topic-index">76</span>
+    <h3>Epoch</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Unix time (epoch) হলো 1970-01-01 UTC থেকে সেকেন্ড/মিলিসেকেন্ড গণনা — time.Unix() এবং t.Unix()/t.UnixNano() দিয়ে কনভার্ট করা হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>সময়কে একটা compact, timezone-independent numeric ফরম্যাটে রিপ্রেজেন্ট করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Database-এ timestamp store করা, API-তে timestamp exchange, cross-system time interoperability।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Epoch second, millisecond, নাকি nanosecond — এটা confirm না করলে ভুল ইউনিটে ১০০০ গুণ পার্থক্য হতে পারে, external API-এর সাথে ইন্টিগ্রেট করার সময় ডকুমেন্টেশন ভালোভাবে চেক করুন।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "time")
+func main() {
+    now := time.Now()
+    fmt.Println(now.Unix())
+    t := time.Unix(1620000000, 0)
+    fmt.Println(t)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-77" data-search="time formatting / parsing">
+  <div class="topic-head">
+    <span class="topic-index">77</span>
+    <h3>Time Formatting / Parsing</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Go-তে time format করার জন্য একটা রেফারেন্স টাইম (Mon Jan 2 15:04:05 MST 2006) ব্যবহার করা হয় — অন্য ভাষার মতো %Y-%m-%d স্টাইল না।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>মানুষের পড়ার উপযোগী string এ time রূপান্তর করা এবং string থেকে time পার্স করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Log output, UI display, API date field parsing/formatting।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>সেই বিখ্যাত '1 2 3 4 5 6 7' reference time (Mon Jan 2 15:04:05 MST 2006) মুখস্থ করে নেওয়াই ভালো — এটাই Go-এর একমাত্র উপায় ফরম্যাট বোঝানোর। time.RFC3339 প্রায়ই API-তে standard ফরম্যাট হিসেবে ব্যবহৃত হয়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "time")
+func main() {
+    t := time.Now()
+    fmt.Println(t.Format("2006-01-02 15:04:05"))
+    t2, _ := time.Parse("2006-01-02", "2024-03-14")
+    fmt.Println(t2)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-78" data-search="randomness / random numbers">
+  <div class="topic-head">
+    <span class="topic-index">78</span>
+    <h3>Randomness / Random Numbers</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>math/rand (deterministic, seedable) নন-ক্রিপ্টোগ্রাফিক randomness দেয়; crypto/rand সিকিউরিটি-sensitive দরকারে cryptographically secure randomness দেয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Random টেস্ট ডেটা, শাফলিং, sampling — অথবা secure টোকেন/কী তৈরি করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>math/rand: game logic, load-balancing jitter, টেস্ট ডেটা। crypto/rand: session token, API key, password reset token।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Security-sensitive কোনো কিছুর জন্য (token, password, key) কখনো math/rand ব্যবহার করবেন না — এটা predictable, attacker কে সুবিধা দেয়। সবসময় crypto/rand ব্যবহার করুন যেকোনো security-related randomness-এর জন্য — এটা প্রোডাকশন সিকিউরিটির অন্যতম গুরুত্বপূর্ণ নিয়ম।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("crypto/rand"; "fmt"; "math/big"; mrand "math/rand")
+func main() {
+    fmt.Println(mrand.Intn(100)) // non-secure, e.g. simulation
+    n, _ := rand.Int(rand.Reader, big.NewInt(100)) // secure token-এর জন্য
+    fmt.Println(n)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-79" data-search="number parsing">
+  <div class="topic-head">
+    <span class="topic-index">79</span>
+    <h3>Number Parsing</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>strconv প্যাকেজ string ↔ numeric টাইপ কনভার্সন করে — Atoi, ParseFloat, ParseInt ইত্যাদি ফাংশন error-ও রিটার্ন করে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>External input (CLI arg, form data, API param) থেকে আসা string কে numeric টাইপে নিরাপদে কনভার্ট করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Form validation, CLI argument parsing, CSV/config value পড়ায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>strconv.Atoi সবসময় error রিটার্ন করে যেটা ignore করা উচিত না — user input কখনো numeric হবে এই ধারণা করে না নিয়ে error path handle করুন। ParseFloat/ParseInt-এ bitSize parameter (32/64) সঠিকভাবে সেট করুন যদি নির্দিষ্ট সাইজে fit করতে হয়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "strconv")
+func main() {
+    n, err := strconv.Atoi("123")
+    fmt.Println(n, err)
+    f, _ := strconv.ParseFloat("3.14", 64)
+    fmt.Println(f)
+    _, err2 := strconv.Atoi("abc")
+    fmt.Println(err2)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-80" data-search="url parsing">
+  <div class="topic-head">
+    <span class="topic-index">80</span>
+    <h3>URL Parsing</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>net/url প্যাকেজ দিয়ে URL string কে component (scheme, host, path, query params) এ ভেঙে পার্স করা এবং বিপরীতভাবে তৈরি করা হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>URL-এর অংশগুলো নিরাপদে extract, modify, বা construct করা — string manipulation দিয়ে না করে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>HTTP client request বানানো, redirect URL validate করা, query parameter পড়া/লেখায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>URL string manually concatenate করে বানাবেন না (বিশেষত query parameter দিয়ে) — url.Values ব্যবহার করুন যাতে proper encoding (special character escape) হয়, নাহলে injection বা malformed URL বাগ হতে পারে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "net/url")
+func main() {
+    u, _ := url.Parse("https://example.org/path?a=1&amp;b=2")
+    fmt.Println(u.Scheme, u.Host, u.Path)
+    q := u.Query()
+    fmt.Println(q.Get("a"))
+}</code></pre>
+</section>
+<h2 class="cat-heading" id="cat-Files-&amp;-OS">Files &amp; OS</h2>
+
+<section class="topic" id="topic-81" data-search="reading files">
+  <div class="topic-head">
+    <span class="topic-index">81</span>
+    <h3>Reading Files</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>os.ReadFile() (Go 1.16+) দিয়ে পুরো ফাইল একবারে পড়া যায়; বড় ফাইলের জন্য bufio.Scanner/Reader দিয়ে line-by-line/streaming পড়া হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Disk থেকে ফাইলের কনটেন্ট প্রোগ্রামে লোড করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Config load, log processing, CSV/data file পড়ায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>পুরো ফাইল ReadFile() দিয়ে মেমরিতে লোড করা বড় ফাইলে (কয়েক GB) risky — মেমরি ফুরিয়ে যেতে পারে; সেক্ষেত্রে bufio.Scanner দিয়ে streaming পড়ুন। File handle সবসময় defer file.Close() দিয়ে বন্ধ করুন, নাহলে file descriptor leak হবে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("bufio"; "fmt"; "os")
+func main() {
+    data, err := os.ReadFile("/tmp/dat")
+    if err == nil { fmt.Println(string(data)) }
+    f, err := os.Open("/tmp/dat")
+    if err == nil {
+        defer f.Close()
+        scanner := bufio.NewScanner(f)
+        for scanner.Scan() { fmt.Println(scanner.Text()) }
+    }
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-82" data-search="writing files">
+  <div class="topic-head">
+    <span class="topic-index">82</span>
+    <h3>Writing Files</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>os.WriteFile() দিয়ে সরাসরি ছোট ফাইল লেখা যায়; বড়/streamed লেখার জন্য os.Create() + bufio.Writer ব্যবহার হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>প্রোগ্রামের ডেটা disk-এ persist করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Log file, config file, generated report, cache file লেখায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>bufio.Writer ব্যবহার করলে শেষে অবশ্যই writer.Flush() call করুন — নাহলে buffer-এ থাকা ডেটা disk-এ না গিয়ে হারিয়ে যেতে পারে (এটা একটা কমন সাইলেন্ট বাগ)। File permission (0644 ইত্যাদি) সঠিকভাবে সেট করুন — security-sensitive ফাইলে অতিরিক্ত permissive mode এড়িয়ে চলুন।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("bufio"; "fmt"; "os")
+func main() {
+    os.WriteFile("/tmp/dat1", []byte("hello\ngo\n"), 0644)
+    f, _ := os.Create("/tmp/dat2")
+    defer f.Close()
+    w := bufio.NewWriter(f)
+    w.WriteString("buffered write\n")
+    w.Flush()
+    fmt.Println("done")
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-83" data-search="line filters">
+  <div class="topic-head">
+    <span class="topic-index">83</span>
+    <h3>Line Filters</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Line filter হলো এমন একটা প্রোগ্রাম যা stdin থেকে লাইন-বাই-লাইন পড়ে, প্রতিটা লাইনে কিছু ট্রান্সফর্মেশন করে stdout-এ লেখে — Unix pipeline প্যাটার্নের সাথে খাপ খায়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Unix-স্টাইল composable command-line টুল তৈরি করা যা pipe (|) দিয়ে chain করা যায়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>grep-এর মতো টুল, log transformer, text preprocessing script-এ।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>bufio.Scanner default এ line-length limit রাখে (খুব বড় single line এ error দিতে পারে) — খুব বড় লাইন আশা করলে scanner.Buffer() দিয়ে limit বাড়ান।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("bufio"; "fmt"; "os"; "strings")
+func main() {
+    scanner := bufio.NewScanner(os.Stdin)
+    for scanner.Scan() {
+        ucl := strings.ToUpper(scanner.Text())
+        fmt.Println(ucl)
+    }
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-84" data-search="file paths">
+  <div class="topic-head">
+    <span class="topic-index">84</span>
+    <h3>File Paths</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>path/filepath প্যাকেজ OS-independent উপায়ে ফাইল path জোড়া লাগানো, বিশ্লেষণ, normalize করার ফাংশন দেয় (Windows-এ \, Unix-এ / handle করে)।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>OS-agnostic ভাবে ফাইল path নিয়ে কাজ করা, hardcoded separator এড়ানো।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Cross-platform টুল, config path resolve, file extension/base name বের করায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>String concatenation দিয়ে path জোড়া লাগাবেন না ("dir" + "/" + "file") — filepath.Join() ব্যবহার করুন, এটা cross-platform এবং duplicate separator handle করে। filepath.Clean() দিয়ে path normalize করা path traversal (../ ব্যবহার করে) সংক্রান্ত security issue কমাতে সাহায্য করে।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "path/filepath")
+func main() {
+    p := filepath.Join("dir", "subdir", "file.txt")
+    fmt.Println(p)
+    fmt.Println(filepath.Base(p), filepath.Ext(p), filepath.Dir(p))
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-85" data-search="directories">
+  <div class="topic-head">
+    <span class="topic-index">85</span>
+    <h3>Directories</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>os প্যাকেজের Mkdir/MkdirAll, ReadDir, RemoveAll ইত্যাদি ফাংশন দিয়ে ডিরেক্টরি তৈরি, তালিকাভুক্ত ও মুছে ফেলা হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>ফাইল সিস্টেমে ফোল্ডার স্ট্রাকচার তৈরি ও পরিচালনা করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Upload directory তৈরি, log rotation directory, temp workspace বানায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>MkdirAll() nested directory (মাল্টিপল লেভেল) একবারে তৈরি করে, Mkdir() শুধু একটা লেভেল — parent না থাকলে error দেয়। RemoveAll() রিকার্সিভভাবে সব ফাইল মুছে দেয়, production কোডে এটা খুব সতর্কতার সাথে ব্যবহার করুন (accidental data loss এর ঝুঁকি)।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "os")
+func main() {
+    os.MkdirAll("/tmp/dir1/subdir", 0755)
+    defer os.RemoveAll("/tmp/dir1")
+    entries, _ := os.ReadDir("/tmp")
+    for _, e := range entries { fmt.Println(e.Name(), e.IsDir()) }
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-86" data-search="temporary files and directories">
+  <div class="topic-head">
+    <span class="topic-index">86</span>
+    <h3>Temporary Files and Directories</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>os.CreateTemp()/os.MkdirTemp() একটা unique-named temporary ফাইল/ডিরেক্টরি তৈরি করে দেয়, যা সিস্টেমের temp location-এ থাকে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Short-lived ডেটার জন্য এমন জায়গা তৈরি করা যেখানে naming collision-এর ভয় নেই এবং cleanup করা সহজ।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Test fixture, file processing pipeline-এর intermediate output, cache download।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Temp ফাইল/ডিরেক্টরি তৈরি করার পরপরই defer os.Remove()/RemoveAll() লিখে ফেলুন — নাহলে cleanup ভুলে যাওয়া disk space leak-এর কারণ হয়। টেস্ট কোডে t.TempDir() ব্যবহার করলে Go টেস্ট শেষে নিজে থেকেই cleanup করে দেয়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "os")
+func main() {
+    f, _ := os.CreateTemp("", "sample")
+    defer os.Remove(f.Name())
+    fmt.Println("temp file:", f.Name())
+    dir, _ := os.MkdirTemp("", "sampledir")
+    defer os.RemoveAll(dir)
+    fmt.Println("temp dir:", dir)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-87" data-search="embed directive">
+  <div class="topic-head">
+    <span class="topic-index">87</span>
+    <h3>Embed Directive</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>Go 1.16+ এর //go:embed directive দিয়ে static ফাইল (HTML, config, image) কম্পাইল-টাইমে বাইনারিতে সরাসরি embed করা যায়, ফাইলটা string, []byte, বা embed.FS হিসেবে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>External static asset dependency ছাড়াই একটা single, self-contained deployable বাইনারি বানানো।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Web server-এর static assets, default config template, CLI টুলের embedded data।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>//go:embed ব্যবহার করলে deployment অনেক সহজ হয়ে যায় — শুধু একটা বাইনারি কপি করলেই হয়, আলাদা asset folder deploy করার ঝামেলা থাকে না। কিন্তু বাইনারি সাইজ বড় হয়ে যায়, তাই খুব বড় asset (video ইত্যাদি) embed করা এড়ানো উচিত।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("embed"; "fmt")
+//go:embed version.txt
+var content string
+func main() { fmt.Println(content) }</code></pre>
+</section>
+<h2 class="cat-heading" id="cat-CLI-&amp;-Testing">CLI &amp; Testing</h2>
+
+<section class="topic" id="topic-88" data-search="command-line arguments">
+  <div class="topic-head">
+    <span class="topic-index">88</span>
+    <h3>Command-Line Arguments</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>os.Args স্লাইস প্রোগ্রামে দেওয়া raw command-line argument ধরে রাখে (os.Args[0] প্রোগ্রামের নাম, বাকিগুলো আসল argument)।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>ব্যবহারকারীর কাছ থেকে সরাসরি টার্মিনাল থেকে ইনপুট নেওয়া।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>সাধারণ CLI script, positional argument দরকার এমন টুল।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Structured flag (--name=value) দরকার হলে os.Args সরাসরি পার্স না করে flag প্যাকেজ ব্যবহার করুন — সেটা help text, default value, type validation অটোমেটিক দেয়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "os")
+func main() {
+    argsWithProg := os.Args
+    argsWithoutProg := os.Args[1:]
+    fmt.Println(argsWithProg, argsWithoutProg)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-89" data-search="command-line flags">
+  <div class="topic-head">
+    <span class="topic-index">89</span>
+    <h3>Command-Line Flags</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>flag প্যাকেজ দিয়ে --name=value স্টাইল বেসিক CLI flag পার্সিং করা হয় — flag.String, flag.Int, flag.Bool ইত্যাদি।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>CLI টুলের behavior configurable করা, structured ও self-documenting আর্গুমেন্ট দেওয়া।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Server port config, verbose mode toggle, input/output file path দেওয়ায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>flag.Parse() অবশ্যই সব flag.String/Int/Bool কল করার পর কিন্তু flag ভ্যালু ব্যবহার করার আগে call করতে হবে। বড় CLI প্রজেক্টে flag প্যাকেজের সীমাবদ্ধতার কারণে (subcommand, nested flag) spf13/cobra বা urfave/cli-এর মতো লাইব্রেরি বেশি প্রচলিত।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("flag"; "fmt")
+func main() {
+    wordPtr := flag.String("word", "foo", "a string")
+    numbPtr := flag.Int("numb", 42, "an int")
+    flag.Parse()
+    fmt.Println(*wordPtr, *numbPtr)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-90" data-search="command-line subcommands">
+  <div class="topic-head">
+    <span class="topic-index">90</span>
+    <h3>Command-Line Subcommands</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>flag.NewFlagSet() দিয়ে git-স্টাইল subcommand (myapp foo -flag) তৈরি করা যায়, প্রতিটা subcommand-এর নিজস্ব flag set থাকে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একটা CLI টুলে একাধিক related কিন্তু আলাদা অপারেশন গ্রুপ করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>git commit/git push এর মতো multi-command CLI tool, deployment/admin script।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>সাধারণত production-grade multi-subcommand CLI-এর জন্য raw flag.NewFlagSet-এর বদলে cobra-এর মতো ফ্রেমওয়ার্ক ব্যবহার করা হয় — এটা auto-generated help, shell completion, nested subcommand সাপোর্ট করে যা হাতে বানানো কঠিন।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("flag"; "fmt"; "os")
+func main() {
+    fooCmd := flag.NewFlagSet("foo", flag.ExitOnError)
+    fooEnable := fooCmd.Bool("enable", false, "enable")
+    switch os.Args[1] {
+    case "foo":
+        fooCmd.Parse(os.Args[2:])
+        fmt.Println("subcommand 'foo'", *fooEnable)
+    }
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-91" data-search="environment variables">
+  <div class="topic-head">
+    <span class="topic-index">91</span>
+    <h3>Environment Variables</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>os.Getenv(), os.LookupEnv(), os.Setenv() দিয়ে OS-level environment variable পড়া/সেট করা হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Deployment environment (dev/staging/prod) অনুযায়ী কনফিগারেশন inject করা, secret না রেখে config বাইরে থেকে দেওয়া।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Database credential, API key, feature flag, deployment-specific config।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>os.Getenv() variable না থাকলে খালি string রিটার্ন করে (error দেয় না) — required env variable এর জন্য os.LookupEnv() দিয়ে অস্তিত্ব চেক করুন, নাহলে সাইলেন্টলি ভুল (empty) config নিয়ে চলবে। Production-এ .env ফাইল সরাসরি কমিট করবেন না — secret management টুল (Vault, AWS Secrets Manager) ব্যবহার করুন।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "os")
+func main() {
+    os.Setenv("FOO", "1")
+    fmt.Println("FOO:", os.Getenv("FOO"))
+    val, ok := os.LookupEnv("BAR")
+    fmt.Println("BAR:", val, ok)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-92" data-search="logging">
+  <div class="topic-head">
+    <span class="topic-index">92</span>
+    <h3>Logging</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>log প্যাকেজ (এবং Go 1.21+ এর structured log/slog) দিয়ে timestamp সহ log মেসেজ প্রিন্ট করা হয় — Println, Printf, Fatal, Panic ভ্যারিয়েন্ট আছে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>প্রোগ্রামের রানটাইম behavior, error, ও গুরুত্বপূর্ণ event রেকর্ড করা debugging ও monitoring-এর জন্য।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>প্রায় সব প্রোডাকশন সার্ভিসে — request log, error trace, audit trail।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Production সার্ভিসে plain log এর বদলে log/slog (structured, key-value logging) ব্যবহার করা এখন standard — এটা log aggregator (ELK, Datadog) দিয়ে সহজে parse/filter করা যায়। log.Fatal() os.Exit(1) কল করে — defer করা cleanup function গুলো চলে না, তাই এটা সতর্কতার সাথে ব্যবহার করুন।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("log/slog"; "os")
+func main() {
+    logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+    logger.Info("server started", "port", 8080, "env", "production")
+    logger.Error("db connection failed", "error", "timeout")
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-93" data-search="testing and benchmarking">
+  <div class="topic-head">
+    <span class="topic-index">93</span>
+    <h3>Testing and Benchmarking</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>testing প্যাকেজ দিয়ে TestXxx(t *testing.T) ফাংশন লিখে unit test এবং BenchmarkXxx(b *testing.B) দিয়ে পারফরম্যান্স বেঞ্চমার্ক করা হয়, go test কমান্ড দিয়ে চালানো হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>কোড সঠিকভাবে কাজ করছে তা যাচাই করা এবং পারফরম্যান্স regression ধরা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>প্রতিটা প্রোডাকশন প্যাকেজে — CI/CD pipeline-এর অবিচ্ছেদ্য অংশ।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Table-driven test (একটা test case slice নিয়ে loop এ চালানো) Go-এর সবচেয়ে idiomatic টেস্টিং প্যাটার্ন — নতুন case যোগ করা সহজ করে। go test -cover দিয়ে coverage মাপা এবং go test -bench দিয়ে বেঞ্চমার্ক চালানো CI pipeline-এ integrate করা ভালো অভ্যাস।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main_test
+import "testing"
+func TestSum(t *testing.T) {
+    cases := []struct{ a, b, want int }{
+        {1, 2, 3}, {2, 2, 4},
+    }
+    for _, c := range cases {
+        if got := c.a + c.b; got != c.want {
+            t.Errorf("got %d, want %d", got, c.want)
+        }
+    }
+}
+func BenchmarkSum(b *testing.B) {
+    for i := 0; i &lt; b.N; i++ { _ = 2 + 2 }
+}</code></pre>
+</section>
+<h2 class="cat-heading" id="cat-Networking">Networking</h2>
+
+<section class="topic" id="topic-94" data-search="http client">
+  <div class="topic-head">
+    <span class="topic-index">94</span>
+    <h3>HTTP Client</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>net/http প্যাকেজের http.Get, http.Post, বা কাস্টম http.Client দিয়ে বাইরের সার্ভারে HTTP request পাঠানো হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>External API/সার্ভিস থেকে ডেটা fetch করা বা পাঠানো।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Third-party API integration, microservice-এর মধ্যে communication, webhook call।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>ডিফল্ট http.Client-এর কোনো timeout নেই — production-এ কখনোই timeout ছাড়া client ব্যবহার করবেন না, নাহলে একটা hang হয়ে যাওয়া dependency আপনার পুরো সার্ভিসকে resource-starve করে ফেলতে পারে। resp.Body সবসময় defer resp.Body.Close() দিয়ে বন্ধ করুন, নাহলে connection leak হয়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "io"; "net/http"; "time")
+func main() {
+    client := &amp;http.Client{Timeout: 5 * time.Second}
+    resp, err := client.Get("https://example.org")
+    if err != nil { fmt.Println(err); return }
+    defer resp.Body.Close()
+    body, _ := io.ReadAll(resp.Body)
+    fmt.Println(resp.Status, len(body))
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-95" data-search="http server">
+  <div class="topic-head">
+    <span class="topic-index">95</span>
+    <h3>HTTP Server</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>net/http প্যাকেজ দিয়ে http.HandleFunc বা http.ServeMux ব্যবহার করে route/handler ডিফাইন করে http.ListenAndServe দিয়ে একটা HTTP সার্ভার চালানো হয়।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>একটা web সার্ভিস/API তৈরি করা যা HTTP request গ্রহণ ও রেসপন্স করে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>REST API backend, microservice, webhook receiver, health-check endpoint।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>ডিফল্ট http.Server-এও timeout সেট করা জরুরি (ReadTimeout, WriteTimeout) — নাহলে slow client সার্ভারের resource ধরে রাখতে পারে (slowloris আক্রমণ)। প্রোডাকশনে graceful shutdown (context দিয়ে) ইমপ্লিমেন্ট করা উচিত যাতে ongoing request শেষ না হওয়া পর্যন্ত সার্ভার বন্ধ না হয়।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "net/http")
+func hello(w http.ResponseWriter, req *http.Request) {
+    fmt.Fprintf(w, "hello\n")
+}
+func main() {
+    http.HandleFunc("/hello", hello)
+    http.ListenAndServe(":8090", nil)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-96" data-search="tcp server">
+  <div class="topic-head">
+    <span class="topic-index">96</span>
+    <h3>TCP Server</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>net প্যাকেজের net.Listen("tcp", addr) দিয়ে raw TCP সার্ভার তৈরি করা হয়, যেটা HTTP-এর মতো কোনো প্রোটোকল layer ছাড়াই সরাসরি byte stream হ্যান্ডেল করে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>Custom binary/text protocol তৈরি করা যেখানে HTTP-এর overhead দরকার নেই।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Chat সার্ভার, custom database protocol, game সার্ভার, IoT ডিভাইস communication।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>প্রতিটা incoming connection সাধারণত একটা আলাদা goroutine এ হ্যান্ডেল করা হয় (go handleConn(conn)) — এটা Go-কে concurrent সার্ভার লেখার জন্য খুব উপযুক্ত করে তোলে, কারণ প্রতিটা goroutine খুব সস্তা।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("bufio"; "fmt"; "net")
+func handleConn(c net.Conn) {
+    defer c.Close()
+    msg, _ := bufio.NewReader(c).ReadString('\n')
+    fmt.Fprint(c, "echo: "+msg)
+}
+func main() {
+    l, _ := net.Listen("tcp", ":9000")
+    defer l.Close()
+    for {
+        conn, err := l.Accept()
+        if err != nil { continue }
+        go handleConn(conn)
+    }
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-97" data-search="spawning processes">
+  <div class="topic-head">
+    <span class="topic-index">97</span>
+    <h3>Spawning Processes</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>os/exec প্যাকেজের exec.Command() দিয়ে একটা child process launch করা হয়, current process চালু থেকে child শেষ হওয়া পর্যন্ত অপেক্ষা করে (fork-এর মতো)।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>External প্রোগ্রাম/script কে বর্তমান প্রোগ্রামের ভেতর থেকে চালানো এবং তার output/exit code সংগ্রহ করা।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Build tool wrapping, শেল script চালানো, external CLI টুল (ffmpeg, git) integrate করায়।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Shell metacharacter (|, ; ইত্যাদি) সরাসরি exec.Command এর argument হিসেবে যায় না — এটা শেল ইনজেকশনের সম্ভাবনা কমায় exec.Command("sh", "-c", ...) ব্যবহার না করলে। User input সরাসরি command argument-এ পাঠালে ইনজেকশন ঝুঁকি নিয়ে সচেতন থাকুন।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "os/exec")
+func main() {
+    out, err := exec.Command("date").Output()
+    if err != nil { fmt.Println(err); return }
+    fmt.Println(string(out))
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-98" data-search="exec'ing processes">
+  <div class="topic-head">
+    <span class="topic-index">98</span>
+    <h3>Exec'ing Processes</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>syscall.Exec() (unix-only) বর্তমান প্রোসেসকে সম্পূর্ণভাবে replace করে একটা নতুন প্রোগ্রাম দিয়ে — child process তৈরি না করে, একই PID-তে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>বর্তমান প্রোগ্রামের জায়গায় সরাসরি আরেকটা প্রোগ্রাম চালানো, যেমন Unix শেলের exec কমান্ডের মতো।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Wrapper script/binary যেটা শুধু কিছু setup করে আসল টুলকে হ্যান্ড-ওভার করে দেয় (যেমন docker-entrypoint স্টাইল স্ক্রিপ্ট)।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>os/exec-এর মতো নতুন process spawn করা (parent+child দুটোই বেঁচে থাকে) থেকে এটা আলাদা — exec সম্পূর্ণভাবে current process replace করে, PID একই থাকে। এটা Unix-specific, Windows-এ syscall.Exec সাপোর্টেড না।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("os"; "os/exec"; "syscall")
+func main() {
+    binary, _ := exec.LookPath("ls")
+    args := []string{"ls", "-a"}
+    env := os.Environ()
+    syscall.Exec(binary, args, env)
+}</code></pre>
+</section>
+
+<section class="topic" id="topic-99" data-search="signals">
+  <div class="topic-head">
+    <span class="topic-index">99</span>
+    <h3>Signals</h3>
+  </div>
+  <div class="topic-grid">
+    <div class="field">
+      <div class="field-label">কনসেপ্ট <span class="en">— What it is</span></div>
+      <p>os/signal প্যাকেজ দিয়ে OS সিগন্যাল (SIGINT, SIGTERM) একটা channel-এ ক্যাচ করা হয়, যাতে প্রোগ্রাম abrupt kill হওয়ার বদলে গ্রেসফুলি cleanup করে বন্ধ হতে পারে।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">উদ্দেশ্য <span class="en">— Purpose</span></div>
+      <p>প্রোগ্রামকে external termination signal (Ctrl+C, container orchestrator stop) গ্রেসফুলভাবে হ্যান্ডেল করার সুযোগ দেওয়া।</p>
+    </div>
+    <div class="field">
+      <div class="field-label">কোথায় ব্যবহার <span class="en">— Where used</span></div>
+      <p>Graceful server shutdown, in-flight request শেষ করা, resource cleanup (DB connection close) — Kubernetes/Docker-এর সাথে কাজ করা প্রায় সব সার্ভিসে জরুরি।</p>
+    </div>
+    <div class="field note">
+      <div class="field-label">🎯 Professional Note</div>
+      <p>Kubernetes pod বন্ধ করার আগে SIGTERM পাঠায় এবং কিছু grace period দেয় — সেই সময়ের মধ্যে signal.Notify দিয়ে সিগন্যাল ধরে ongoing request শেষ করে, নতুন connection নেওয়া বন্ধ করে, তারপর প্রোগ্রাম বন্ধ করা production-grade সার্ভিসের অপরিহার্য অংশ।</p>
+    </div>
+  </div>
+  <pre><code class="language-go">package main
+import ("fmt"; "os"; "os/signal"; "syscall")
+func main() {
+    sigs := make(chan os.Signal, 1)
+    signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+    done := make(chan bool, 1)
+    go func() {
+        sig := &lt;-sigs
+        fmt.Println("received signal:", sig)
+        done &lt;- true
+    }()
+    fmt.Println("awaiting signal")
+    &lt;-done
+    fmt.Println("exiting gracefully")
+}</code></pre>
+</section>
+
+    <footer>
+      <svg class="gopher-mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="50" cy="58" rx="34" ry="30" fill="currentColor"/>
+        <circle cx="30" cy="40" r="11" fill="currentColor"/>
+        <circle cx="70" cy="40" r="11" fill="currentColor"/>
+      </svg>
+      Happy coding — practice each concept with real code, প্রতিটা কনসেপ্ট নিজে হাতে-কলমে চর্চা করাই সবচেয়ে গুরুত্বপূর্ণ।
+    </footer>
+  </main>
+</div>
+
+<button id="toTop" title="Back to top">↑</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+<script>
+hljs.highlightAll();
+
+// Sidebar toggle (mobile)
+const sidebar = document.getElementById('sidebar');
+const menuToggle = document.getElementById('menuToggle');
+menuToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+document.addEventListener('click', (e) => {
+  if (window.innerWidth <= 980 && sidebar.classList.contains('open')) {
+    if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+      sidebar.classList.remove('open');
+    }
+  }
+});
+
+// Search filter
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  document.querySelectorAll('.nav-group').forEach(group => {
+    let anyVisible = false;
+    group.querySelectorAll('.nav-link').forEach(link => {
+      const match = link.dataset.search.includes(q);
+      link.classList.toggle('hidden', !match);
+      if (match) anyVisible = true;
+    });
+    group.classList.toggle('hidden', !anyVisible);
+  });
+});
+
+// Active link highlight on scroll
+const links = Array.from(document.querySelectorAll('.nav-link'));
+const sections = links.map(l => document.querySelector(l.getAttribute('href')));
+function onScroll() {
+  let idx = 0;
+  const y = window.scrollY + 120;
+  sections.forEach((sec, i) => { if (sec && sec.offsetTop <= y) idx = i; });
+  links.forEach(l => l.classList.remove('active'));
+  if (links[idx]) links[idx].classList.add('active');
+
+  const toTop = document.getElementById('toTop');
+  toTop.classList.toggle('show', window.scrollY > 500);
+}
+window.addEventListener('scroll', onScroll);
+onScroll();
+
+document.getElementById('toTop').addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
+
+// Close mobile sidebar after clicking a link
+links.forEach(l => l.addEventListener('click', () => {
+  if (window.innerWidth <= 980) sidebar.classList.remove('open');
+}));
+</script>
+</body>
+</html>

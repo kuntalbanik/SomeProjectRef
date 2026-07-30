@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fast Writing Toolkit — ভোকাবুলারি ও বাক্য গঠন</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Source+Sans+3:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2b3a; --ink-soft:#33475c;
+    --paper:#efe9db; --paper-raised:#f8f4ea; --paper-dark:#e2dac6;
+    --accent:#a33d2e; --accent-soft:#c65e4c;
+    --gold:#a4823b; --muted:#6b6459; --line:#d8cfb8; --done:#4f6b4a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;scroll-behavior:smooth;}
+  body{ background:var(--paper); background-image:repeating-linear-gradient(0deg, rgba(28,43,58,0.025) 0px, rgba(28,43,58,0.025) 1px, transparent 1px, transparent 32px); color:var(--ink); font-family:'Source Sans 3', sans-serif; min-height:100vh; }
+  .bn{ font-family:'Noto Sans Bengali','Source Sans 3',sans-serif; }
+  code, .mono{ font-family:'JetBrains Mono', monospace; }
+
+  header{ padding:20px 32px; border-bottom:2px solid var(--ink); position:sticky; top:0; z-index:20; background:linear-gradient(180deg, var(--paper-raised), var(--paper)); }
+  .header-top{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:14px; }
+  .brand{display:flex; align-items:center; gap:14px;}
+  .seal{ width:46px;height:46px;border-radius:50%; background:radial-gradient(circle at 35% 30%, var(--accent-soft), var(--accent) 70%); display:flex;align-items:center;justify-content:center; box-shadow:0 3px 0 rgba(0,0,0,0.15), inset 0 0 0 3px rgba(255,255,255,0.25); flex-shrink:0; }
+  .seal svg{width:22px;height:22px;fill:#fbe9c9;}
+  h1{ font-family:'Fraunces', serif; font-weight:700; font-size:1.4rem; margin:0; }
+  .tagline{ margin:2px 0 0; color:var(--muted); font-size:0.85rem; }
+  .stat{ font-size:0.8rem; color:var(--muted); text-align:right; }
+  .search-wrap{ position:relative; }
+  #searchInput{ width:100%; padding:12px 16px 12px 42px; border:1.5px solid var(--ink); border-radius:6px; background:var(--paper-raised); font-family:'Source Sans 3',sans-serif; font-size:0.98rem; color:var(--ink); }
+  #searchInput:focus{ outline:2px solid var(--gold); outline-offset:1px; }
+  .search-wrap::before{ content:"🔍"; position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:0.95rem; opacity:0.6; }
+  #searchCount{ font-size:0.78rem; color:var(--muted); margin-top:6px; }
+
+  .layout{ display:flex; }
+  nav.sidebar{ width:280px; flex-shrink:0; border-right:2px solid var(--ink); position:sticky; top:132px; align-self:flex-start; max-height:calc(100vh - 132px); overflow-y:auto; background:var(--paper-raised); }
+  .toc-item{ padding:10px 18px; cursor:pointer; font-size:0.87rem; border-left:3px solid transparent; }
+  .toc-item:hover{ background:var(--paper-dark); }
+
+  main{ flex:1; padding:28px 40px 100px; max-width:940px; }
+  .intro{ background:var(--paper-raised); border:1px solid var(--line); border-left:4px solid var(--gold); padding:18px 22px; border-radius:2px; margin-bottom:30px; line-height:1.75; }
+  .intro p{ margin:0 0 8px; }
+  .intro p:last-child{ margin-bottom:0; }
+
+  section.cat{ margin-bottom:44px; }
+  .cat-title{ font-family:'Fraunces', serif; font-size:1.35rem; font-weight:700; margin:0 0 4px; padding-top:10px; border-top:2px solid var(--ink); }
+  .cat-sub{ color:var(--muted); font-size:0.88rem; margin:0 0 18px; }
+
+  /* Master formula flow */
+  .formula-flow{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px; }
+  .formula-step{ flex:1; min-width:150px; background:var(--paper-raised); border:1px solid var(--line); border-top:4px solid var(--gold); border-radius:3px; padding:12px 14px; }
+  .formula-step .fnum{ font-family:'Fraunces',serif; font-weight:700; color:var(--gold); font-size:0.85rem; }
+  .formula-step .flabel{ font-weight:600; margin-top:2px; }
+  .formula-step .fdesc{ font-size:0.8rem; color:var(--muted); margin-top:4px; }
+  .flow-arrow{ display:flex; align-items:center; color:var(--gold); font-size:1.2rem; }
+
+  .cards{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:760px){ .cards{ grid-template-columns:1fr; } .formula-flow{ flex-direction:column; } .flow-arrow{ transform:rotate(90deg); justify-content:center; } }
+
+  .card{ background:var(--paper-raised); border:1px solid var(--line); border-radius:3px; padding:16px 18px; box-shadow:2px 3px 0 rgba(28,43,58,0.05); }
+  .card.hidden{ display:none; }
+  .card-title{ font-family:'Fraunces',serif; font-weight:600; font-size:1rem; margin:0 0 8px; color:var(--ink); }
+  .phrase-list{ list-style:none; margin:0; padding:0; }
+  .phrase-list li{ padding:6px 0; border-bottom:1px dashed var(--line); font-size:0.9rem; line-height:1.5; }
+  .phrase-list li:last-child{ border-bottom:none; }
+  .phrase-list li .blank{ color:var(--accent); font-weight:600; }
+  .note{ font-size:0.82rem; color:var(--muted); margin-top:8px; line-height:1.55; }
+
+  .mini-table{ width:100%; border-collapse:collapse; font-size:0.85rem; margin-top:4px; }
+  .mini-table th, .mini-table td{ border:1px solid var(--line); padding:6px 9px; text-align:left; }
+  .mini-table th{ background:var(--paper-dark); font-weight:600; }
+  .full-card{ grid-column:1/-1; }
+
+  .word-chips{ display:flex; flex-wrap:wrap; gap:7px; }
+  .word-chip{ background:var(--paper-dark); border:1px solid var(--line); border-radius:16px; padding:5px 12px; font-size:0.85rem; }
+
+  #noResults{ display:none; text-align:center; padding:40px 0; color:var(--muted); }
+  footer{ text-align:center; padding:30px; color:var(--muted); font-size:0.82rem; border-top:1px solid var(--line); }
+
+  @media (max-width:820px){
+    .layout{ flex-direction:column; }
+    nav.sidebar{ display:none; }
+    main{ padding:20px 18px 80px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="brand">
+      <div class="seal"><svg viewBox="0 0 24 24"><path d="M4 4h16v3H4V4zm0 6.5h16v3H4v-3zM4 17h10v3H4v-3z"/></svg></div>
+      <div>
+        <h1>Fast Writing Toolkit</h1>
+        <p class="tagline bn">রেডিমেড বাক্য-কাঠামো, ভোকাবুলারি ব্যাংক ও ভার্ব ফর্ম — দ্রুত স্ট্যান্ডার্ড ইংরেজি লেখার জন্য</p>
+      </div>
+    </div>
+    <div class="stat bn" id="totalStat"></div>
+  </div>
+  <div class="search-wrap">
+    <input type="text" id="searchInput" placeholder="যেমন লিখুন: request, apologize, write, transition..." oninput="filterCards()">
+  </div>
+  <div id="searchCount" class="bn"></div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main>
+    <div class="intro bn">
+      <p><b>এটা কীভাবে ব্যবহার করবেন:</b> কোনো ইমেইল/চিঠি/রিপোর্ট লিখতে বসে যদি মাথায় বাক্য না আসে — নিচের "মাস্টার ফর্মুলা" অনুসরণ করুন এবং প্রতিটা ধাপে "Phrase Bank" থেকে একটা রেডিমেড লাইন তুলে নিয়ে নিজের তথ্য বসিয়ে দিন। ভাবতে হবে না বাক্য কীভাবে শুরু হবে — শুধু কোন কাজ (request/inform/apologize) সেটা ঠিক করে নিলেই বাকিটা রেডি।</p>
+      <p>ভোকাবুলারি ও ভার্ব ফর্ম সেকশন লেখার সময় শব্দ খুঁজতে সাহায্য করবে — যেটা লাগবে সার্চ বক্সে টাইপ করুন।</p>
+    </div>
+
+    <section class="cat" id="cat-formula">
+      <h2 class="cat-title">১. মাস্টার ফর্মুলা — যেকোনো ফরমাল লেখার কাঠামো</h2>
+      <p class="cat-sub bn">প্রায় সব অফিসিয়াল চিঠি/ইমেইল/রিপোর্ট এই ৫টা ধাপেই তৈরি — শুধু প্রতিটা ধাপে নিচের Phrase Bank থেকে একটা লাইন বসান।</p>
+      <div class="formula-flow">
+        <div class="formula-step"><div class="fnum">STEP 1</div><div class="flabel bn">শুরু (Opening)</div><div class="fdesc bn">কেন লিখছেন সেটা প্রথম বাক্যেই বলুন</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="formula-step"><div class="fnum">STEP 2</div><div class="flabel bn">প্রসঙ্গ/কারণ</div><div class="fdesc bn">পটভূমি বা কারণ সংক্ষেপে দিন</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="formula-step"><div class="fnum">STEP 3</div><div class="flabel bn">মূল বক্তব্য</div><div class="fdesc bn">অনুরোধ/তথ্য/সমস্যা — যা বলতে চান</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="formula-step"><div class="fnum">STEP 4</div><div class="flabel bn">বিস্তারিত (ঐচ্ছিক)</div><div class="fdesc bn">সাপোর্টিং তথ্য বা ব্যাখ্যা</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="formula-step"><div class="fnum">STEP 5</div><div class="flabel bn">শেষ (Closing)</div><div class="fdesc bn">পরবর্তী পদক্ষেপ বা ধন্যবাদ</div></div>
+      </div>
+      <div class="card full-card"><div class="card-title bn">উদাহরণ — সব ধাপ জোড়া লাগিয়ে</div>
+        <div class="note bn" style="font-size:0.92rem; color:var(--ink-soft);">
+        <b>(1)</b> I am writing to request an extension on the project deadline. <b>(2)</b> Due to an unexpected server issue last week, our progress has been delayed. <b>(3)</b> I would be grateful if the deadline could be moved to August 15. <b>(4)</b> This will allow the team enough time to complete thorough testing. <b>(5)</b> Thank you for your understanding, and I look forward to your response.
+        </div>
+      </div>
+    </section>
+
+    <section class="cat" id="cat-phrases">
+      <h2 class="cat-title">২. Phrase Bank — কাজ অনুযায়ী রেডিমেড লাইন</h2>
+      <p class="cat-sub bn">যা করতে চান সেই ক্যাটাগরি বেছে নিন, একটা লাইন তুলে নিজের তথ্য বসিয়ে দিন।</p>
+      <div class="cards">
+        <div class="card"><div class="card-title">Opening — শুরু করা</div>
+          <ul class="phrase-list">
+            <li>I am writing to <span class="blank">[request/inform you about/inquire about]</span>...</li>
+            <li>I am writing in connection with...</li>
+            <li>Further to your email dated <span class="blank">[date]</span>,...</li>
+            <li>With reference to our recent conversation,...</li>
+            <li>I hope this email finds you well.</li>
+          </ul>
+        </div>
+        <div class="card"><div class="card-title">Giving a Reason — কারণ দেখানো</div>
+          <ul class="phrase-list">
+            <li>This is due to <span class="blank">[reason]</span>.</li>
+            <li>Owing to <span class="blank">[reason]</span>,...</li>
+            <li>As a result of <span class="blank">[event]</span>,...</li>
+            <li>In light of the recent <span class="blank">[situation]</span>,...</li>
+          </ul>
+        </div>
+        <div class="card"><div class="card-title">Making a Request — অনুরোধ করা</div>
+          <ul class="phrase-list">
+            <li>I would be grateful if you could <span class="blank">[action]</span>.</li>
+            <li>Could you please <span class="blank">[action]</span>?</li>
+            <li>I would like to request that <span class="blank">[action]</span>.</li>
+            <li>It would be helpful if <span class="blank">[condition]</span>.</li>
+          </ul>
+        </div>
+        <div class="card"><div class="card-title">Informing — জানানো</div>
+          <ul class="phrase-list">
+            <li>Please be informed that <span class="blank">[information]</span>.</li>
+            <li>This is to inform you that...</li>
+            <li>I would like to bring to your attention that...</li>
+            <li>Kindly note that...</li>
+          </ul>
+        </div>
+        <div class="card"><div class="card-title">Apologizing — দুঃখ প্রকাশ</div>
+          <ul class="phrase-list">
+            <li>I apologize for any inconvenience caused.</li>
+            <li>Please accept my sincere apologies for <span class="blank">[issue]</span>.</li>
+            <li>I regret to inform you that...</li>
+            <li>I understand the inconvenience this may have caused.</li>
+          </ul>
+        </div>
+        <div class="card"><div class="card-title">Complaining (Politely) — অভিযোগ</div>
+          <ul class="phrase-list">
+            <li>I am writing to express my concern about <span class="blank">[issue]</span>.</li>
+            <li>I wish to raise an issue regarding...</li>
+            <li>Unfortunately, I have encountered a problem with...</li>
+            <li>I would appreciate it if this could be resolved promptly.</li>
+          </ul>
+        </div>
+        <div class="card"><div class="card-title">Proposing / Suggesting — প্রস্তাব</div>
+          <ul class="phrase-list">
+            <li>I would like to propose that <span class="blank">[idea]</span>.</li>
+            <li>May I suggest that...</li>
+            <li>It might be worth considering...</li>
+            <li>One possible solution would be to...</li>
+          </ul>
+        </div>
+        <div class="card"><div class="card-title">Agreeing / Disagreeing — মত প্রকাশ</div>
+          <ul class="phrase-list">
+            <li>I fully agree that <span class="blank">[point]</span>.</li>
+            <li>While I understand your point, I believe...</li>
+            <li>I see your point; however,...</li>
+            <li>I am afraid I have to disagree, as...</li>
+          </ul>
+        </div>
+        <div class="card full-card"><div class="card-title">Closing — শেষ করা</div>
+          <ul class="phrase-list">
+            <li>I look forward to hearing from you.</li>
+            <li>Please do not hesitate to contact me if you have any questions.</li>
+            <li>Thank you for your time and consideration.</li>
+            <li>I would appreciate a prompt response.</li>
+            <li>Kindly let me know if you require any further information.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="cat" id="cat-transition">
+      <h2 class="cat-title">৩. Transition / Linking Words — বাক্য জোড়া লাগানোর শব্দ</h2>
+      <p class="cat-sub bn">এই শব্দগুলো দুটো বাক্য বা ধারণাকে মসৃণভাবে জুড়ে দেয় — লেখা fragmented মনে হয় না।</p>
+      <div class="cards">
+        <div class="card"><div class="card-title">যোগ করতে (Addition)</div>
+          <div class="word-chips"><span class="word-chip">moreover</span><span class="word-chip">furthermore</span><span class="word-chip">in addition</span><span class="word-chip">also</span><span class="word-chip">besides</span></div>
+        </div>
+        <div class="card"><div class="card-title">বৈপরীত্য (Contrast)</div>
+          <div class="word-chips"><span class="word-chip">however</span><span class="word-chip">on the other hand</span><span class="word-chip">nevertheless</span><span class="word-chip">although</span><span class="word-chip">whereas</span></div>
+        </div>
+        <div class="card"><div class="card-title">কারণ-ফলাফল (Cause &amp; Effect)</div>
+          <div class="word-chips"><span class="word-chip">therefore</span><span class="word-chip">as a result</span><span class="word-chip">consequently</span><span class="word-chip">thus</span><span class="word-chip">hence</span></div>
+        </div>
+        <div class="card"><div class="card-title">ক্রম (Sequence)</div>
+          <div class="word-chips"><span class="word-chip">firstly</span><span class="word-chip">subsequently</span><span class="word-chip">meanwhile</span><span class="word-chip">finally</span><span class="word-chip">following this</span></div>
+        </div>
+        <div class="card"><div class="card-title">উদাহরণ (Example)</div>
+          <div class="word-chips"><span class="word-chip">for instance</span><span class="word-chip">for example</span><span class="word-chip">such as</span><span class="word-chip">namely</span></div>
+        </div>
+        <div class="card"><div class="card-title">উপসংহার (Conclusion)</div>
+          <div class="word-chips"><span class="word-chip">in conclusion</span><span class="word-chip">to summarize</span><span class="word-chip">overall</span><span class="word-chip">in short</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cat" id="cat-vocab">
+      <h2 class="cat-title">৪. Formal Vocabulary Bank — থিম অনুযায়ী শব্দভাণ্ডার</h2>
+      <div class="cards">
+        <div class="card"><div class="card-title">অফিস / বিজনেস — Noun</div>
+          <div class="word-chips"><span class="word-chip">proposal</span><span class="word-chip">deadline</span><span class="word-chip">invoice</span><span class="word-chip">agenda</span><span class="word-chip">feedback</span><span class="word-chip">colleague</span><span class="word-chip">supervisor</span><span class="word-chip">budget</span><span class="word-chip">resource</span><span class="word-chip">stakeholder</span></div>
+        </div>
+        <div class="card"><div class="card-title">অফিস / বিজনেস — Verb</div>
+          <div class="word-chips"><span class="word-chip">implement</span><span class="word-chip">coordinate</span><span class="word-chip">allocate</span><span class="word-chip">oversee</span><span class="word-chip">streamline</span><span class="word-chip">facilitate</span><span class="word-chip">finalize</span><span class="word-chip">submit</span><span class="word-chip">review</span><span class="word-chip">approve</span></div>
+        </div>
+        <div class="card"><div class="card-title">গুণবাচক শব্দ (Adjectives)</div>
+          <div class="word-chips"><span class="word-chip">efficient</span><span class="word-chip">reliable</span><span class="word-chip">comprehensive</span><span class="word-chip">feasible</span><span class="word-chip">essential</span><span class="word-chip">significant</span><span class="word-chip">subsequent</span><span class="word-chip">prior</span><span class="word-chip">adequate</span><span class="word-chip">thorough</span></div>
+        </div>
+        <div class="card"><div class="card-title">একাডেমিক শব্দ</div>
+          <div class="word-chips"><span class="word-chip">curriculum</span><span class="word-chip">thesis</span><span class="word-chip">criteria</span><span class="word-chip">methodology</span><span class="word-chip">findings</span><span class="word-chip">hypothesis</span><span class="word-chip">analysis</span><span class="word-chip">assessment</span></div>
+        </div>
+        <div class="card full-card"><div class="card-title">ভদ্র আবেগ প্রকাশের শব্দ (Personal Letters)</div>
+          <div class="word-chips"><span class="word-chip">grateful</span><span class="word-chip">delighted</span><span class="word-chip">concerned</span><span class="word-chip">disappointed</span><span class="word-chip">reassured</span><span class="word-chip">honored</span><span class="word-chip">sincere</span><span class="word-chip">heartfelt</span><span class="word-chip">saddened</span><span class="word-chip">relieved</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cat" id="cat-verbs">
+      <h2 class="cat-title">৫. Verb Forms — V1 / V2 / V3 টেবিল</h2>
+      <p class="cat-sub bn">V1 = base form (present/modal-এর সাথে), V2 = simple past, V3 = past participle (perfect tense ও passive-এর সাথে)। Regular verb-এ শুধু -ed যোগ করলেই V2=V3 হয়ে যায় (request → requested → requested), তাই সেগুলোর আলাদা তালিকা লাগে না। নিচে শুধু irregular verb গুলো দেওয়া হলো, যেগুলোতে ভুল বেশি হয়।</p>
+      <div class="cards">
+        <div class="card full-card"><div class="card-title">যোগাযোগ ও চিন্তা (Communication &amp; Thought)</div>
+          <table class="mini-table"><tr><th>V1</th><th>V2</th><th>V3</th></tr>
+          <tr><td>say</td><td>said</td><td>said</td></tr>
+          <tr><td>tell</td><td>told</td><td>told</td></tr>
+          <tr><td>write</td><td>wrote</td><td>written</td></tr>
+          <tr><td>speak</td><td>spoke</td><td>spoken</td></tr>
+          <tr><td>read</td><td>read</td><td>read</td></tr>
+          <tr><td>think</td><td>thought</td><td>thought</td></tr>
+          <tr><td>know</td><td>knew</td><td>known</td></tr>
+          <tr><td>understand</td><td>understood</td><td>understood</td></tr>
+          <tr><td>mean</td><td>meant</td><td>meant</td></tr>
+          </table>
+        </div>
+        <div class="card full-card"><div class="card-title">অফিস/ব্যবসায়িক কাজ (Business Actions)</div>
+          <table class="mini-table"><tr><th>V1</th><th>V2</th><th>V3</th></tr>
+          <tr><td>give</td><td>gave</td><td>given</td></tr>
+          <tr><td>take</td><td>took</td><td>taken</td></tr>
+          <tr><td>make</td><td>made</td><td>made</td></tr>
+          <tr><td>do</td><td>did</td><td>done</td></tr>
+          <tr><td>send</td><td>sent</td><td>sent</td></tr>
+          <tr><td>buy</td><td>bought</td><td>bought</td></tr>
+          <tr><td>sell</td><td>sold</td><td>sold</td></tr>
+          <tr><td>pay</td><td>paid</td><td>paid</td></tr>
+          <tr><td>spend</td><td>spent</td><td>spent</td></tr>
+          <tr><td>keep</td><td>kept</td><td>kept</td></tr>
+          <tr><td>choose</td><td>chose</td><td>chosen</td></tr>
+          <tr><td>bring</td><td>brought</td><td>brought</td></tr>
+          <tr><td>build</td><td>built</td><td>built</td></tr>
+          <tr><td>begin</td><td>began</td><td>begun</td></tr>
+          <tr><td>break</td><td>broke</td><td>broken</td></tr>
+          </table>
+        </div>
+        <div class="card full-card"><div class="card-title">উপলব্ধি ও অনুভূতি (Perception &amp; Discovery)</div>
+          <table class="mini-table"><tr><th>V1</th><th>V2</th><th>V3</th></tr>
+          <tr><td>see</td><td>saw</td><td>seen</td></tr>
+          <tr><td>hear</td><td>heard</td><td>heard</td></tr>
+          <tr><td>find</td><td>found</td><td>found</td></tr>
+          <tr><td>feel</td><td>felt</td><td>felt</td></tr>
+          <tr><td>meet</td><td>met</td><td>met</td></tr>
+          <tr><td>show</td><td>showed</td><td>shown</td></tr>
+          <tr><td>grow</td><td>grew</td><td>grown</td></tr>
+          </table>
+        </div>
+        <div class="card full-card"><div class="card-title">চলাচল (Movement)</div>
+          <table class="mini-table"><tr><th>V1</th><th>V2</th><th>V3</th></tr>
+          <tr><td>go</td><td>went</td><td>gone</td></tr>
+          <tr><td>come</td><td>came</td><td>come</td></tr>
+          <tr><td>leave</td><td>left</td><td>left</td></tr>
+          <tr><td>rise</td><td>rose</td><td>risen</td></tr>
+          <tr><td>fall</td><td>fell</td><td>fallen</td></tr>
+          <tr><td>run</td><td>ran</td><td>run</td></tr>
+          <tr><td>fly</td><td>flew</td><td>flown</td></tr>
+          <tr><td>drive</td><td>drove</td><td>driven</td></tr>
+          </table>
+        </div>
+        <div class="card full-card"><div class="card-title">অন্যান্য প্রচলিত ভার্ব (Other Common)</div>
+          <table class="mini-table"><tr><th>V1</th><th>V2</th><th>V3</th></tr>
+          <tr><td>have</td><td>had</td><td>had</td></tr>
+          <tr><td>get</td><td>got</td><td>got / gotten</td></tr>
+          <tr><td>put</td><td>put</td><td>put</td></tr>
+          <tr><td>let</td><td>let</td><td>let</td></tr>
+          <tr><td>set</td><td>set</td><td>set</td></tr>
+          <tr><td>hold</td><td>held</td><td>held</td></tr>
+          <tr><td>stand</td><td>stood</td><td>stood</td></tr>
+          <tr><td>sit</td><td>sat</td><td>sat</td></tr>
+          <tr><td>win</td><td>won</td><td>won</td></tr>
+          <tr><td>lose</td><td>lost</td><td>lost</td></tr>
+          <tr><td>teach</td><td>taught</td><td>taught</td></tr>
+          <tr><td>catch</td><td>caught</td><td>caught</td></tr>
+          <tr><td>lend</td><td>lent</td><td>lent</td></tr>
+          <tr><td>become</td><td>became</td><td>become</td></tr>
+          <tr><td>draw</td><td>drew</td><td>drawn</td></tr>
+          </table>
+        </div>
+        <div class="card full-card"><div class="card-title bn">কোন ফর্ম কোথায় বসে — দ্রুত স্মরণ</div>
+          <table class="mini-table"><tr><th>Structure</th><th>কোন Form</th><th>উদাহরণ</th></tr>
+          <tr><td>Present Simple (he/she/it)</td><td>V1+s/es</td><td>He <b>writes</b> reports.</td></tr>
+          <tr><td>Past Simple</td><td>V2</td><td>He <b>wrote</b> the report.</td></tr>
+          <tr><td>Modal + verb (can/will/should)</td><td>V1</td><td>He should <b>write</b> it.</td></tr>
+          <tr><td>have/has/had + verb</td><td>V3</td><td>He has <b>written</b> it.</td></tr>
+          <tr><td>be verb (is/was/been) + verb</td><td>V3 (Passive)</td><td>It was <b>written</b> by him.</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <footer class="bn">মোট রেফারেন্স কার্ড: <span id="footCount"></span>টা — সার্চ বক্সে টাইপ করে দ্রুত খুঁজে নিন।</footer>
+  </main>
+</div>
+
+<div id="noResults" class="bn">কোনো ফলাফল পাওয়া যায়নি — অন্য শব্দ দিয়ে চেষ্টা করুন।</div>
+
+<script>
+function buildSidebar(){
+  const cats = document.querySelectorAll('section.cat');
+  const sb = document.getElementById('sidebar');
+  cats.forEach(cat=>{
+    const title = cat.querySelector('.cat-title').textContent;
+    const item = document.createElement('div');
+    item.className = 'toc-item';
+    item.textContent = title;
+    item.onclick = ()=> cat.scrollIntoView({behavior:'smooth', block:'start'});
+    sb.appendChild(item);
+  });
+}
+buildSidebar();
+
+const allCards = document.querySelectorAll('.card');
+document.getElementById('totalStat').textContent = allCards.length + ' টি রেফারেন্স কার্ড';
+document.getElementById('footCount').textContent = allCards.length;
+
+function filterCards(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  let visibleCount = 0;
+  allCards.forEach(card=>{
+    const text = card.textContent.toLowerCase();
+    const match = q==='' || text.includes(q);
+    card.classList.toggle('hidden', !match);
+    if(match) visibleCount++;
+  });
+  document.querySelectorAll('section.cat').forEach(cat=>{
+    const visible = Array.from(cat.querySelectorAll('.card')).some(c=>!c.classList.contains('hidden'));
+    cat.style.display = (q==='' || visible) ? '' : 'none';
+  });
+  document.getElementById('searchCount').textContent = q==='' ? '' : (visibleCount + 'টি ফলাফল পাওয়া গেছে');
+  document.getElementById('noResults').style.display = (q!=='' && visibleCount===0) ? 'block' : 'none';
+}
+</script>
+</body>
+</html>

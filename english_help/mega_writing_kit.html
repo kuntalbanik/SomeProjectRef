@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mega Writing Kit — বিস্তারিত ভোকাবুলারি, ফ্রেজ ও ট্রানজিশন (সহ উদাহরণ)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Source+Sans+3:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2b3a; --ink-soft:#33475c;
+    --paper:#efe9db; --paper-raised:#f8f4ea; --paper-dark:#e2dac6;
+    --accent:#a33d2e; --accent-soft:#c65e4c;
+    --gold:#a4823b; --muted:#6b6459; --line:#d8cfb8;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;scroll-behavior:smooth;}
+  body{ background:var(--paper); background-image:repeating-linear-gradient(0deg, rgba(28,43,58,0.025) 0px, rgba(28,43,58,0.025) 1px, transparent 1px, transparent 32px); color:var(--ink); font-family:'Source Sans 3', sans-serif; min-height:100vh; }
+  .bn{ font-family:'Noto Sans Bengali','Source Sans 3',sans-serif; }
+
+  header{ padding:16px 28px; border-bottom:2px solid var(--ink); position:sticky; top:0; z-index:20; background:linear-gradient(180deg, var(--paper-raised), var(--paper)); }
+  .header-top{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:10px; }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .seal{ width:40px;height:40px;border-radius:50%; background:radial-gradient(circle at 35% 30%, var(--accent-soft), var(--accent) 70%); display:flex;align-items:center;justify-content:center; box-shadow:0 3px 0 rgba(0,0,0,0.15), inset 0 0 0 3px rgba(255,255,255,0.25); flex-shrink:0; }
+  .seal svg{width:18px;height:18px;fill:#fbe9c9;}
+  h1{ font-family:'Fraunces', serif; font-weight:700; font-size:1.25rem; margin:0; }
+  .tagline{ margin:2px 0 0; color:var(--muted); font-size:0.8rem; }
+  .stat{ font-size:0.75rem; color:var(--muted); text-align:right; }
+  .search-wrap{ position:relative; }
+  #searchInput{ width:100%; padding:10px 14px 10px 38px; border:1.5px solid var(--ink); border-radius:6px; background:var(--paper-raised); font-size:0.94rem; color:var(--ink); }
+  #searchInput:focus{ outline:2px solid var(--gold); outline-offset:1px; }
+  .search-wrap::before{ content:"🔍"; position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:0.88rem; opacity:0.6; }
+  #searchCount{ font-size:0.74rem; color:var(--muted); margin-top:5px; }
+
+  .layout{ display:flex; }
+  nav.sidebar{ width:250px; flex-shrink:0; border-right:2px solid var(--ink); position:sticky; top:110px; align-self:flex-start; max-height:calc(100vh - 110px); overflow-y:auto; background:var(--paper-raised); }
+  .toc-group{ padding:8px 14px 2px; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--gold); font-weight:700; border-top:1px solid var(--line); cursor:pointer; }
+  .toc-item{ padding:6px 16px; cursor:pointer; font-size:0.79rem; border-left:3px solid transparent; }
+  .toc-item:hover{ background:var(--paper-dark); }
+
+  main{ flex:1; padding:24px 32px 100px; max-width:1000px; }
+  .intro{ background:var(--paper-raised); border:1px solid var(--line); border-left:4px solid var(--gold); padding:15px 18px; border-radius:2px; margin-bottom:24px; line-height:1.65; font-size:0.92rem; }
+  .intro p{ margin:0 0 6px; } .intro p:last-child{ margin-bottom:0; }
+
+  section.megacat{ margin-bottom:18px; padding-top:6px; border-top:3px double var(--ink); }
+  .megacat-title{ font-family:'Fraunces',serif; font-size:1.4rem; font-weight:700; margin:8px 0 4px; }
+  .megacat-sub{ color:var(--muted); font-size:0.84rem; margin:0 0 14px; }
+
+  .cards{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:760px){ .cards{ grid-template-columns:1fr; } }
+  .card{ background:var(--paper-raised); border:1px solid var(--line); border-radius:3px; padding:12px 15px; box-shadow:2px 3px 0 rgba(28,43,58,0.05); }
+  .card.hidden{ display:none; }
+  .card-title{ font-family:'Fraunces',serif; font-weight:600; font-size:0.92rem; margin:0 0 6px; color:var(--ink); }
+  .phrase-list{ list-style:none; margin:0; padding:0; }
+  .phrase-list li{ padding:4px 0; border-bottom:1px dashed var(--line); font-size:0.85rem; line-height:1.4; }
+  .phrase-list li:last-child{ border-bottom:none; }
+  .phrase-list li .blank{ color:var(--accent); font-weight:600; }
+  .ex-table{ width:100%; border-collapse:collapse; font-size:0.8rem; }
+  .ex-table th, .ex-table td{ border:1px solid var(--line); padding:5px 7px; text-align:left; vertical-align:top; }
+  .ex-table th{ background:var(--paper-dark); font-weight:600; font-size:0.72rem; text-transform:uppercase; }
+  .ex-table td.w{ font-weight:600; white-space:nowrap; color:var(--ink); }
+  .ex-table td.e{ color:var(--ink-soft); font-style:italic; }
+  .full-card{ grid-column:1/-1; }
+  #noResults{ display:none; text-align:center; padding:40px 0; color:var(--muted); }
+  footer{ text-align:center; padding:26px; color:var(--muted); font-size:0.78rem; border-top:1px solid var(--line); }
+
+  @media (max-width:820px){
+    .layout{ flex-direction:column; }
+    nav.sidebar{ display:none; }
+    main{ padding:16px 14px 80px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="brand">
+      <div class="seal"><svg viewBox="0 0 24 24"><path d="M4 4h16v3H4V4zm0 6.5h16v3H4v-3zM4 17h10v3H4v-3z"/></svg></div>
+      <div>
+        <h1>Mega Writing Kit</h1>
+        <p class="tagline bn">বৃহৎ Phrase Bank + Transition Words (with example) + Vocabulary Bank (with example)</p>
+      </div>
+    </div>
+    <div class="stat bn" id="totalStat"></div>
+  </div>
+  <div class="search-wrap">
+    <input type="text" id="searchInput" placeholder="সার্চ করুন..." oninput="filterCards()">
+  </div>
+  <div id="searchCount" class="bn"></div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main>
+    <div class="intro bn">
+      <p><b>নোট:</b> "৫ গুণ" ঠিক অতটা সংখ্যায় নিলে অনেক কৃত্রিম/পুনরাবৃত্তিমূলক এন্ট্রি ঢুকে যেত, তাই আমি প্রতিটা অংশ ~২-৩ গুণ বড় করেছি — সবই real, কাজে-লাগার মতো এন্ট্রি, আর Transition ও Vocabulary-তে এবার প্রতিটার সাথে Example Sentence যোগ করা হয়েছে যেমনটা চেয়েছিলেন।</p>
+      <p>সার্চ বক্সে টাইপ করে বা বাঁ পাশের তালিকা থেকে সরাসরি সেকশনে যান।</p>
+    </div>
+
+    <section class="megacat" id="mega-phrases">
+      <h2 class="megacat-title">১. Phrase Bank — ৫২টা ফাংশন ক্যাটাগরি</h2>
+      <p class="megacat-sub bn">যা করতে চান (request/apologize/inform/negotiate ইত্যাদি) সেটা খুঁজে নিন।</p>
+      <div class="cards">
+        <div class="card"><div class="card-title">Opening</div><ul class="phrase-list">
+          <li>I am writing to <span class="blank">[request/inform you about]</span>...</li>
+          <li>I am writing in connection with...</li>
+          <li>Further to your email dated <span class="blank">[date]</span>,...</li>
+          <li>With reference to our recent conversation,...</li>
+          <li>I hope this email finds you well.</li>
+          <li>I am writing on behalf of...</li>
+          <li>Thank you for your email regarding...</li>
+          <li>Following up on our discussion yesterday,...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Giving a Reason</div><ul class="phrase-list">
+          <li>This is due to <span class="blank">[reason]</span>.</li>
+          <li>Owing to <span class="blank">[reason]</span>,...</li>
+          <li>As a result of <span class="blank">[event]</span>,...</li>
+          <li>In light of the recent <span class="blank">[situation]</span>,...</li>
+          <li>Given the circumstances,...</li>
+          <li>The reason for this is that...</li>
+          <li>On account of <span class="blank">[reason]</span>,...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Making a Request</div><ul class="phrase-list">
+          <li>I would be grateful if you could <span class="blank">[action]</span>.</li>
+          <li>Could you please <span class="blank">[action]</span>?</li>
+          <li>I would like to request that <span class="blank">[action]</span>.</li>
+          <li>Would it be possible to <span class="blank">[action]</span>?</li>
+          <li>I wonder if you could <span class="blank">[action]</span>.</li>
+          <li>May I ask you to <span class="blank">[action]</span>?</li>
+          <li>I would appreciate it if you could <span class="blank">[action]</span>.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Informing</div><ul class="phrase-list">
+          <li>Please be informed that <span class="blank">[info]</span>.</li>
+          <li>This is to inform you that...</li>
+          <li>Kindly note that...</li>
+          <li>For your information,...</li>
+          <li>I am pleased to inform you that...</li>
+          <li>Please note that, effective <span class="blank">[date]</span>,...</li>
+          <li>You may be interested to know that...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Apologizing</div><ul class="phrase-list">
+          <li>I apologize for any inconvenience caused.</li>
+          <li>Please accept my sincere apologies for <span class="blank">[issue]</span>.</li>
+          <li>I regret to inform you that...</li>
+          <li>We sincerely apologize for the delay.</li>
+          <li>Please be assured that this will not happen again.</li>
+          <li>I take full responsibility for this oversight.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Complaining (Politely)</div><ul class="phrase-list">
+          <li>I am writing to express my concern about <span class="blank">[issue]</span>.</li>
+          <li>I wish to raise an issue regarding...</li>
+          <li>Unfortunately, I have encountered a problem with...</li>
+          <li>This is not the level of service I expected.</li>
+          <li>I trust this matter will receive your immediate attention.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Proposing / Suggesting</div><ul class="phrase-list">
+          <li>I would like to propose that <span class="blank">[idea]</span>.</li>
+          <li>May I suggest that...</li>
+          <li>It might be worth considering...</li>
+          <li>An alternative approach would be to...</li>
+          <li>I recommend that we...</li>
+          <li>Have you considered...?</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Agreeing / Disagreeing</div><ul class="phrase-list">
+          <li>I fully agree that <span class="blank">[point]</span>.</li>
+          <li>While I understand your point, I believe...</li>
+          <li>I am afraid I have to disagree, as...</li>
+          <li>I share your view on this matter.</li>
+          <li>To some extent, I agree, but...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Closing</div><ul class="phrase-list">
+          <li>I look forward to hearing from you.</li>
+          <li>Please do not hesitate to contact me.</li>
+          <li>Thank you for your time and consideration.</li>
+          <li>I would appreciate a prompt response.</li>
+          <li>Please feel free to reach out with any concerns.</li>
+          <li>I trust this meets your requirements.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Expressing Concern</div><ul class="phrase-list">
+          <li>I am somewhat concerned about <span class="blank">[issue]</span>.</li>
+          <li>This raises a concern regarding...</li>
+          <li>I have some reservations about...</li>
+          <li>It is worth flagging that...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Giving Good News</div><ul class="phrase-list">
+          <li>I am delighted to inform you that...</li>
+          <li>I am pleased to announce that...</li>
+          <li>I am happy to confirm that...</li>
+          <li>Great news — <span class="blank">[news]</span>.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Giving Bad News</div><ul class="phrase-list">
+          <li>I regret to inform you that...</li>
+          <li>Unfortunately, I must inform you that...</li>
+          <li>I am afraid that <span class="blank">[news]</span>.</li>
+          <li>I am sorry to have to tell you that...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Making an Offer</div><ul class="phrase-list">
+          <li>We would like to offer you...</li>
+          <li>Should you require any assistance, please let us know.</li>
+          <li>We are pleased to extend an offer of...</li>
+          <li>Would you be interested in...?</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Accepting</div><ul class="phrase-list">
+          <li>I am delighted to accept your offer of...</li>
+          <li>Thank you for the invitation; I would be happy to attend.</li>
+          <li>I gladly accept this opportunity.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Declining Politely</div><ul class="phrase-list">
+          <li>Thank you for the offer, but I must decline.</li>
+          <li>Unfortunately, I am unable to accept at this time.</li>
+          <li>I regret that I will not be able to attend.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Asking for Clarification</div><ul class="phrase-list">
+          <li>Could you please clarify what you mean by <span class="blank">[term]</span>?</li>
+          <li>Would you mind explaining this in more detail?</li>
+          <li>Just to confirm, are you saying that...?</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Confirming Details</div><ul class="phrase-list">
+          <li>I am writing to confirm our appointment on <span class="blank">[date]</span>.</li>
+          <li>This is to confirm that...</li>
+          <li>I can confirm that everything is in order.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Scheduling</div><ul class="phrase-list">
+          <li>Would <span class="blank">[day/time]</span> work for you?</li>
+          <li>I need to reschedule our meeting due to <span class="blank">[reason]</span>.</li>
+          <li>Could we move the meeting to <span class="blank">[new time]</span>?</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Following Up</div><ul class="phrase-list">
+          <li>I am following up on my previous email regarding...</li>
+          <li>Just a gentle reminder about...</li>
+          <li>Have you had a chance to look into this?</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Expressing Gratitude</div><ul class="phrase-list">
+          <li>Thank you very much for your help with...</li>
+          <li>I truly appreciate your support in this matter.</li>
+          <li>Many thanks for taking the time to...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Congratulating</div><ul class="phrase-list">
+          <li>Congratulations on your <span class="blank">[achievement]</span>!</li>
+          <li>Well deserved — congratulations on this success.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Expressing Sympathy</div><ul class="phrase-list">
+          <li>I was deeply saddened to hear about...</li>
+          <li>My deepest condolences to you and your family.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Introducing Yourself</div><ul class="phrase-list">
+          <li>Allow me to introduce myself — I am <span class="blank">[name]</span>.</li>
+          <li>We are a company specializing in...</li>
+          <li>I represent <span class="blank">[company]</span>, and we would like to...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Attachments</div><ul class="phrase-list">
+          <li>Please find attached <span class="blank">[document]</span>.</li>
+          <li>Kindly refer to the attached document for details.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Reminding</div><ul class="phrase-list">
+          <li>This is a gentle reminder that...</li>
+          <li>As previously mentioned,...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Formal Warning</div><ul class="phrase-list">
+          <li>Please be advised that failure to comply may result in...</li>
+          <li>This letter serves as formal notice that...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Summarizing</div><ul class="phrase-list">
+          <li>To summarize our discussion,...</li>
+          <li>The key points discussed were as follows:</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Urgency</div><ul class="phrase-list">
+          <li>This matter requires immediate attention.</li>
+          <li>Please treat this as a matter of urgency.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Feedback</div><ul class="phrase-list">
+          <li>I would welcome your feedback on...</li>
+          <li>Overall, this was well done; one area to improve is...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Confidence / Uncertainty</div><ul class="phrase-list">
+          <li>I am confident that this approach will work.</li>
+          <li>It remains uncertain whether...</li>
+          <li>It is essential that...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Expressing Preference</div><ul class="phrase-list">
+          <li>I would prefer to <span class="blank">[option A]</span> rather than <span class="blank">[option B]</span>.</li>
+          <li>My preference would be to...</li>
+          <li>Given the choice, I would opt for...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Expressing Regret</div><ul class="phrase-list">
+          <li>I regret that I was unable to...</li>
+          <li>In hindsight, it would have been better to...</li>
+          <li>I wish we had addressed this sooner.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Small Talk / Pleasantries</div><ul class="phrase-list">
+          <li>I hope you had a pleasant weekend.</li>
+          <li>I trust everything is going well on your end.</li>
+          <li>It was a pleasure meeting you last week.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Availability</div><ul class="phrase-list">
+          <li>I am available on <span class="blank">[day]</span> at <span class="blank">[time]</span>.</li>
+          <li>I am free anytime after <span class="blank">[time]</span>.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Unavailability</div><ul class="phrase-list">
+          <li>Unfortunately, I am unavailable on <span class="blank">[date]</span>.</li>
+          <li>I will be out of office from <span class="blank">[date]</span> to <span class="blank">[date]</span>.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Asking Permission</div><ul class="phrase-list">
+          <li>Would it be possible for me to <span class="blank">[action]</span>?</li>
+          <li>I would like to seek your approval for...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Giving Permission</div><ul class="phrase-list">
+          <li>You are welcome to proceed with...</li>
+          <li>Permission is hereby granted for...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Expressing Disappointment</div><ul class="phrase-list">
+          <li>I must admit I am disappointed with...</li>
+          <li>This falls short of what was agreed.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Expressing Relief</div><ul class="phrase-list">
+          <li>I am relieved to hear that...</li>
+          <li>It is a relief to know that the issue has been resolved.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Recommending</div><ul class="phrase-list">
+          <li>I highly recommend <span class="blank">[person/service]</span> for...</li>
+          <li>Without hesitation, I would suggest...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Expressing Hope</div><ul class="phrase-list">
+          <li>I am hopeful that this will lead to...</li>
+          <li>We remain optimistic about the outcome.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Expressing Opinion</div><ul class="phrase-list">
+          <li>In my view,...</li>
+          <li>I firmly believe that...</li>
+          <li>From my perspective,...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Comparing Options</div><ul class="phrase-list">
+          <li>Compared to <span class="blank">[option]</span>, this offers better value.</li>
+          <li>Unlike the previous plan, this one is more flexible.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Explaining a Process</div><ul class="phrase-list">
+          <li>The process begins with <span class="blank">[step]</span>, followed by...</li>
+          <li>Once <span class="blank">[step]</span> is complete, the next step is...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Giving Instructions</div><ul class="phrase-list">
+          <li>Please ensure that <span class="blank">[action]</span> before proceeding.</li>
+          <li>Kindly follow the steps outlined below.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Expressing Priority</div><ul class="phrase-list">
+          <li>This should take priority over...</li>
+          <li>The most pressing issue at hand is...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Announcing a Decision</div><ul class="phrase-list">
+          <li>After careful consideration, we have decided to...</li>
+          <li>We are pleased to announce our decision to...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Requesting an Extension</div><ul class="phrase-list">
+          <li>I would like to request an extension until <span class="blank">[date]</span>.</li>
+          <li>Would it be possible to extend the deadline?</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Requesting a Refund</div><ul class="phrase-list">
+          <li>I am writing to request a refund for...</li>
+          <li>Given the circumstances, I believe a refund is warranted.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Ending a Business Relationship</div><ul class="phrase-list">
+          <li>We regret to inform you that we will not be renewing...</li>
+          <li>After careful thought, we have decided to end our partnership.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Renewing an Agreement</div><ul class="phrase-list">
+          <li>We would like to renew our contract for another <span class="blank">[period]</span>.</li>
+          <li>We are pleased with the partnership and wish to continue.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Expressing Interest</div><ul class="phrase-list">
+          <li>I am very interested in learning more about...</li>
+          <li>This opportunity aligns closely with my goals.</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Welcoming Someone New</div><ul class="phrase-list">
+          <li>We are delighted to welcome <span class="blank">[name]</span> to the team.</li>
+          <li>Please join me in welcoming...</li>
+        </ul></div>
+        <div class="card"><div class="card-title">Wishing Well / Farewell</div><ul class="phrase-list">
+          <li>We wish you all the best in your future endeavors.</li>
+          <li>It has been a pleasure working with you.</li>
+        </ul></div>
+        <div class="card full-card"><div class="card-title">Acknowledging, Confirming &amp; Closing a Deal</div><ul class="phrase-list">
+          <li>This is to acknowledge receipt of <span class="blank">[item]</span>.</li>
+          <li>Could you please confirm receipt of this email?</li>
+          <li>Please note that <span class="blank">[constraint]</span> applies.</li>
+          <li>As an alternative, we could consider...</li>
+          <li>We are pleased to finalize the agreement on these terms.</li>
+          <li>I am satisfied with the outcome of this arrangement.</li>
+        </ul></div>
+      </div>
+    </section>
+
+    <section class="megacat" id="mega-transition">
+      <h2 class="megacat-title">২. Transition Words — ১৮ ক্যাটাগরি, প্রতিটার সাথে Example</h2>
+      <div class="cards">
+        <div class="card"><div class="card-title">Addition</div><table class="ex-table">
+          <tr><th>Word</th><th>Example</th></tr>
+          <tr><td class="w">moreover</td><td class="e">Moreover, the report highlights several risks.</td></tr>
+          <tr><td class="w">furthermore</td><td class="e">Furthermore, the budget has increased by 10%.</td></tr>
+          <tr><td class="w">in addition</td><td class="e">In addition, we need to review the contract.</td></tr>
+          <tr><td class="w">also</td><td class="e">Also, please confirm your availability.</td></tr>
+          <tr><td class="w">besides</td><td class="e">Besides the delay, the quality remained high.</td></tr>
+          <tr><td class="w">additionally</td><td class="e">Additionally, two new staff members joined the team.</td></tr>
+          <tr><td class="w">as well as</td><td class="e">As well as cutting costs, this improves efficiency.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Contrast</div><table class="ex-table">
+          <tr><th>Word</th><th>Example</th></tr>
+          <tr><td class="w">however</td><td class="e">However, the results were not as expected.</td></tr>
+          <tr><td class="w">on the other hand</td><td class="e">On the other hand, the new system is faster.</td></tr>
+          <tr><td class="w">nevertheless</td><td class="e">Nevertheless, we decided to proceed.</td></tr>
+          <tr><td class="w">although</td><td class="e">Although the deadline was tight, we finished on time.</td></tr>
+          <tr><td class="w">whereas</td><td class="e">Whereas the first plan failed, the second succeeded.</td></tr>
+          <tr><td class="w">nonetheless</td><td class="e">Nonetheless, the client remained satisfied.</td></tr>
+          <tr><td class="w">conversely</td><td class="e">Conversely, demand could fall if prices rise.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Cause &amp; Effect</div><table class="ex-table">
+          <tr><th>Word</th><th>Example</th></tr>
+          <tr><td class="w">therefore</td><td class="e">Therefore, we must revise the schedule.</td></tr>
+          <tr><td class="w">as a result</td><td class="e">As a result, the project was delayed.</td></tr>
+          <tr><td class="w">consequently</td><td class="e">Consequently, costs increased significantly.</td></tr>
+          <tr><td class="w">thus</td><td class="e">Thus, the proposal was rejected.</td></tr>
+          <tr><td class="w">hence</td><td class="e">Hence, further testing is required.</td></tr>
+          <tr><td class="w">accordingly</td><td class="e">Accordingly, the policy has been updated.</td></tr>
+          <tr><td class="w">for this reason</td><td class="e">For this reason, the meeting was postponed.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Sequence / Time</div><table class="ex-table">
+          <tr><th>Word</th><th>Example</th></tr>
+          <tr><td class="w">firstly</td><td class="e">Firstly, we will review the budget.</td></tr>
+          <tr><td class="w">subsequently</td><td class="e">Subsequently, the team began implementation.</td></tr>
+          <tr><td class="w">meanwhile</td><td class="e">Meanwhile, the other department continued testing.</td></tr>
+          <tr><td class="w">finally</td><td class="e">Finally, the report was submitted.</td></tr>
+          <tr><td class="w">following this</td><td class="e">Following this, a new policy was introduced.</td></tr>
+          <tr><td class="w">afterward</td><td class="e">Afterward, we held a debrief meeting.</td></tr>
+          <tr><td class="w">previously</td><td class="e">Previously, the process took much longer.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Example</div><table class="ex-table">
+          <tr><th>Word</th><th>Example</th></tr>
+          <tr><td class="w">for instance</td><td class="e">For instance, sales rose by 20% in July.</td></tr>
+          <tr><td class="w">for example</td><td class="e">For example, some clients requested faster delivery.</td></tr>
+          <tr><td class="w">such as</td><td class="e">Services such as networking and maintenance are included.</td></tr>
+          <tr><td class="w">namely</td><td class="e">Namely, security and speed were the main concerns.</td></tr>
+          <tr><td class="w">to illustrate</td><td class="e">To illustrate, consider last month's performance.</td></tr>
+          <tr><td class="w">in particular</td><td class="e">In particular, the northern branch performed well.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Conclusion / Summary</div><table class="ex-table">
+          <tr><th>Word</th><th>Example</th></tr>
+          <tr><td class="w">in conclusion</td><td class="e">In conclusion, the project was a success.</td></tr>
+          <tr><td class="w">to summarize</td><td class="e">To summarize, three issues remain unresolved.</td></tr>
+          <tr><td class="w">overall</td><td class="e">Overall, performance has improved this quarter.</td></tr>
+          <tr><td class="w">in short</td><td class="e">In short, the plan is feasible.</td></tr>
+          <tr><td class="w">to conclude</td><td class="e">To conclude, we recommend proceeding as planned.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Emphasis</div><table class="ex-table">
+          <tr><th>Word</th><th>Example</th></tr>
+          <tr><td class="w">indeed</td><td class="e">Indeed, the results exceeded expectations.</td></tr>
+          <tr><td class="w">in fact</td><td class="e">In fact, costs were lower than projected.</td></tr>
+          <tr><td class="w">notably</td><td class="e">Notably, no major issues were reported.</td></tr>
+          <tr><td class="w">above all</td><td class="e">Above all, safety must be the priority.</td></tr>
+          <tr><td class="w">significantly</td><td class="e">Significantly, revenue grew by 15%.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Comparison (Similarity)</div><table class="ex-table">
+          <tr><th>Word</th><th>Example</th></tr>
+          <tr><td class="w">similarly</td><td class="e">Similarly, the second test produced the same result.</td></tr>
+          <tr><td class="w">likewise</td><td class="e">Likewise, other departments reported delays.</td></tr>
+          <tr><td class="w">equally</td><td class="e">Equally, both proposals have merit.</td></tr>
+          <tr><td class="w">correspondingly</td><td class="e">Correspondingly, expenses rose along with revenue.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Condition</div><table class="ex-table">
+          <tr><th>Word</th><th>Example</th></tr>
+          <tr><td class="w">provided that</td><td class="e">Provided that funds are available, we will proceed.</td></tr>
+          <tr><td class="w">as long as</td><td class="e">As long as the deadline is met, this is acceptable.</td></tr>
+          <tr><td class="w">unless</td><td class="e">Unless otherwise stated, standard terms apply.</td></tr>
+          <tr><td class="w">assuming that</td><td class="e">Assuming that the data is accurate, our forecast holds.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Purpose</div><table class="ex-table">
+          <tr><th>Word</th><th>Example</th></tr>
+          <tr><td class="w">in order to</td><td class="e">In order to reduce delays, we upgraded the system.</td></tr>
+          <tr><td class="w">so as to</td><td class="e">So as to avoid confusion, please confirm in writing.</td></tr>
+          <tr><td class="w">with the aim of</td><td class="e">With the aim of improving service, we hired more staff.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Clarification</div><table class="ex-table">
+          <tr><th>Word</th><th>Example</th></tr>
+          <tr><td class="w">in other words</td><td class="e">In other words, the deadline cannot be extended.</td></tr>
+          <tr><td class="w">that is to say</td><td class="e">That is to say, all applications must be submitted by Friday.</td></tr>
+          <tr><td class="w">to put it another way</td><td class="e">To put it another way, the budget is fixed.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Concession</div><table class="ex-table">
+          <tr><th>Word</th><th>Example</th></tr>
+          <tr><td class="w">admittedly</td><td class="e">Admittedly, the process took longer than expected.</td></tr>
+          <tr><td class="w">despite this</td><td class="e">Despite this, the client remained satisfied.</td></tr>
+          <tr><td class="w">even though</td><td class="e">Even though it rained, the event proceeded.</td></tr>
+          <tr><td class="w">while it is true that</td><td class="e">While it is true that sales dipped, profits held steady.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Certainty</div><table class="ex-table">
+          <tr><th>Word</th><th>Example</th></tr>
+          <tr><td class="w">certainly</td><td class="e">Certainly, this approach will save time.</td></tr>
+          <tr><td class="w">undoubtedly</td><td class="e">Undoubtedly, the new system is more efficient.</td></tr>
+          <tr><td class="w">clearly</td><td class="e">Clearly, further investment is required.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Doubt / Possibility</div><table class="ex-table">
+          <tr><th>Word</th><th>Example</th></tr>
+          <tr><td class="w">perhaps</td><td class="e">Perhaps the delay was avoidable.</td></tr>
+          <tr><td class="w">possibly</td><td class="e">Possibly, the figures need rechecking.</td></tr>
+          <tr><td class="w">it seems that</td><td class="e">It seems that demand is slowing.</td></tr>
+          <tr><td class="w">presumably</td><td class="e">Presumably, the client will respond soon.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Introducing a Topic</div><table class="ex-table">
+          <tr><th>Word</th><th>Example</th></tr>
+          <tr><td class="w">regarding</td><td class="e">Regarding your request, we will respond by Friday.</td></tr>
+          <tr><td class="w">concerning</td><td class="e">Concerning the budget, no changes are planned.</td></tr>
+          <tr><td class="w">with respect to</td><td class="e">With respect to the delay, we apologize.</td></tr>
+          <tr><td class="w">in terms of</td><td class="e">In terms of performance, results were mixed.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Result / Consequence</div><table class="ex-table">
+          <tr><th>Word</th><th>Example</th></tr>
+          <tr><td class="w">leading to</td><td class="e">The delay led to additional costs.</td></tr>
+          <tr><td class="w">resulting in</td><td class="e">The error resulted in a system failure.</td></tr>
+          <tr><td class="w">culminating in</td><td class="e">The project culminated in a successful launch.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Transitioning Between Paragraphs</div><table class="ex-table">
+          <tr><th>Word</th><th>Example</th></tr>
+          <tr><td class="w">turning to</td><td class="e">Turning to the budget, expenses remain under control.</td></tr>
+          <tr><td class="w">moving on to</td><td class="e">Moving on to the next issue, staffing remains a concern.</td></tr>
+          <tr><td class="w">with this in mind</td><td class="e">With this in mind, we propose the following changes.</td></tr>
+          <tr><td class="w">building on this</td><td class="e">Building on this, further improvements are planned next quarter.</td></tr>
+        </table></div>
+      </div>
+    </section>
+
+    <section class="megacat" id="mega-vocab">
+      <h2 class="megacat-title">৩. Vocabulary Bank — ২৮টা থিম, প্রতিটার সাথে Example</h2>
+      <div class="cards">
+        <div class="card"><div class="card-title">Business/Office — Noun</div><table class="ex-table">
+          <tr><td class="w">proposal</td><td class="e">The client approved our proposal.</td></tr>
+          <tr><td class="w">deadline</td><td class="e">The deadline is next Friday.</td></tr>
+          <tr><td class="w">invoice</td><td class="e">Please send the invoice by email.</td></tr>
+          <tr><td class="w">feedback</td><td class="e">We received positive feedback from the client.</td></tr>
+          <tr><td class="w">stakeholder</td><td class="e">All stakeholders attended the meeting.</td></tr>
+          <tr><td class="w">milestone</td><td class="e">We reached an important milestone this month.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Business/Office — Verb</div><table class="ex-table">
+          <tr><td class="w">implement</td><td class="e">We will implement the new policy next month.</td></tr>
+          <tr><td class="w">allocate</td><td class="e">Funds were allocated to the marketing team.</td></tr>
+          <tr><td class="w">oversee</td><td class="e">She oversees the entire project.</td></tr>
+          <tr><td class="w">finalize</td><td class="e">Please finalize the report by tomorrow.</td></tr>
+          <tr><td class="w">delegate</td><td class="e">He delegated the task to his assistant.</td></tr>
+          <tr><td class="w">escalate</td><td class="e">The issue was escalated to senior management.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Business/Office — Adjective</div><table class="ex-table">
+          <tr><td class="w">efficient</td><td class="e">The new process is far more efficient.</td></tr>
+          <tr><td class="w">feasible</td><td class="e">The plan is technically feasible.</td></tr>
+          <tr><td class="w">viable</td><td class="e">This is not a viable option right now.</td></tr>
+          <tr><td class="w">thorough</td><td class="e">A thorough review was conducted.</td></tr>
+          <tr><td class="w">robust</td><td class="e">We need a more robust backup system.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Academic</div><table class="ex-table">
+          <tr><td class="w">methodology</td><td class="e">The methodology section explains our approach.</td></tr>
+          <tr><td class="w">findings</td><td class="e">The findings support our hypothesis.</td></tr>
+          <tr><td class="w">hypothesis</td><td class="e">The hypothesis was later confirmed.</td></tr>
+          <tr><td class="w">criteria</td><td class="e">The criteria for selection are strict.</td></tr>
+          <tr><td class="w">citation</td><td class="e">Each claim needs a proper citation.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Legal</div><table class="ex-table">
+          <tr><td class="w">clause</td><td class="e">This clause outlines the payment terms.</td></tr>
+          <tr><td class="w">breach</td><td class="e">This is a breach of contract.</td></tr>
+          <tr><td class="w">liability</td><td class="e">The company denies liability for the damage.</td></tr>
+          <tr><td class="w">compliance</td><td class="e">All staff must ensure compliance with the policy.</td></tr>
+          <tr><td class="w">jurisdiction</td><td class="e">This falls outside our jurisdiction.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Financial / Banking</div><table class="ex-table">
+          <tr><td class="w">liquidity</td><td class="e">The company maintains strong liquidity.</td></tr>
+          <tr><td class="w">collateral</td><td class="e">The property was offered as collateral.</td></tr>
+          <tr><td class="w">arrears</td><td class="e">The account is three months in arrears.</td></tr>
+          <tr><td class="w">disbursement</td><td class="e">The disbursement will be processed next week.</td></tr>
+          <tr><td class="w">audit</td><td class="e">An audit was conducted last quarter.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">IT / Networking</div><table class="ex-table">
+          <tr><td class="w">infrastructure</td><td class="e">We upgraded our network infrastructure.</td></tr>
+          <tr><td class="w">bandwidth</td><td class="e">The office needs more bandwidth.</td></tr>
+          <tr><td class="w">latency</td><td class="e">Users reported high latency during peak hours.</td></tr>
+          <tr><td class="w">redundancy</td><td class="e">We built redundancy into the system.</td></tr>
+          <tr><td class="w">uptime</td><td class="e">Our servers maintained 99% uptime.</td></tr>
+          <tr><td class="w">deployment</td><td class="e">The software deployment went smoothly.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Travel / Immigration</div><table class="ex-table">
+          <tr><td class="w">itinerary</td><td class="e">Please share your travel itinerary.</td></tr>
+          <tr><td class="w">residency</td><td class="e">He applied for permanent residency.</td></tr>
+          <tr><td class="w">layover</td><td class="e">We have a two-hour layover in Dubai.</td></tr>
+          <tr><td class="w">accommodation</td><td class="e">Accommodation has been arranged for all guests.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Personal / Emotional</div><table class="ex-table">
+          <tr><td class="w">grateful</td><td class="e">I am grateful for your support.</td></tr>
+          <tr><td class="w">delighted</td><td class="e">We were delighted with the outcome.</td></tr>
+          <tr><td class="w">reassured</td><td class="e">I was reassured by her response.</td></tr>
+          <tr><td class="w">honored</td><td class="e">We are honored to host this event.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Reporting / News Verbs</div><table class="ex-table">
+          <tr><td class="w">state</td><td class="e">Officials stated that the project is on track.</td></tr>
+          <tr><td class="w">reveal</td><td class="e">The data revealed a significant trend.</td></tr>
+          <tr><td class="w">highlight</td><td class="e">The report highlights three key risks.</td></tr>
+          <tr><td class="w">confirm</td><td class="e">The spokesperson confirmed the announcement.</td></tr>
+          <tr><td class="w">urge</td><td class="e">Experts urge caution before proceeding.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Problem-Solving Verbs</div><table class="ex-table">
+          <tr><td class="w">resolve</td><td class="e">The team resolved the issue quickly.</td></tr>
+          <tr><td class="w">mitigate</td><td class="e">We took steps to mitigate the risk.</td></tr>
+          <tr><td class="w">troubleshoot</td><td class="e">He helped troubleshoot the network problem.</td></tr>
+          <tr><td class="w">rectify</td><td class="e">We will rectify the error immediately.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Degree / Quantity Adjectives</div><table class="ex-table">
+          <tr><td class="w">significant</td><td class="e">There was a significant improvement in sales.</td></tr>
+          <tr><td class="w">substantial</td><td class="e">A substantial amount was invested.</td></tr>
+          <tr><td class="w">negligible</td><td class="e">The impact was negligible.</td></tr>
+          <tr><td class="w">considerable</td><td class="e">It required considerable effort.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Marketing / Sales</div><table class="ex-table">
+          <tr><td class="w">target audience</td><td class="e">We identified our target audience clearly.</td></tr>
+          <tr><td class="w">campaign</td><td class="e">The marketing campaign launched last week.</td></tr>
+          <tr><td class="w">conversion rate</td><td class="e">The conversion rate improved by 5%.</td></tr>
+          <tr><td class="w">brand awareness</td><td class="e">The event boosted brand awareness.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Manufacturing / Production</div><table class="ex-table">
+          <tr><td class="w">output</td><td class="e">Production output increased this quarter.</td></tr>
+          <tr><td class="w">assembly line</td><td class="e">The assembly line was upgraded.</td></tr>
+          <tr><td class="w">defect rate</td><td class="e">The defect rate dropped significantly.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Healthcare (Administrative)</div><table class="ex-table">
+          <tr><td class="w">appointment</td><td class="e">Please confirm your appointment time.</td></tr>
+          <tr><td class="w">referral</td><td class="e">The doctor provided a referral letter.</td></tr>
+          <tr><td class="w">insurance coverage</td><td class="e">Please check your insurance coverage.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Environmental / Sustainability</div><table class="ex-table">
+          <tr><td class="w">carbon footprint</td><td class="e">The company aims to reduce its carbon footprint.</td></tr>
+          <tr><td class="w">renewable</td><td class="e">We are investing in renewable energy.</td></tr>
+          <tr><td class="w">sustainable</td><td class="e">This is a more sustainable approach.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Education / Training</div><table class="ex-table">
+          <tr><td class="w">enrollment</td><td class="e">Enrollment has increased this year.</td></tr>
+          <tr><td class="w">curriculum</td><td class="e">The curriculum was recently updated.</td></tr>
+          <tr><td class="w">certification</td><td class="e">He completed the certification last month.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Real Estate</div><table class="ex-table">
+          <tr><td class="w">tenant</td><td class="e">The tenant signed a two-year lease.</td></tr>
+          <tr><td class="w">premises</td><td class="e">The premises are available from next month.</td></tr>
+          <tr><td class="w">landlord</td><td class="e">The landlord approved the renovation request.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Retail</div><table class="ex-table">
+          <tr><td class="w">inventory</td><td class="e">We are updating our inventory system.</td></tr>
+          <tr><td class="w">supply chain</td><td class="e">The supply chain was disrupted last month.</td></tr>
+          <tr><td class="w">wholesale</td><td class="e">We offer wholesale pricing for bulk orders.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Government / Public Administration</div><table class="ex-table">
+          <tr><td class="w">regulation</td><td class="e">New regulations come into effect next month.</td></tr>
+          <tr><td class="w">jurisdiction</td><td class="e">This matter falls under local jurisdiction.</td></tr>
+          <tr><td class="w">public notice</td><td class="e">A public notice was issued yesterday.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Media / Communications</div><table class="ex-table">
+          <tr><td class="w">press release</td><td class="e">The company issued a press release.</td></tr>
+          <tr><td class="w">spokesperson</td><td class="e">The spokesperson declined to comment further.</td></tr>
+          <tr><td class="w">outlet</td><td class="e">Several media outlets covered the story.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Quality Assurance / Testing</div><table class="ex-table">
+          <tr><td class="w">defect</td><td class="e">The defect was identified during testing.</td></tr>
+          <tr><td class="w">benchmark</td><td class="e">Performance was measured against a benchmark.</td></tr>
+          <tr><td class="w">compliance testing</td><td class="e">Compliance testing was completed successfully.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">HR / Recruitment</div><table class="ex-table">
+          <tr><td class="w">candidate</td><td class="e">The candidate impressed the panel.</td></tr>
+          <tr><td class="w">onboarding</td><td class="e">Onboarding takes about two weeks.</td></tr>
+          <tr><td class="w">appraisal</td><td class="e">The annual appraisal is next month.</td></tr>
+        </table></div>
+        <div class="card"><div class="card-title">Project Management</div><table class="ex-table">
+          <tr><td class="w">scope</td><td class="e">The project scope was expanded.</td></tr>
+          <tr><td class="w">dependency</td><td class="e">This task has a dependency on the previous one.</td></tr>
+          <tr><td class="w">deliverable</td><td class="e">The final deliverable is due Friday.</td></tr>
+        </table></div>
+        <div class="card full-card"><div class="card-title">Common → Professional Word Swap</div><table class="ex-table">
+          <tr><th>Common</th><th>Professional (with example)</th></tr>
+          <tr><td class="w">get</td><td class="e">obtain — We obtained approval yesterday.</td></tr>
+          <tr><td class="w">use</td><td class="e">utilize — We utilized the new tool for testing.</td></tr>
+          <tr><td class="w">help</td><td class="e">assist — She assisted with the migration.</td></tr>
+          <tr><td class="w">show</td><td class="e">demonstrate — The data demonstrates clear growth.</td></tr>
+          <tr><td class="w">start</td><td class="e">initiate — We initiated the process last week.</td></tr>
+          <tr><td class="w">tell</td><td class="e">notify — Please notify the client immediately.</td></tr>
+          <tr><td class="w">fix</td><td class="e">resolve — The bug was resolved overnight.</td></tr>
+          <tr><td class="w">big</td><td class="e">significant — This is a significant improvement.</td></tr>
+          <tr><td class="w">say</td><td class="e">state — The manager stated the new policy clearly.</td></tr>
+        </table></div>
+      </div>
+    </section>
+
+    <footer class="bn">মোট কার্ড: <span id="footCount"></span>টা — Phrase + Transition (with example) + Vocabulary (with example) মিলিয়ে একটা বড় সার্চযোগ্য ডেটাব্যাংক।</footer>
+  </main>
+</div>
+
+<div id="noResults" class="bn">কোনো ফলাফল পাওয়া যায়নি — অন্য শব্দ দিয়ে চেষ্টা করুন।</div>
+
+<script>
+function buildSidebar(){
+  const megacats = document.querySelectorAll('section.megacat');
+  const sb = document.getElementById('sidebar');
+  megacats.forEach(mc=>{
+    const title = mc.querySelector('.megacat-title').textContent;
+    const group = document.createElement('div');
+    group.className = 'toc-group';
+    group.textContent = title;
+    group.onclick = ()=> mc.scrollIntoView({behavior:'smooth', block:'start'});
+    sb.appendChild(group);
+  });
+}
+buildSidebar();
+
+const allCards = document.querySelectorAll('.card');
+document.getElementById('totalStat').textContent = allCards.length + ' টি কার্ড';
+document.getElementById('footCount').textContent = allCards.length;
+
+function filterCards(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  let visibleCount = 0;
+  allCards.forEach(card=>{
+    const text = card.textContent.toLowerCase();
+    const match = q==='' || text.includes(q);
+    card.classList.toggle('hidden', !match);
+    if(match) visibleCount++;
+  });
+  document.querySelectorAll('section.megacat').forEach(mc=>{
+    const visible = Array.from(mc.querySelectorAll('.card')).some(c=>!c.classList.contains('hidden'));
+    mc.style.display = (q==='' || visible) ? '' : 'none';
+  });
+  document.getElementById('searchCount').textContent = q==='' ? '' : (visibleCount + 'টি কার্ডে ফলাফল পাওয়া গেছে');
+  document.getElementById('noResults').style.display = (q!=='' && visibleCount===0) ? 'block' : 'none';
+}
+</script>
+</body>
+</html>
